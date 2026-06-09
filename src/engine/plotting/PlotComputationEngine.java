@@ -1,4 +1,4 @@
-package engine.Graphing;
+package engine.plotting;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -11,10 +11,6 @@ import core.math.RootFindingAlgorithms.HybridSolvers;
 import core.model.CurveData;
 import core.model.Segment2D;
 import core.model.ViewportState;
-import engine.plotting.FunctionPlot;
-import engine.plotting.ODEPlot;
-import engine.plotting.ParametricPlot;
-import engine.plotting.Plot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.effect.Light.Point;

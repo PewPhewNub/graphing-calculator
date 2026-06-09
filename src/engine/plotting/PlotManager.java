@@ -1,21 +1,17 @@
-package engine.Graphing;
+package engine.plotting;
 
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
 import core.model.CurveData;
 import core.model.ViewportState;
-import engine.plotting.FunctionPlot;
-import engine.plotting.ODEPlot;
-import engine.plotting.ParametricPlot;
-import engine.plotting.Plot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 
 public class PlotManager{
     public ArrayList<Plot> plots;
-    ArrayList<CurveData> curveCache;
-    ArrayList<Point2D> featureCache;
+    public ArrayList<CurveData> curveCache;
+    public ArrayList<Point2D> featureCache;
     boolean dirty;
 
     public PlotManager(){

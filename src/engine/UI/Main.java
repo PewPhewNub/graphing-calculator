@@ -1,10 +1,10 @@
 package engine.UI;
 
 import core.math.Core.Point;
-import engine.Graphing.Graph;
 import engine.plotting.FunctionPlot;
 import engine.plotting.ODEPlot;
 import engine.plotting.ParametricPlot;
+import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;

@@ -1,17 +1,15 @@
-package engine.Graphing;
+package engine.plotting;
 
 import java.util.ArrayList;
 
-import engine.plotting.ODEPlot;
-import engine.plotting.Plot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 public class PlotInteractionController {
     Plot selectedPlot;
-    Point2D inspectionPoint;
-    Color currentColor;
+    public Point2D inspectionPoint;
+    public Color currentColor;
 
     public PlotInteractionController(){
         reset();

@@ -1,12 +1,12 @@
-package engine.Graphing;
+package engine.rendering;
 
 import core.model.CameraIntent;
 import core.model.CurveData;
 import core.model.GridData;
 import core.model.ViewportState;
-import engine.rendering.CameraSystem;
-import engine.rendering.Renderer;
-import engine.rendering.Viewport;
+import engine.UI.InputController;
+import engine.plotting.PlotInteractionController;
+import engine.plotting.PlotManager;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;

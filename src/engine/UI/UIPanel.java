@@ -1,6 +1,6 @@
 package engine.UI;
 
-import engine.Graphing.Graph;
+import engine.rendering.Graph;
 import javafx.scene.layout.VBox;
 
 public class UIPanel extends VBox {
