@@ -1,0 +1,67 @@
+package Simulation.Plot;
+
+import java.util.function.Function;
+
+import Simulation.Graphing.Viewport;
+import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
+
+public class FunctionPlot implements Plot, RootFindable{
+
+    Function<Double, Double> function;
+    Color color;
+    String name;
+    public FunctionPlot(String name, Function<Double, Double> f, Color color){
+        function = f;
+        this.name = name;
+        this.color = color;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public Color getColor() {
+        return color;
+    }
+    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
+        return new Point2D(worldX, function.apply(worldX));
+    }
+    public double distanceSquaredFrom(double x0, double y0, Viewport viewport) {
+        double minDist2 = Double.POSITIVE_INFINITY;
+        double worldMinX = viewport.screenToWorldX(0);
+        double worldMaxX = viewport.screenToWorldX(viewport.width);
+        double mouseX = viewport.worldToScreenX(x0);
+        double mouseY = viewport.worldToScreenY(y0);
+
+        int samples = (int)viewport.width; // 1 sample per pixel (good UX baseline)
+        
+        for (int i = 0; i < samples; i++) {
+
+            double x = worldMinX + (worldMaxX - worldMinX) * (i / (double) samples);
+
+            double y = function.apply(x);
+            if (!Double.isFinite(y)) continue;
+
+            double dx = viewport.worldToScreenX(x) - mouseX;
+            double dy = viewport.worldToScreenY(y) - mouseY;
+
+            double dist2 = dx * dx + dy * dy;
+
+            if (dist2 < minDist2) {
+                minDist2 = dist2;
+            }
+        }
+        return minDist2;
+    }
+
+    @Override
+    public Function<Double, Double> getFunction() {
+        return function;
+    }
+
+    public boolean contains(Point2D point){
+        double pointX = point.getX();
+        double pointY = point.getY();
+        return pointY - function.apply(pointX) < 1e-7;
+    }
+}
