@@ -157,15 +157,13 @@ public class Renderer {
     public void drawCurveSegmented(ArrayList<Segment2D> list, Color color){
         if(list.isEmpty()) return;
         gc.setStroke(color);
-        gc.setLineWidth(2);
+        gc.setLineWidth(2.5);
         gc.beginPath();
         for(Segment2D i : list){
             double x1 = viewport.worldToScreenX(i.point1.getX());
             double y1 = viewport.worldToScreenY(i.point1.getY());
             double x2 = viewport.worldToScreenX(i.point2.getX());
             double y2 = viewport.worldToScreenY(i.point2.getY());
-            double dx = x2 - x1; double dy = y2 - y1;
-            if(dx*dx + dy*dy < 1) continue;
             gc.moveTo(x1, y1);
             gc.lineTo(x2, y2);
         }

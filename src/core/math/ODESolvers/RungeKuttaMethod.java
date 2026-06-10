@@ -126,7 +126,7 @@ public class RungeKuttaMethod {
         list.add(initial.copy());
         
         while(Math.abs(current.x - max) > tolerance){
-            if(list.size() > 1e7) return new ODESolution(ODEStatus.EXCEEDED_MAX_ITERATIONS);
+            if(list.size() > 1e7) return new ODESolution(list, minimumStepUsed, maximumStepUsed, acceptedSteps, rejectedSteps, ODEStatus.EXCEEDED_MAX_ITERATIONS);
             double sign = Math.signum(stepSize*multiplier);
             double h = sign * Math.min(Math.abs(stepSize*multiplier), Math.abs(max-current.x));
             //if(h < tolerance/10) return new ODESolution(ODEStatus.INVALID_STEPSIZE);

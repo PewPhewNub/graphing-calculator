@@ -38,10 +38,10 @@ public class ODEPlot implements Plot {
         ODESolution solutionLeft = RungeKuttaMethod.adaptiveRK4(equation, initial, -1e-1, -256, 1e-7);
         statusLeft = solutionLeft.status();
         statusRight = solutionRight.status();
-        if(statusLeft == ODEStatus.SUCCESS){
+        if(statusLeft == ODEStatus.SUCCESS || statusLeft == ODEStatus.EXCEEDED_MAX_ITERATIONS){
             for(Point i : solutionLeft.list()) leftBranch.addFirst(new Point2D(i.x, i.y));
         }
-        if(statusRight == ODEStatus.SUCCESS){
+        if(statusRight == ODEStatus.SUCCESS || statusRight == ODEStatus.EXCEEDED_MAX_ITERATIONS){
             for(Point i : solutionRight.list()) rightBranch.addLast(new Point2D(i.x, i.y));
         }
 
@@ -180,11 +180,11 @@ public class ODEPlot implements Plot {
     }
 
     public void extendCoverage(double worldMinX, double worldMaxX, double marginX){
-        if(leftBranch.getFirst().getX() > (worldMinX + marginX)){
+        if(!leftBranch.isEmpty() && leftBranch.getFirst().getX() > (worldMinX + marginX)){
             extendLeft();
         }
         
-        if(rightBranch.getLast().getX() < (worldMaxX - marginX)){
+        if(!rightBranch.isEmpty() && rightBranch.getLast().getX() < (worldMaxX - marginX)){
             extendRight();
         }
     }

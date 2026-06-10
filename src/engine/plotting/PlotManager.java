@@ -45,6 +45,12 @@ public class PlotManager{
                     PlotComputationEngine.computeCurveData((ParametricPlot)plot, viewport)
                 );
             }
+            if(plot instanceof PolarPlot){
+                ((PolarPlot)plot).accurateComputedPoints.clear();
+                curveCache.add(    
+                    PlotComputationEngine.computeCurveData((PolarPlot)plot, viewport)
+                );
+            }
         }
     }
     public void computeFeaturePoints(ViewportState state){

@@ -4,6 +4,7 @@ import core.math.Core.Point;
 import engine.plotting.FunctionPlot;
 import engine.plotting.ODEPlot;
 import engine.plotting.ParametricPlot;
+import engine.plotting.PolarPlot;
 import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
@@ -124,8 +125,9 @@ public class Main extends Application {
         graph.plotManager.addPlot(new FunctionPlot("F1", x -> 1/x, Color.GREEN));
         //graph.plotManager.addPlot(new FunctionPlot("F2", x -> Math.sin(x)/x, Color.RED));
         //graph.plotManager.addPlot(new FunctionPlot("F3", x -> Math.sin(x - 2*Math.PI/3), Color.PURPLE));
-        graph.plotManager.addPlot(new ODEPlot("ODE1", (x,y) -> y, new Point(0, 1), Color.BLUE));
+        graph.plotManager.addPlot(new ODEPlot("ODE1", (x,y) -> -1/(x*x), new Point(2, .5), Color.BLUE));
         //graph.plotManager.addPlot(new ParametricPlot("Para1", t -> Math.sin(t) * Math.exp(t/10), t -> Math.cos(t) * Math.exp(t/100), -50, 50, 50000, Color.BLACK));
+        //graph.plotManager.addPlot(new PolarPlot("Polar1", t -> 1 + t, -50, 50, 50000, Color.ORANGE));
 
         for(Node i : graphStack.getChildren()){
             if(i instanceof Graph){  

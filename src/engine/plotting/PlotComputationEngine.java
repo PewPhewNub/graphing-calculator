@@ -134,149 +134,64 @@ public class PlotComputationEngine {
 
         if(points.isEmpty()) return new CurveData(plot, list);
 
-        ViewportState state = new ViewportState(viewport);
-
         Point2D prev = points.getFirst();
 
         for(int i = 1; i < points.size(); i++){
             Point2D point = points.get(i);
-
-            boolean prevVisible =
-                prev.getX() >= state.left - state.marginX &&
-                prev.getX() <= state.right + state.marginX &&
-                prev.getY() >= state.bottom - state.marginY &&
-                prev.getY() <= state.top + state.marginY;
-
-            boolean currVisible =
-                point.getX() >= state.left - state.marginX &&
-                point.getX() <= state.right + state.marginX &&
-                point.getY() >= state.bottom - state.marginY &&
-                point.getY() <= state.top + state.marginY;
-
-             boolean overlapsViewport =
-                Math.max(prev.getX(), point.getX()) >= state.left &&
-                Math.min(prev.getX(), point.getX()) <= state.right &&
-                Math.max(prev.getY(), point.getY()) >= state.bottom &&
-                Math.min(prev.getY(), point.getY()) <= state.top;
-
-            if(prevVisible || currVisible || overlapsViewport){
-
-                double x1 = viewport.worldToScreenX(prev.getX());
-                double y1 = viewport.worldToScreenY(prev.getY());
-
-                double x2 = viewport.worldToScreenX(point.getX());
-                double y2 = viewport.worldToScreenY(point.getY());
-
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                if(dx * dx + dy * dy >= 1){
-                    list.add(new Segment2D(prev, point));
-                }
+            if(isWithinBounds(prev, point, viewport)){
+                list.add(new Segment2D(prev, point));
             }
-
             prev = point;
         }
-
-        System.out.println(list.size());
         return new CurveData(plot, list);
     }
 
     public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
         ArrayList<Segment2D> list = new ArrayList<>();
-        ViewportState state = new ViewportState(viewport);
         Function<Double, Double> function = plot.getFunction();
+        ViewportState state = new ViewportState(viewport);
         double stepSize = (state.right - state.left)/state.viewportWidth;
         Point2D prev = new Point2D((state.left - stepSize), function.apply((state.left - stepSize)));
         for(double i = 1; i <= state.viewportWidth; i++){
             double x = (i * stepSize + state.left);
             Point2D point = new Point2D(x, function.apply(x));
-            boolean prevVisible =
-                prev.getX() >= state.left - state.marginX &&
-                prev.getX() <= state.right + state.marginX &&
-                prev.getY() >= state.bottom - state.marginY &&
-                prev.getY() <= state.top + state.marginY;
-
-            boolean currVisible =
-                point.getX() >= state.left - state.marginX &&
-                point.getX() <= state.right + state.marginX &&
-                point.getY() >= state.bottom - state.marginY &&
-                point.getY() <= state.top + state.marginY;
-
-            boolean overlapsViewport =
-                Math.max(prev.getX(), point.getX()) >= state.left &&
-                Math.min(prev.getX(), point.getX()) <= state.right &&
-                Math.max(prev.getY(), point.getY()) >= state.bottom &&
-                Math.min(prev.getY(), point.getY()) <= state.top;
-
-            if(prevVisible || currVisible){
-
-                double x1 = viewport.worldToScreenX(prev.getX());
-                double y1 = viewport.worldToScreenY(prev.getY());
-
-                double x2 = viewport.worldToScreenX(point.getX());
-                double y2 = viewport.worldToScreenY(point.getY());
-
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                if(dx * dx + dy * dy >= 1 && dy <= viewport.height*0.95){
-                    list.add(new Segment2D(prev, point));
-                }
+            if(isWithinBounds(prev, point, viewport)){
+                list.add(new Segment2D(prev, point));
             }
             prev = point;
         }
-        System.out.println(list.size());
         return new CurveData(plot, list);
     }
     
     public static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
-        ViewportState state = new ViewportState(viewport);
         ArrayList<Point2D> points = plot.sample(viewport.width);
         ArrayList<Segment2D> list = new ArrayList<>();
         if(points.isEmpty()) return new CurveData(plot, list);
         Point2D prev = points.getFirst();
         for(int i = 1; i < points.size(); i+=1){
             Point2D point = points.get(i);
-            boolean prevVisible =
-                prev.getX() >= state.left - state.marginX &&
-                prev.getX() <= state.right + state.marginX &&
-                prev.getY() >= state.bottom - state.marginY &&
-                prev.getY() <= state.top + state.marginY; 
-
-            boolean currVisible =
-                point.getX() >= state.left - state.marginX &&
-                point.getX() <= state.right + state.marginX&&
-                point.getY() >= state.bottom - state.marginY &&
-                point.getY() <= state.top + state.marginY;
-
-             boolean overlapsViewport =
-                Math.max(prev.getX(), point.getX()) >= state.left &&
-                Math.min(prev.getX(), point.getX()) <= state.right &&
-                Math.max(prev.getY(), point.getY()) >= state.bottom &&
-                Math.min(prev.getY(), point.getY()) <= state.top;
-
-            if(prevVisible || currVisible || overlapsViewport){
-
-                double x1 = viewport.worldToScreenX(prev.getX());
-                double y1 = viewport.worldToScreenY(prev.getY());
-
-                double x2 = viewport.worldToScreenX(point.getX());
-                double y2 = viewport.worldToScreenY(point.getY());
-
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                if(dx * dx + dy * dy >= 1){
-                    list.add(new Segment2D(prev, point));
-                }
+            if(isWithinBounds(prev, point, viewport)){
+                list.add(new Segment2D(prev, point));
             }
             prev = point;
         }
-        System.out.println(list.size());
         return new CurveData(plot, list);
     }
     
+    public static CurveData computeCurveData(PolarPlot plot, Viewport viewport){
+        ArrayList<Point2D> points = plot.sample(viewport.width);
+        ArrayList<Segment2D> list = new ArrayList<>();
+        if(points.isEmpty()) return new CurveData(plot, list);
+        Point2D prev = points.getFirst();
+        for(int i = 1; i < points.size(); i+=1){
+            Point2D point = points.get(i);
+            if(isWithinBounds(prev, point, viewport)){
+                list.add(new Segment2D(prev, point));
+            }
+            prev = point;
+        }
+        return new CurveData(plot, list);
+    }
     public static void ensureCoverage(ODEPlot plot, double worldMinX, double worldMaxX, double marginX){
         plot.extendCoverage(worldMinX, worldMaxX, marginX);
     }
@@ -315,5 +230,38 @@ public class PlotComputationEngine {
             }
         }
         return list;
+    }
+
+    private static boolean isWithinBounds(Point2D prev, Point2D point, Viewport viewport){
+        ViewportState state = new ViewportState(viewport);
+        boolean prevVisible =
+            prev.getX() >= state.left - state.marginX &&
+            prev.getX() <= state.right + state.marginX &&
+            prev.getY() >= state.bottom - state.marginY &&
+            prev.getY() <= state.top + state.marginY; 
+
+        boolean currVisible =
+            point.getX() >= state.left - state.marginX &&
+            point.getX() <= state.right + state.marginX&&
+            point.getY() >= state.bottom - state.marginY &&
+            point.getY() <= state.top + state.marginY;
+
+        boolean overlapsViewport =
+            Math.max(prev.getX(), point.getX()) >= state.left &&
+            Math.min(prev.getX(), point.getX()) <= state.right &&
+            Math.max(prev.getY(), point.getY()) >= state.bottom &&
+            Math.min(prev.getY(), point.getY()) <= state.top;
+        
+        if(!(prevVisible || currVisible || overlapsViewport)) return false;
+
+        double x1 = viewport.worldToScreenX(prev.getX());
+        double y1 = viewport.worldToScreenY(prev.getY());
+
+        double x2 = viewport.worldToScreenX(point.getX());
+        double y2 = viewport.worldToScreenY(point.getY());
+
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return dx *dx + dy*dy > 1;
     }
 }
