@@ -158,16 +158,13 @@ public class Renderer {
         if(list.isEmpty()) return;
         gc.setStroke(color);
         gc.setLineWidth(2.5);
-        gc.beginPath();
         for(Segment2D i : list){
             double x1 = viewport.worldToScreenX(i.point1.getX());
             double y1 = viewport.worldToScreenY(i.point1.getY());
             double x2 = viewport.worldToScreenX(i.point2.getX());
             double y2 = viewport.worldToScreenY(i.point2.getY());
-            gc.moveTo(x1, y1);
-            gc.lineTo(x2, y2);
+            gc.strokeLine(x1, y1, x2, y2);
         }
-        gc.stroke();
     }
     public void drawMarker(Point2D point, double radius, Color color){
         if(point == null) return;
