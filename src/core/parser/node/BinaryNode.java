@@ -1,11 +1,13 @@
-package core.parser;
+package core.parser.node;
+
+import core.parser.TokenType;
 
 public class BinaryNode extends ExpressionNode{
     private final ExpressionNode left;
     private final ExpressionNode right;
-    private final TokenType operator;
+    private final BinaryOp operator;
 
-    public BinaryNode(final ExpressionNode left, final TokenType operator, final ExpressionNode right){
+    public BinaryNode(final ExpressionNode left, final BinaryOp operator, final ExpressionNode right){
         this.left = left; this.right = right; this.operator = operator;
     }
 
@@ -15,13 +17,13 @@ public class BinaryNode extends ExpressionNode{
         switch (operator) {
             case PLUS:
                 return leftValue + rightValue;
-            case MINUS:
+            case SUBTRACT:
                 return leftValue - rightValue;
-            case STAR:
+            case MULTIPLY:
                 return leftValue * rightValue;
-            case SLASH:
+            case DIVIDE:
                 return leftValue / rightValue;
-            case POW:
+            case POWER:
                 return Math.pow(leftValue, rightValue);
             default:
                 return Double.NaN;

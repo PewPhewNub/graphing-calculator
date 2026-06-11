@@ -1,4 +1,6 @@
-package core.parser;
+package core.parser.node;
+
+import core.parser.TokenType;
 
 public class UnaryNode extends ExpressionNode{
     private final ExpressionNode right;

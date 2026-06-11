@@ -3,13 +3,22 @@ package core.parser;
 import java.io.EOFException;
 import java.util.ArrayList;
 
+import core.parser.node.BinaryNode;
+import core.parser.node.BinaryOp;
+import core.parser.node.DefinitionNode;
+import core.parser.node.ExpressionNode;
+import core.parser.node.FunctionNode;
+import core.parser.node.NumberNode;
+import core.parser.node.UnaryNode;
+import core.parser.node.VariableNode;
+
 public class Parser{
     private ArrayList<Token> tokenList;
     int position;
     
-    public Parser(ArrayList<Token> tokenList, int position) {
+    public Parser(ArrayList<Token> tokenList) {
         this.tokenList = tokenList;
-        this.position = position;
+        this.position = 0;
     }
 
     private Token advance(){
@@ -71,7 +80,7 @@ public class Parser{
         ExpressionNode left = parseUnary();
         if(match(TokenType.POW)){
             ExpressionNode right = parsePower();
-            return new BinaryNode(left, TokenType.POW, right);
+            return new BinaryNode(left, BinaryOp.POWER, right);
         }
         return left;
     }
@@ -83,26 +92,49 @@ public class Parser{
             if(type == TokenType.SLASH){
                 advance();
                 ExpressionNode right = parsePower();
-                left = new BinaryNode(left, TokenType.SLASH, right);
+                left = new BinaryNode(left, BinaryOp.DIVIDE, right);
             }else if (type == TokenType.STAR){
                 advance();
                 ExpressionNode right = parsePower();
-                left = new BinaryNode(left, TokenType.STAR, right);
+                left = new BinaryNode(left, BinaryOp.MULTIPLY, right);
             }else{
                 ExpressionNode right = parsePower();
-                left = new BinaryNode(left, TokenType.STAR, right);
+                left = new BinaryNode(left, BinaryOp.MULTIPLY, right);
             }
         }
         return left;
     }
 
-    ExpressionNode parseExpression() throws Exception{
+    public ExpressionNode parseExpression() throws Exception{
         ExpressionNode left = parseTerm();
         while(peek().type == TokenType.PLUS || peek().type == TokenType.MINUS){
             TokenType type = advance().type;
             ExpressionNode right = parseTerm();
-            left =  new BinaryNode(left, type, right);
+            left =  new BinaryNode(left, (type == TokenType.PLUS) ? BinaryOp.PLUS : BinaryOp.SUBTRACT, right);
         }
         return left;
+    }
+
+    public DefinitionNode parseDefinition() throws Exception {
+
+        if (peek().type != TokenType.IDENTIFIER) {
+            throw new RuntimeException("Expected identifier at start of definition");
+        }
+
+        String name = advance().value;
+
+        if (peek().type != TokenType.ASSIGN) {
+            throw new RuntimeException("Expected '=' after identifier");
+        }
+
+        advance(); // consume '='
+
+        ExpressionNode expr = parseExpression();
+
+        if (name.equals("y")) {
+            return new DefinitionNode("y", "x", expr);
+        }
+
+        return new DefinitionNode(name, "x", expr);
     }
 }

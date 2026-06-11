@@ -1,4 +1,4 @@
-package core.parser;
+package core.parser.node;
 
 public class NumberNode extends ExpressionNode {
     private final double number;

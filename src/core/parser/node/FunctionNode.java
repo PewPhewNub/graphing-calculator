@@ -1,4 +1,4 @@
-package core.parser;
+package core.parser.node;
 
 public class FunctionNode extends ExpressionNode{
     private final String functionName;

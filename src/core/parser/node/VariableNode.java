@@ -1,4 +1,4 @@
-package core.parser;
+package core.parser.node;
 
 public class VariableNode extends ExpressionNode {
     public String name;

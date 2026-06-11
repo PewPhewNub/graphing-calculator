@@ -1,6 +1,10 @@
 package engine.UI;
 
+import java.util.function.Function;
+
 import core.math.Core.Point;
+import core.parser.Lexer;
+import core.parser.Parser;
 import engine.plotting.FunctionPlot;
 import engine.plotting.ODEPlot;
 import engine.plotting.ParametricPlot;
@@ -41,7 +45,7 @@ public class Main extends Application {
         launch();
     }
 
-    public void start(Stage stage){
+    public void start(Stage stage) throws Exception{
         graph = new Graph(1200, 900);
         ui = new UIPanel(400, 900, graph);
         ui.setMinWidth(400);
@@ -121,7 +125,13 @@ public class Main extends Application {
         stage.setMinHeight(300);
         stage.show();
 
-        graph.plotManager.addPlot(new FunctionPlot("F1", x -> 1/x, Color.GREEN));
+        String string = "y = x + 4";
+        Function<Double, Double> f = new Parser(new Lexer(string){
+            {
+                tokenize();
+            }
+        }.tokenList).parseDefinition().getFunction();
+        graph.plotManager.addPlot(new FunctionPlot("F1", f, Color.GREEN));
         //graph.plotManager.addPlot(new FunctionPlot("F2", x -> Math.sin(x)/x, Color.RED));
         //graph.plotManager.addPlot(new FunctionPlot("F3", x -> Math.sin(x - 2*Math.PI/3), Color.PURPLE));
         graph.plotManager.addPlot(new ODEPlot("ODE1", (x,y) -> y, new Point(0, 1), Color.BLUE));
