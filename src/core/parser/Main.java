@@ -12,7 +12,7 @@ public class Main {
             lexer.tokenize();
             System.out.println(lexer.tokenList.toString());
             Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = (parser.parseDefinition());
+            DefinitionNode node = (parser.parseDefinitionFunction());
 
             System.out.println(node.getFunction().apply(2d));
         }catch(Exception e){

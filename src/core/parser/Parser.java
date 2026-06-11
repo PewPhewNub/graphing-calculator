@@ -115,7 +115,7 @@ public class Parser{
         return left;
     }
 
-    public DefinitionNode parseDefinition() throws Exception {
+    public DefinitionNode parseDefinitionFunction() throws Exception {
 
         if (peek().type != TokenType.IDENTIFIER) {
             throw new RuntimeException("Expected identifier at start of definition");
@@ -137,4 +137,6 @@ public class Parser{
 
         return new DefinitionNode(name, "x", expr);
     }
+
+    
 }

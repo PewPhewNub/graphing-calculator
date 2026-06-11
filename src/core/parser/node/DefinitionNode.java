@@ -26,4 +26,8 @@ public class DefinitionNode extends ExpressionNode{
     public Function<Double, Double> getFunction(){
         return x -> evaluate(x);
     }
+
+    public String getName() {
+        return name;
+    }
 }
