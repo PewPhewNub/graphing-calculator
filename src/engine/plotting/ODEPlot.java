@@ -212,4 +212,9 @@ public class ODEPlot implements Plot {
         }
         return false;
     }
+    
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }

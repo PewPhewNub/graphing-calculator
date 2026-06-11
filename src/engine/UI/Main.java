@@ -23,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -68,6 +69,7 @@ public class Main extends Application {
         
         //toolBar.setPrefWidth(50);
         //toolBar.setMaxWidth(50);
+        toolBar.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(0), new Insets(0))));
         toolBar.getItems().add(new Button(){
                 boolean isVisible = true;
             {

@@ -34,6 +34,12 @@ public class FunctionNode extends ExpressionNode{
                 return Math.sqrt(argumentValue);
             case "abs":
                 return Math.abs(argumentValue);
+            case "sinh":
+                return Math.sinh(argumentValue);
+            case "cosh":
+                return Math.cosh(argumentValue);
+            case "tanh":
+                return Math.tanh(argumentValue);
             default:
                 break;
         }

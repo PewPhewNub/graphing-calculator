@@ -138,5 +138,26 @@ public class Parser{
         return new DefinitionNode(name, "x", expr);
     }
 
-    
+    public DefinitionNode parseDefinitionPolar() throws Exception {
+
+        if (peek().type != TokenType.IDENTIFIER) {
+            throw new RuntimeException("Expected identifier at start of definition");
+        }
+
+        String name = advance().value;
+
+        if (peek().type != TokenType.ASSIGN) {
+            throw new RuntimeException("Expected '=' after identifier");
+        }
+
+        advance(); // consume '='
+
+        ExpressionNode expr = parseExpression();
+
+        if (name.equals("r")) {
+            return new DefinitionNode("r", "x", expr);
+        }
+
+        return new DefinitionNode(name, "x", expr);
+    }
 }

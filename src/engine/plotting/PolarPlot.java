@@ -101,4 +101,9 @@ public class PolarPlot implements Plot {
     public boolean contains(Point2D point) {
         return initialList.contains(point) || accurateComputedPoints.contains(point);
     }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }

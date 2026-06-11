@@ -63,4 +63,9 @@ public class FunctionPlot implements Plot{
         double pointY = point.getY();
         return pointY - function.apply(pointX) < 1e-7;
     }
+    
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }

@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 
 public class UIPanel extends VBox {
     Graph graph;
-    TextField field;
     String lastValidName;
     public UIPanel(double width, double height, Graph graph){
         super();
