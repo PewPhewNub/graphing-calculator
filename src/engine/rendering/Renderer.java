@@ -154,18 +154,30 @@ public class Renderer {
         gc.stroke();
     }
 
-    public void drawCurveSegmented(ArrayList<Segment2D> list, Color color){
-        if(list.isEmpty()) return;
+    public void drawCurveSegmented(ArrayList<Segment2D> list, Color color) {
+        if (list.isEmpty()) return;
         gc.setStroke(color);
         gc.setLineWidth(2.5);
-        for(Segment2D i : list){
-            double x1 = viewport.worldToScreenX(i.point1.getX());
-            double y1 = viewport.worldToScreenY(i.point1.getY());
-            double x2 = viewport.worldToScreenX(i.point2.getX());
-            double y2 = viewport.worldToScreenY(i.point2.getY());
+        double limit = Math.max(gc.getCanvas().getWidth(), gc.getCanvas().getHeight()) * 10;
+        for (Segment2D seg : list) {
+            double x1 = viewport.worldToScreenX(seg.point1.getX());
+            double y1 = viewport.worldToScreenY(seg.point1.getY());
+            double x2 = viewport.worldToScreenX(seg.point2.getX());
+            double y2 = viewport.worldToScreenY(seg.point2.getY());
+
+            // Skip any residual non-finite coords (shouldn't happen after Fix 1, but be safe)
+            if (!Double.isFinite(x1) || !Double.isFinite(y1) ||
+                !Double.isFinite(x2) || !Double.isFinite(y2)) continue;
+
+            // Clamp to a large-but-finite range so the OS rasteriser clips correctly
+            x1 = Math.max(-limit, Math.min(limit, x1));
+            y1 = Math.max(-limit, Math.min(limit, y1));
+            x2 = Math.max(-limit, Math.min(limit, x2));
+            y2 = Math.max(-limit, Math.min(limit, y2));
+
             gc.strokeLine(x1, y1, x2, y2);
         }
-    }
+}
     public void drawMarker(Point2D point, double radius, Color color){
         if(point == null) return;
         gc.setFill(color);

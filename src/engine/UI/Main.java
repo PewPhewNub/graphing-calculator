@@ -122,12 +122,12 @@ public class Main extends Application {
         stage.setMinHeight(300);
         stage.show();
 
-        graph.plotManager.addPlot(new FunctionPlot("F1", x -> 1/x, Color.GREEN));
-        //graph.plotManager.addPlot(new FunctionPlot("F2", x -> Math.sin(x)/x, Color.RED));
-        //graph.plotManager.addPlot(new FunctionPlot("F3", x -> Math.sin(x - 2*Math.PI/3), Color.PURPLE));
+        graph.plotManager.addPlot(new FunctionPlot("F1", x -> x, Color.GREEN));
+        graph.plotManager.addPlot(new FunctionPlot("F2", x -> Math.sin(x)/x, Color.RED));
+        graph.plotManager.addPlot(new FunctionPlot("F3", x -> Math.sin(x - 2*Math.PI/3), Color.PURPLE));
         graph.plotManager.addPlot(new ODEPlot("ODE1", (x,y) -> -1/(x*x), new Point(2, .5), Color.BLUE));
-        //graph.plotManager.addPlot(new ParametricPlot("Para1", t -> Math.sin(t) * Math.exp(t/10), t -> Math.cos(t) * Math.exp(t/100), -50, 50, 50000, Color.BLACK));
-        //graph.plotManager.addPlot(new PolarPlot("Polar1", t -> 1 + t, -50, 50, 50000, Color.ORANGE));
+        graph.plotManager.addPlot(new ParametricPlot("Para1", t -> Math.sin(t) * Math.exp(t/10), t -> Math.cos(t) * Math.exp(t/10), -50, 50, 50000, Color.BLACK));
+        graph.plotManager.addPlot(new PolarPlot("Polar1", t -> -t/100, 0, 500, 50000, Color.ORANGE));
 
         for(Node i : graphStack.getChildren()){
             if(i instanceof Graph){  

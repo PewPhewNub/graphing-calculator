@@ -146,19 +146,64 @@ public class PlotComputationEngine {
         return new CurveData(plot, list);
     }
 
-    public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
+    public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport) {
         ArrayList<Segment2D> list = new ArrayList<>();
         Function<Double, Double> function = plot.getFunction();
         ViewportState state = new ViewportState(viewport);
-        double stepSize = (state.right - state.left)/state.viewportWidth;
-        Point2D prev = new Point2D((state.left - stepSize), function.apply((state.left - stepSize)));
-        for(double i = 1; i <= state.viewportWidth; i++){
-            double x = (i * stepSize + state.left);
-            Point2D point = new Point2D(x, function.apply(x));
-            if(isWithinBounds(prev, point, viewport)){
-                list.add(new Segment2D(prev, point));
+        double stepSize = (state.right - state.left) / state.viewportWidth;
+        double viewportHeight = Math.abs(state.top - state.bottom);
+
+        Point2D prev = new Point2D(state.left - stepSize,
+                                function.apply(state.left - stepSize));
+
+        for (double i = 1; i <= state.viewportWidth; i++) {
+            double x = i * stepSize + state.left;
+            double rawY = function.apply(x);
+
+            boolean prevFinite = Double.isFinite(prev.getY());
+            boolean currFinite = Double.isFinite(rawY);
+
+            if (prevFinite && currFinite) {
+                Point2D point = new Point2D(x, rawY);
+
+                // Discontinuity guard: sign-flip AND big jump == asymptote crossing
+                boolean prevPos = prev.getY() > 0, prevNeg = prev.getY() < 0;
+                boolean currPos = rawY > 0,        currNeg = rawY < 0;
+                boolean signFlip = (prevPos && currNeg) || (prevNeg && currPos);
+                boolean bigJump  = Math.abs(rawY - prev.getY()) > viewportHeight;
+
+                if (!(signFlip && bigJump) && isWithinBounds(prev, point, viewport)) {
+                    list.add(new Segment2D(prev, point));
+                }
+                prev = point;
+
+            } else if (prevFinite && Double.isInfinite(rawY)) {
+                // Branch heading to ±∞ — extend visually to one viewport-height past the edge
+                double extY = (prev.getY() >= 0)
+                        ? state.top    + viewportHeight
+                        : state.bottom - viewportHeight;
+                Point2D extension = new Point2D(x, extY);
+                if (isWithinBounds(prev, extension, viewport)) {
+                    list.add(new Segment2D(prev, extension));
+                }
+                prev = new Point2D(x, rawY);  // keep the ±Inf value so next iter detects it
+
+            } else if (Double.isInfinite(prev.getY()) && currFinite) {
+                // Branch arriving from ±∞ — start one viewport-height past the edge
+                double extY = (rawY >= 0)
+                        ? state.top    + viewportHeight
+                        : state.bottom - viewportHeight;
+                Point2D extension = new Point2D(prev.getX(), extY);
+                Point2D point     = new Point2D(x, rawY);
+                if (isWithinBounds(extension, point, viewport)) {
+                    list.add(new Segment2D(extension, point));
+                }
+                prev = point;
+
+            } else {
+                // NaN (domain gap) or both non-finite — just reset the branch
+                prev = new Point2D(x, rawY);
             }
-            prev = point;
         }
         return new CurveData(plot, list);
     }
@@ -233,6 +278,13 @@ public class PlotComputationEngine {
     }
 
     private static boolean isWithinBounds(Point2D prev, Point2D point, Viewport viewport){
+    // Reject any segment with non-finite coordinates before doing anything else
+    if (!Double.isFinite(prev.getX()) || !Double.isFinite(prev.getY()) ||
+        !Double.isFinite(point.getX()) || !Double.isFinite(point.getY())) {
+        return false;
+    }
+    // ... rest of your existing code unchanged
+
         ViewportState state = new ViewportState(viewport);
         boolean prevVisible =
             prev.getX() >= state.left - state.marginX &&
@@ -253,15 +305,6 @@ public class PlotComputationEngine {
             Math.min(prev.getY(), point.getY()) <= state.top;
         
         if(!(prevVisible || currVisible || overlapsViewport)) return false;
-
-        double x1 = viewport.worldToScreenX(prev.getX());
-        double y1 = viewport.worldToScreenY(prev.getY());
-
-        double x2 = viewport.worldToScreenX(point.getX());
-        double y2 = viewport.worldToScreenY(point.getY());
-
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        return dx *dx + dy*dy > 1;
+        return true;
     }
 }
