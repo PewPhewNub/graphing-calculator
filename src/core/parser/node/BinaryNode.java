@@ -1,5 +1,9 @@
 package core.parser.node;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import core.parser.TokenType;
 
 public class BinaryNode extends ExpressionNode{
@@ -11,9 +15,9 @@ public class BinaryNode extends ExpressionNode{
         this.left = left; this.right = right; this.operator = operator;
     }
 
-    public double evaluate(double x){
-        final double leftValue = left.evaluate(x);
-        final double rightValue = right.evaluate(x);
+    public double evaluate(Map<String, Double> map){
+        final double leftValue = left.evaluate(map);
+        final double rightValue = right.evaluate(map);
         switch (operator) {
             case PLUS:
                 return leftValue + rightValue;
@@ -32,5 +36,12 @@ public class BinaryNode extends ExpressionNode{
 
     public String toString(){
         return "( " + left.toString() + operator + right.toString() + ") ";
+    }
+
+    @Override
+    public HashSet<String> getVariables() {
+        HashSet<String> variables = (HashSet<String>) left.getVariables();
+        variables.addAll(right.getVariables());
+        return variables;
     }
 }

@@ -2,7 +2,7 @@ package core.model;
 
 import java.util.ArrayList;
 
-import engine.plotting.Plot;
+import engine.plotting.plots.Plot;
 
 public record CurveData(
     Plot originalPlot,

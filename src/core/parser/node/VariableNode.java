@@ -1,5 +1,9 @@
 package core.parser.node;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class VariableNode extends ExpressionNode {
     public String name;
 
@@ -14,7 +18,24 @@ public class VariableNode extends ExpressionNode {
             return Math.E;
         return x;
     }
+
+    public double evaluate(Map<String, Double> variables){
+        return variables.get(name);
+    }
+
     public String toString(){
         return name;
+    }
+    public String getName() {
+        return name;
+    }
+    
+    @Override
+    public HashSet<String> getVariables() {
+        return new HashSet<String>() {
+            {
+                add(name);
+            }
+        };
     }
 }

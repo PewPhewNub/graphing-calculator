@@ -1,8 +1,9 @@
-package engine.plotting;
+package engine.plotting.plots;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import core.math.Core.ODESolution;
@@ -25,10 +26,12 @@ public class ODEPlot implements Plot {
     ArrayList<Point2D> rightBranch;
     String name;
     Color color;
+    boolean autoGenerate = false;
+    ArrayList<Point2D> fullData;
+    public final Set<String> knownVariables = Set.of("x", "y");
     public ODEPlot(String name, BiFunction<Double, Double, Double> equation, Point initial, Color color){
         long t = System.currentTimeMillis();
         System.out.println("ODE constructor start");
-
         this.equation = equation;
         this.initial = initial;
         this.name = name;
@@ -39,12 +42,13 @@ public class ODEPlot implements Plot {
         statusLeft = solutionLeft.status();
         statusRight = solutionRight.status();
         if(statusLeft == ODEStatus.SUCCESS || statusLeft == ODEStatus.EXCEEDED_MAX_ITERATIONS){
-            for(Point i : solutionLeft.list()) leftBranch.addFirst(new Point2D(i.x, i.y));
+            for(Point i : solutionLeft.list()) leftBranch.add(new Point2D(i.x, i.y));
         }
         if(statusRight == ODEStatus.SUCCESS || statusRight == ODEStatus.EXCEEDED_MAX_ITERATIONS){
             for(Point i : solutionRight.list()) rightBranch.addLast(new Point2D(i.x, i.y));
         }
-
+        fullData = new ArrayList<>();
+        regenerateFullData();
         this.color = color;
         
         System.out.println("ODE constructor end " + (System.currentTimeMillis() - t));
@@ -52,14 +56,17 @@ public class ODEPlot implements Plot {
     public void extendLeft(){
         if(statusLeft != ODEStatus.SUCCESS) return;
         long t = System.currentTimeMillis();
-        Point2D currentEndPoint = leftBranch.getFirst();
+        Point2D currentEndPoint = leftBranch.getLast();
         ODESolution solutionLeft = RungeKuttaMethod.adaptiveRK4(equation, new Point(currentEndPoint.getX(), currentEndPoint.getY()), -1e-3, currentEndPoint.getX() - 64, 1e-7);
         statusLeft = solutionLeft.status();
         ArrayList<Point> solutionList = solutionLeft.list(); 
         if(statusLeft == ODEStatus.SUCCESS){
-            for(int i = 1; i < solutionList.size(); i++){
-                leftBranch.addFirst(new Point2D(solutionList.get(i).x, solutionList.get(i).y));
-            } 
+            System.out.println(
+                "accepted=" + solutionLeft.acceptedSteps() +
+                " rejected=" + solutionLeft.rejectedSteps() +
+                " points=" + solutionLeft.list().size()
+            );
+            for(Point i : solutionList) leftBranch.add(new Point2D(i.x, i.y));
         }
         //System.out.println(solutionLeft);
         System.out.println(
@@ -78,6 +85,11 @@ public class ODEPlot implements Plot {
         statusRight = solutionRight.status();
         ArrayList<Point> solutionList = solutionRight.list(); 
         if(statusRight == ODEStatus.SUCCESS){
+            System.out.println(
+                "accepted=" + solutionRight.acceptedSteps() +
+                " rejected=" + solutionRight.rejectedSteps() +
+                " points=" + solutionRight.list().size()
+            );
             for(int i = 1; i < solutionList.size(); i++){
                 rightBranch.addLast(new Point2D(solutionList.get(i).x, solutionList.get(i).y));
             } 
@@ -111,19 +123,15 @@ public class ODEPlot implements Plot {
         return color;
     }
 
-    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {//TODO:remove
-        ArrayList<Point2D> data = list();
-        data.addAll(leftBranch);
-        data.add(new Point2D(initial.x, initial.y));
-        data.addAll(rightBranch);
-        if(data.isEmpty()) return null;
-        if (data == null || data.isEmpty()) return null;
+    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
+        if(fullData.isEmpty()) return null;
 
         // 1. Use binary search to find the index where worldX would fit
-        int index = Collections.binarySearch(data, new Point2D(worldX, 0), 
+        int index = Collections.binarySearch(fullData, new Point2D(worldX, 0), 
                     Comparator.comparingDouble(Point2D::getX));
         
         if (index < 0) index = -(index + 1);
+        index = Math.max(0, Math.min(index, fullData.size() - 1));
 
         // 2. Search outward from that index until the distance starts increasing
         double minD2 = Double.POSITIVE_INFINITY;
@@ -131,7 +139,7 @@ public class ODEPlot implements Plot {
 
         // Check left and right
         for (int i = index; i >= 0; i--) {
-            Point2D p = data.get(i);
+            Point2D p = fullData.get(i);
             double d2 = Math.abs(p.getX() - worldX);
             if (d2 < minD2) {
                 minD2 = d2;
@@ -139,8 +147,8 @@ public class ODEPlot implements Plot {
             } else break; // We passed the closest point on this side
         }
 
-        for (int i = index + 1; i < data.size(); i++) {
-            Point2D p = data.get(i);
+        for (int i = index + 1; i < fullData.size(); i++) {
+            Point2D p = fullData.get(i);
             double d2 = Math.abs(p.getX() - worldX);
             if (d2 < minD2) {
                 minD2 = d2;
@@ -151,42 +159,57 @@ public class ODEPlot implements Plot {
         return nearest;
     }
 
-    public double distanceSquaredFrom(double x0, double y0, Viewport viewport) {//TODO: remove
-        ArrayList<Point2D> data = list();
+    public double distanceSquaredFrom(double worldX, double worldY, Viewport viewport) {
+        if(fullData.isEmpty()) return Double.POSITIVE_INFINITY;
+
+        // 1. Use binary search to find the index where worldX would fit
+        int index = Collections.binarySearch(fullData, new Point2D(worldX, 0), 
+                    Comparator.comparingDouble(Point2D::getX));
         
-        if(data.isEmpty()) return Double.NaN;
+        if (index < 0) index = -(index + 1);
+        index = Math.max(0, Math.min(index, fullData.size() - 1));
 
-        double minDist2 = Double.POSITIVE_INFINITY;
+        // 2. Search outward from that index until the distance starts increasing
+        double minD2 = Double.POSITIVE_INFINITY;
 
-        double sx = viewport.worldToScreenX(x0);
-        double sy = viewport.worldToScreenY(y0);
-
-        for (Point2D p : data) {
-
-            double px = viewport.worldToScreenX(p.getX());
-            double py = viewport.worldToScreenY(p.getY());
-
-            double dx = px - sx;
-            double dy = py - sy;
-
-            double dist2 = dx * dx + dy * dy;
-
-            if (dist2 <= minDist2) {
-                minDist2 = dist2;
-            }
+        double mouseX = viewport.worldToScreenX(worldX);
+        double mouseY = viewport.worldToScreenY(worldY);
+        // Check left and right
+        for (int i = index; i >= 0; i--) {
+            Point2D p = fullData.get(i);
+            double dx = viewport.worldToScreenX(p.getX()) - mouseX;
+            double dy = viewport.worldToScreenX(p.getY()) - mouseY;
+            double d2 = dx*dx + dy*dy;
+            if (d2 < minD2) {
+                minD2 = d2;
+            } else break; // We passed the closest point on this side
         }
 
-        return minDist2;
+        for (int i = index + 1; i < fullData.size(); i++) {
+            Point2D p = fullData.get(i);
+            double dx = viewport.worldToScreenX(p.getX()) - mouseX;
+            double dy = viewport.worldToScreenX(p.getY()) - mouseY;
+            double d2 = dx*dx + dy*dy;
+            if (d2 < minD2) {
+                minD2 = d2;
+            } else break; // We passed the closest point on this side
+        }
+
+        return minD2;
     }
 
     public void extendCoverage(double worldMinX, double worldMaxX, double marginX){
-        if(!leftBranch.isEmpty() && leftBranch.getFirst().getX() > (worldMinX + marginX)){
+        if(!autoGenerate) return;
+        boolean hasChanged = false;
+        if(!leftBranch.isEmpty() && leftBranch.getLast().getX() > (worldMinX + marginX)){
             extendLeft();
+            hasChanged = true;
         }
-        
         if(!rightBranch.isEmpty() && rightBranch.getLast().getX() < (worldMaxX - marginX)){
             extendRight();
+            hasChanged = true;
         }
+        if(hasChanged)regenerateFullData();
     }
     
     public ArrayList<Point2D> solve(Point2D initial, double stepSize, double maxSteps){
@@ -197,11 +220,15 @@ public class ODEPlot implements Plot {
     }
 
     public ArrayList<Point2D> list(){
-        ArrayList<Point2D> data = new ArrayList<>();
-        data.addAll(leftBranch);
-        data.add(new Point2D(initial.x, initial.y));
-        data.addAll(rightBranch);
-        return data;
+        return fullData;
+    }
+
+    public void regenerateFullData(){     
+        fullData.clear();
+        fullData.addAll(leftBranch);
+        Collections.reverse(fullData);
+        fullData.add(new Point2D(initial.x, initial.y));
+        fullData.addAll(rightBranch);
     }
 
     public boolean contains(Point2D point){
@@ -216,5 +243,9 @@ public class ODEPlot implements Plot {
     @Override
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public void setAutoGenerate(boolean autoGenerate) {
+        this.autoGenerate = autoGenerate;
     }
 }

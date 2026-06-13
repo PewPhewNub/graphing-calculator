@@ -5,10 +5,10 @@ import java.util.function.Function;
 import core.math.Core.Point;
 import core.parser.Lexer;
 import core.parser.Parser;
-import engine.plotting.FunctionPlot;
-import engine.plotting.ODEPlot;
-import engine.plotting.ParametricPlot;
-import engine.plotting.PolarPlot;
+import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ODEPlot;
+import engine.plotting.plots.ParametricPlot;
+import engine.plotting.plots.PolarPlot;
 import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
@@ -20,6 +20,10 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -30,10 +34,13 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Main extends Application {
     Renderer renderer;
@@ -43,14 +50,15 @@ public class Main extends Application {
     StackPane graphStack;
     UIPanel ui;
     ToolBar toolBar;
+    MenuBar menuBar;
     public static void main(String[] args){
         launch();
     }
 
     public void start(Stage stage) throws Exception{
         graph = new Graph(1200, 900);
-        ui = new UIPanel(400, 900, graph);
-        ui.setMinWidth(400);
+        ui = new UIPanel(350, 900, graph);
+        ui.setMinWidth(350);
         
         currentGraph = graph;
         graphStack = new StackPane();
@@ -60,12 +68,19 @@ public class Main extends Application {
         graphStack.getChildren().add(graph);
         graph.setVisible(true);
         
+        menuBar = new MenuBar();
+        menuBar.setBackground(new Background(
+            new BackgroundFill(
+                Color.rgb(230, 230, 230),
+                CornerRadii.EMPTY,
+                Insets.EMPTY
+            )
+        ));
+        menuBar.getMenus().add(new Menu("File"));
+        menuBar.getMenus().add(new Menu("Plot"));
+        menuBar.getMenus().add(new Menu("View"));
 
         toolBar = new ToolBar();
-        toolBar.setMinHeight(50);
-        toolBar.setPrefHeight(50);
-        toolBar.setMaxHeight(50);
-        toolBar.setMinWidth(50);
         
         //toolBar.setPrefWidth(50);
         //toolBar.setMaxWidth(50);
@@ -74,7 +89,7 @@ public class Main extends Application {
                 boolean isVisible = true;
             {
                 setText(" ≡ ");
-                setFont(new Font(30));
+                setFont(new Font(20));
                 setPadding(Insets.EMPTY);
                 setBorder(Border.EMPTY);
                 setBackground(Background.EMPTY);
@@ -99,16 +114,60 @@ public class Main extends Application {
                     @Override
                     public void handle(ActionEvent e){
                         isVisible = !isVisible;
-                        ui.setVisible(isVisible);
                         ui.setManaged(isVisible);
+                        ui.setVisible(isVisible);
                     }
                 });
             }
         });
-        
+
+        MenuButton addPlotButton = new MenuButton("Add Plot");
+
+        MenuItem functionItem = new MenuItem("Function");
+        functionItem.setOnAction(e ->{
+            ui.getChildren().add(new FunctionPlotEditor(graph.plotManager));
+        });
+        MenuItem parametricItem = new MenuItem("ODE");
+        parametricItem.setOnAction(e ->{
+            ui.getChildren().add(new ODEPlotEditor(graph.plotManager));
+        });
+        MenuItem polarItem = new MenuItem("Parametric");
+        MenuItem odeItem = new MenuItem("Polar");
+
+        addPlotButton.getItems().addAll(
+            functionItem,
+            parametricItem,
+            polarItem,
+            odeItem
+        );
+        addPlotButton.setBackground(new Background(
+            new BackgroundFill(
+                Color.WHITE,
+                new CornerRadii(3),
+                new Insets(3)
+            )
+        ));
+        addPlotButton.setBorder(new Border(
+            new BorderStroke(
+                Color.LIGHTGREY,
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(4),
+                new BorderWidths(1)
+            )
+        ));
+
+        toolBar.getItems().add(addPlotButton);
+        toolBar.setPadding(new Insets(3, 3, 3, 3));
+
         BorderPane pane = new BorderPane();
         pane.setCenter(graphStack);
-        pane.setTop(toolBar);
+
+        VBox menuToolBarPanel = new VBox();
+        menuToolBarPanel.getChildren().add(menuBar);
+        menuToolBarPanel.getChildren().add(toolBar);
+
+        pane.setTop(menuToolBarPanel);
+
         pane.setLeft(ui);
 
         Border thinBorder = new Border(new BorderStroke(
@@ -124,6 +183,7 @@ public class Main extends Application {
         scene = new Scene(pane, 1600, 900);
         stage.setScene(scene);
         stage.setTitle("Almost Desmos");
+        stage.initStyle(StageStyle.DECORATED);
         stage.setMinWidth(400);
         stage.setMinHeight(300);
         stage.show();

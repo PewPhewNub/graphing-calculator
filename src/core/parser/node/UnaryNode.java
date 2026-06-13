@@ -1,5 +1,8 @@
 package core.parser.node;
 
+import java.util.HashSet;
+import java.util.Map;
+
 import core.parser.TokenType;
 
 public class UnaryNode extends ExpressionNode{
@@ -10,8 +13,8 @@ public class UnaryNode extends ExpressionNode{
         this.right = right; this.operator = operator;
     }
 
-    public double evaluate(double x){
-        final double rightValue = right.evaluate(x);
+    public double evaluate(Map<String, Double> map){
+        final double rightValue = right.evaluate(map);
         switch (operator) {
             case PLUS:
                 return rightValue;
@@ -24,5 +27,10 @@ public class UnaryNode extends ExpressionNode{
 
     public String toString(){
         return operator + " " + right.toString();
+    }
+    
+    @Override
+    public HashSet<String> getVariables() {
+        return right.getVariables();
     }
 }

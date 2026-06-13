@@ -1,4 +1,4 @@
-package engine.plotting;
+package engine.plotting.plots;
 
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;

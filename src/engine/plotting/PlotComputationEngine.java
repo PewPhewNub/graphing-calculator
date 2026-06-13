@@ -11,6 +11,11 @@ import core.math.RootFindingAlgorithms.HybridSolvers;
 import core.model.CurveData;
 import core.model.Segment2D;
 import core.model.ViewportState;
+import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ODEPlot;
+import engine.plotting.plots.ParametricPlot;
+import engine.plotting.plots.Plot;
+import engine.plotting.plots.PolarPlot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.effect.Light.Point;
@@ -138,10 +143,10 @@ public class PlotComputationEngine {
 
         for(int i = 1; i < points.size(); i++){
             Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport)){
+            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
+                prev = point;
             }
-            prev = point;
         }
         return new CurveData(plot, list);
     }
@@ -215,7 +220,7 @@ public class PlotComputationEngine {
         Point2D prev = points.getFirst();
         for(int i = 1; i < points.size(); i+=1){
             Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport)){
+            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
             }
             prev = point;
@@ -230,7 +235,7 @@ public class PlotComputationEngine {
         Point2D prev = points.getFirst();
         for(int i = 1; i < points.size(); i+=1){
             Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport)){
+            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
             }
             prev = point;
@@ -305,6 +310,19 @@ public class PlotComputationEngine {
             Math.min(prev.getY(), point.getY()) <= state.top;
         
         if(!(prevVisible || currVisible || overlapsViewport)) return false;
+
+        return true;
+    }
+    private static boolean isSignificant(Point2D prev, Point2D point, Viewport viewport){
+        if (!Double.isFinite(prev.getX()) || !Double.isFinite(prev.getY()) ||
+            !Double.isFinite(point.getX()) || !Double.isFinite(point.getY())) {
+            return false;
+        }
+        double dx = viewport.worldToScreenX(point.getX()) - viewport.worldToScreenX(prev.getX());
+        double dy = viewport.worldToScreenY(point.getY()) - viewport.worldToScreenY(prev.getY());
+        if ((dx * dx + dy * dy) < 1.0) {
+            return false;
+        }
         return true;
     }
 }

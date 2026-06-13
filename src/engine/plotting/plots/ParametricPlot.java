@@ -1,8 +1,7 @@
-package engine.plotting;
+package engine.plotting.plots;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Set;
 import java.util.function.Function;
 
 import engine.rendering.Viewport;
@@ -19,7 +18,7 @@ public class ParametricPlot implements Plot{
     public double maxSamples;
     public ArrayList<Point2D> initialList;
     public ArrayList<Point2D> accurateComputedPoints;
-
+    public final Set<String> knownVariables = Set.of("t");
     public ParametricPlot(String name, Function<Double, Double> x, Function<Double, Double> y, double tMin, double tMax, double maxSamples, Color color){
         this.x = x;
         this.y = y;

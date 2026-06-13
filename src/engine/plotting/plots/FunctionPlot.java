@@ -1,7 +1,9 @@
-package engine.plotting;
+package engine.plotting.plots;
 
+import java.util.Set;
 import java.util.function.Function;
 
+import engine.plotting.settings.FunctionPlotSettings;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -11,10 +13,13 @@ public class FunctionPlot implements Plot{
     public Function<Double, Double> function;
     Color color;
     String name;
+    public FunctionPlotSettings settings;
+
     public FunctionPlot(String name, Function<Double, Double> f, Color color){
         function = f;
         this.name = name;
         this.color = color;
+        settings = new FunctionPlotSettings();
     }
 
     public String getName() {
@@ -67,5 +72,13 @@ public class FunctionPlot implements Plot{
     @Override
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public void setDependentVariable(String dependent){
+        settings.dependentVariable = dependent;
+    }
+    
+    public void setIndependentVariable(String independent){
+        settings.independentVariable = independent;
     }
 }

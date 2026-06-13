@@ -1,5 +1,8 @@
 package core.parser.node;
 
+import java.util.HashSet;
+import java.util.Map;
+
 public class FunctionNode extends ExpressionNode{
     private final String functionName;
     private final ExpressionNode argument;
@@ -8,8 +11,8 @@ public class FunctionNode extends ExpressionNode{
         this.argument = argument;
     }
 
-    public double evaluate(double x){
-        double argumentValue = argument.evaluate(x);
+    public double evaluate(Map<String, Double> map){
+        double argumentValue = argument.evaluate(map);
 
         switch (functionName) {
             case "sin":
@@ -48,5 +51,9 @@ public class FunctionNode extends ExpressionNode{
 
     public String toString(){
         return " " + functionName + "(" + argument.toString() + ") ";
+    }
+    @Override
+    public HashSet<String> getVariables() {
+        return argument.getVariables();
     }
 }

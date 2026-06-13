@@ -149,13 +149,13 @@ public class RungeKuttaMethod {
                 return new ODESolution(ODEStatus.STEPSIZE_UNDERFLOW);
             }
             if(error == 0){
-                multiplier = Math.max(20, multiplier * 1.5);
+                multiplier = Math.max(1, multiplier * 1.5);
             }else{
                 double factor = 0.9*Math.pow(tolerance/error,0.2);
                 factor = Math.max(0.2, Math.min(5.0,factor));
                 multiplier *= factor;   
             }
-
+            multiplier = Math.min(multiplier, 5);
             if(error >= tolerance){
                 rejectedSteps++;
                 continue;

@@ -1,6 +1,7 @@
-package engine.plotting;
+package engine.plotting.plots;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.function.Function;
 
 import engine.rendering.Viewport;
@@ -16,7 +17,7 @@ public class PolarPlot implements Plot {
     public double maxSamples;
     public ArrayList<Point2D> initialList;
     public ArrayList<Point2D> accurateComputedPoints;
-
+    public final Set<String> knownVariables = Set.of("\u03B8");
     public PolarPlot(String name, Function<Double, Double> r, double tMin, double tMax, double maxSamples, Color color){
         this.r = r;
         this.name = name;

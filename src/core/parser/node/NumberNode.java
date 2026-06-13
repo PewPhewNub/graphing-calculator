@@ -1,5 +1,9 @@
 package core.parser.node;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class NumberNode extends ExpressionNode {
     private final double number;
 
@@ -7,10 +11,15 @@ public class NumberNode extends ExpressionNode {
         this.number = number;
     }
 
-    public double evaluate(double x){
+    public double evaluate(Map<String, Double> map){
         return number;
     }
     public String toString(){
         return number + "";
+    }
+    
+    @Override
+    public HashSet<String> getVariables() {
+        return new HashSet<>();
     }
 }

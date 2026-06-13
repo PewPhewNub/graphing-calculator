@@ -2,6 +2,8 @@ package engine.plotting;
 
 import java.util.ArrayList;
 
+import engine.plotting.plots.ODEPlot;
+import engine.plotting.plots.Plot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

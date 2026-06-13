@@ -1,7 +1,7 @@
 package core.parser;
 
-import java.io.EOFException;
 import java.util.ArrayList;
+import java.util.Set;
 
 import core.parser.node.BinaryNode;
 import core.parser.node.BinaryOp;
@@ -115,49 +115,8 @@ public class Parser{
         return left;
     }
 
-    public DefinitionNode parseDefinitionFunction() throws Exception {
-
-        if (peek().type != TokenType.IDENTIFIER) {
-            throw new RuntimeException("Expected identifier at start of definition");
-        }
-
-        String name = advance().value;
-
-        if (peek().type != TokenType.ASSIGN) {
-            throw new RuntimeException("Expected '=' after identifier");
-        }
-
-        advance(); // consume '='
-
+    public DefinitionNode parseDefinition(String dependentVariable, Set<String> knownVariables) throws Exception {
         ExpressionNode expr = parseExpression();
-
-        if (name.equals("y")) {
-            return new DefinitionNode("y", "x", expr);
-        }
-
-        return new DefinitionNode(name, "x", expr);
-    }
-
-    public DefinitionNode parseDefinitionPolar() throws Exception {
-
-        if (peek().type != TokenType.IDENTIFIER) {
-            throw new RuntimeException("Expected identifier at start of definition");
-        }
-
-        String name = advance().value;
-
-        if (peek().type != TokenType.ASSIGN) {
-            throw new RuntimeException("Expected '=' after identifier");
-        }
-
-        advance(); // consume '='
-
-        ExpressionNode expr = parseExpression();
-
-        if (name.equals("r")) {
-            return new DefinitionNode("r", "x", expr);
-        }
-
-        return new DefinitionNode(name, "x", expr);
-    }
+        return new DefinitionNode(expr, dependentVariable, knownVariables);
+    }  
 }

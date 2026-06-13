@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 import core.model.CurveData;
 import core.model.ViewportState;
+import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ODEPlot;
+import engine.plotting.plots.ParametricPlot;
+import engine.plotting.plots.Plot;
+import engine.plotting.plots.PolarPlot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 
@@ -29,6 +34,7 @@ public class PlotManager{
         curveCache.clear();
         ViewportState state = new ViewportState(viewport);
         for(Plot plot : plots){
+            if(plot == null) continue;
             if(plot instanceof FunctionPlot)
                 curveCache.add(
                     PlotComputationEngine.computeCurveData((FunctionPlot)plot, viewport)

@@ -1,7 +1,5 @@
 package engine.UI;
 
-import java.util.HexFormat;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -20,18 +18,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 
 public class ColorChooser extends StackPane{
@@ -50,6 +49,9 @@ public class ColorChooser extends StackPane{
     private Slider redSlider;
     private Slider greenSlider;
     private Slider blueSlider;
+    private Label redLabel;
+    private Label greenLabel;
+    private Label blueLabel;
 
     private TextField hexField;
 
@@ -61,6 +63,7 @@ public class ColorChooser extends StackPane{
         Color.ORANGE,
         Color.LIMEGREEN,
         Color.PINK,
+        Color.DARKGRAY,
         Color.BLACK
     };
 
@@ -85,7 +88,7 @@ public class ColorChooser extends StackPane{
             new BorderStroke(
                 Color.LIGHTGRAY, 
                 BorderStrokeStyle.SOLID, 
-                new CornerRadii(15), 
+                new CornerRadii(12.5), 
                 new BorderWidths(2)
             )
         ));
@@ -95,7 +98,7 @@ public class ColorChooser extends StackPane{
                     new BackgroundFill(
                         color,
                         new CornerRadii(15),
-                        new Insets(2)
+                        new Insets(3)
                     )
                 )
             );
@@ -118,7 +121,7 @@ public class ColorChooser extends StackPane{
                     new BackgroundFill(
                         newColor,
                         new CornerRadii(15),
-                        new Insets(2)
+                        new Insets(3)
                     )
                 )
             );
@@ -171,6 +174,7 @@ public class ColorChooser extends StackPane{
             circle.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent e){
+                    circle.requestFocus();
                     setSelectedColor(i);
                 }
             });
@@ -290,17 +294,61 @@ public class ColorChooser extends StackPane{
 
         redSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
             setSelectedColor(new Color((double)newValue/255, getSelectedColor().getGreen(), getSelectedColor().getBlue(), 1));
+            redLabel.setText("R: " + (int)(Math.round((double)newValue)));
         });
         greenSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
             setSelectedColor(new Color(getSelectedColor().getRed(), (double)newValue/255, getSelectedColor().getBlue(), 1));
+            greenLabel.setText("G: " + (int)(Math.round((double)newValue)));
         });
         blueSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
             setSelectedColor(new Color(getSelectedColor().getRed(), getSelectedColor().getGreen(), (double)newValue/255, 1));
+            blueLabel.setText("B: " + (int)(Math.round((double)newValue)));
         });
 
-        advancedPane.getChildren().add(redSlider);
-        advancedPane.getChildren().add(greenSlider);
-        advancedPane.getChildren().add(blueSlider);
+        advancedPane.getChildren().add(new BorderPane(){
+            {
+                redLabel = new Label();
+                redLabel.setLabelFor(redSlider);
+                redLabel.setTextFill(Color.RED);
+                redLabel.setMaxWidth(75);
+                redLabel.setMinWidth(75);
+                redLabel.setTextAlignment(TextAlignment.LEFT);
+                redLabel.setPadding(new Insets(5, 5, 5, 25));
+                redSlider.setPadding(new Insets(5, 25, 5, 5));
+                setLeft(redLabel);
+                setCenter(redSlider);
+            }
+        });
+        
+        advancedPane.getChildren().add(new BorderPane(){
+            {
+                greenLabel = new Label();
+                greenLabel.setLabelFor(greenSlider);
+                greenLabel.setTextFill(Color.GREEN);
+                greenLabel.setMaxWidth(75);
+                greenLabel.setMinWidth(75);
+                greenLabel.setTextAlignment(TextAlignment.LEFT);
+                greenLabel.setPadding(new Insets(5, 5, 5, 25));
+                greenSlider.setPadding(new Insets(5, 25, 5, 5));
+                setLeft(greenLabel);
+                setCenter(greenSlider);
+            }
+        });
+        
+        advancedPane.getChildren().add(new BorderPane(){
+            {
+                blueLabel = new Label();
+                blueLabel.setLabelFor(blueSlider);
+                blueLabel.setTextFill(Color.BLUE);
+                blueLabel.setMaxWidth(75);
+                blueLabel.setMinWidth(75);
+                blueLabel.setTextAlignment(TextAlignment.LEFT);
+                blueLabel.setPadding(new Insets(5, 5, 5, 25));
+                blueSlider.setPadding(new Insets(5, 25, 5, 5));
+                setLeft(blueLabel);
+                setCenter(blueSlider);
+            }
+        });
 
         popupContent.getChildren().add(swatchPane);
         swatchPane.setManaged(true);
@@ -317,6 +365,8 @@ public class ColorChooser extends StackPane{
                     localToScreen(colorDisplay.getBoundsInLocal()).getMaxX(),
                     localToScreen(colorDisplay.getBoundsInLocal()).getMinY()
                 );
+            }else{
+                popup.hide();
             }
         });
 
