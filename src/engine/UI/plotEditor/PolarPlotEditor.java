@@ -1,4 +1,4 @@
-package engine.UI;
+package engine.UI.plotEditor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,8 +7,9 @@ import java.util.Set;
 import core.parser.Lexer;
 import core.parser.Parser;
 import core.parser.node.DefinitionNode;
+import engine.UI.ColorChooser;
 import engine.plotting.PlotManager;
-import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.PolarPlot;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,8 +35,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-public class FunctionPlotEditor extends PlotEditor{
-
+public class PolarPlotEditor extends PlotEditor{
     public ColorChooser colorChooser;
     public BorderPane topPanel;
 
@@ -44,19 +44,21 @@ public class FunctionPlotEditor extends PlotEditor{
     public TextField functionInputField;
     public Label functionInputLabel;
 
-    public String dependent = "y";
-    public String independent = "x";
+    public String dependent = "r";
+    public String independent = "\u03B8";
 
     private Label independentVarLabel;
     private Label dependentVarLabel;
     private TextField independentVarField;
     private TextField dependentVarField;
+    private TextField minimum; private TextField maximum;
+    private TextField maxSamples;
 
     private Button advancedButton;
     private boolean isAdvancedShow = false;
     private VBox advancedOptionsPanel;
 
-    public FunctionPlotEditor(PlotManager plotManager){
+    public PolarPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
 
         setBackground(new Background(
@@ -87,7 +89,7 @@ public class FunctionPlotEditor extends PlotEditor{
         });
 
         functionInputPanel = new HBox();
-        functionInputLabel = new Label("y = ");
+        functionInputLabel = new Label("r(\u03B8) = ");
         functionInputLabel.setBorder(new Border(new BorderStroke(
             Color.rgb(220, 220, 220),       // A soft, light gray color
             BorderStrokeStyle.SOLID,        // Solid line style
@@ -98,7 +100,7 @@ public class FunctionPlotEditor extends PlotEditor{
         functionInputLabel.setTextAlignment(TextAlignment.LEFT);
         functionInputLabel.setPadding(new Insets(5,0,5,15));
 
-        functionInputField = new TextField("x");
+        functionInputField = new TextField("\u03B8");
         functionInputField.setFont(new Font(20));
         functionInputField.setAlignment(Pos.CENTER_LEFT);
         functionInputField.textProperty().addListener(
@@ -285,7 +287,7 @@ public class FunctionPlotEditor extends PlotEditor{
         topPanel = new BorderPane();
         getChildren().add(0, topPanel);
         topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Function Plot"){
+        topPanel.setCenter(new Label("Polar Plot"){
             {
                 setAlignment(Pos.CENTER);
             }
@@ -310,10 +312,211 @@ public class FunctionPlotEditor extends PlotEditor{
             close();
         });
 
+        HBox minBox = new HBox();
+        minBox.getChildren().add(new Label(){
+            {
+                setText("Min : ");
+                setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                
+                setBorder(new Border(new BorderStroke(
+                    Color.rgb(220, 220, 220),
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2, 0, 0, 2, false),
+                    new BorderWidths(2, 0, 2, 2)
+                )));
+                setPadding(new Insets(5, 0, 5, 10));
+            }
+        });
+        minimum = new TextField();
+        minimum.setBackground(new Background(new BackgroundFill(
+            Color.WHITE,
+            new CornerRadii(0, 2, 2, 0, false),
+            new Insets(2, 2, 2, 0)
+        )));
+        
+        minimum.setBorder(new Border(new BorderStroke(
+            Color.rgb(220, 220, 220),
+            BorderStrokeStyle.SOLID,
+            new CornerRadii(0, 2, 2, 0, false),
+            new BorderWidths(2, 2, 2, 0)
+        )));
+        minimum.setPadding(new Insets(5, 0, 5, 0));
+
+        minimum.textProperty().addListener((obs, oldValue, newValue) -> {
+            try {
+                buildPlot();
+            } catch (Exception e1) {
+                System.out.println(e1.getMessage());
+            }
+        });
+        minimum.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.contains("theta")) {
+                // Use Platform.runLater to avoid conflicts with the ongoing text update
+                Platform.runLater(() -> {
+                    int caretPosition = minimum.getCaretPosition();
+                    
+                    // Replace the text
+                    String replaced = newValue.replace("theta", "\u03B8");
+                    minimum.setText(replaced);
+                    
+                    // Adjust caret position so it doesn't jump to the beginning
+                    minimum.positionCaret(caretPosition - 4); 
+                });
+            }
+        });
+        
+        minBox.getChildren().add(minimum);
+        
+        HBox maxBox = new HBox();
+        maxBox.getChildren().add(new Label(){
+            {
+                setText("Max : ");
+                setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                
+                setBorder(new Border(new BorderStroke(
+                    Color.rgb(220, 220, 220),       // A soft, light gray color
+                    BorderStrokeStyle.SOLID,        // Solid line style
+                    new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                    new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+                )));
+                setPadding(new Insets(5, 0, 5, 10));
+            }
+        });
+        maximum = new TextField("50");
+        maximum.setBackground(new Background(new BackgroundFill(
+            Color.WHITE,
+            new CornerRadii(0, 2, 2, 0, false),
+            new Insets(2, 2, 2, 0)
+        )));
+        
+        maximum.setBorder(new Border(new BorderStroke(
+            Color.rgb(220, 220, 220),       // A soft, light gray color
+            BorderStrokeStyle.SOLID,        // Solid line style
+            new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+        )));
+        maximum.setPadding(new Insets(5, 0, 5, 0));
+
+        maximum.textProperty().addListener((obs, oldValue, newValue) -> {
+            try {
+                buildPlot();
+            } catch (Exception e1) {
+                System.out.println(e1.getMessage());
+            }
+        });
+        
+        maximum.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.contains("theta")) {
+                // Use Platform.runLater to avoid conflicts with the ongoing text update
+                Platform.runLater(() -> {
+                    int caretPosition = maximum.getCaretPosition();
+                    
+                    // Replace the text
+                    String replaced = newValue.replace("theta", "\u03B8");
+                    maximum.setText(replaced);
+                    
+                    // Adjust caret position so it doesn't jump to the beginning
+                    maximum.positionCaret(caretPosition - 4); 
+                });
+            }
+        });
+        maxBox.getChildren().add(maximum);
+
+        minimum.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            if (newText.matches("-?\\d*(\\.\\d*)?")) {
+                return change;
+            }
+
+            return null;
+        }));
+        maximum.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            if (newText.matches("-?\\d*(\\.\\d*)?")) {
+                return change;
+            }
+
+            return null;
+        }));
+
+        minBox.setPadding(new Insets(5, 25, 5, 25));
+        maxBox.setPadding(new Insets(5, 25, 5, 25));
+
+        minimum.setText("0");
+        maximum.setText("50");
+
+        advancedOptionsPanel.getChildren().add(minBox);
+        advancedOptionsPanel.getChildren().add(maxBox);
+
+        HBox sampleBox = new HBox();
+        sampleBox.getChildren().add(new Label(){
+            {
+                setText("Max samples : ");
+                setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                
+                setBorder(new Border(new BorderStroke(
+                    Color.rgb(220, 220, 220),       // A soft, light gray color
+                    BorderStrokeStyle.SOLID,        // Solid line style
+                    new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                    new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+                )));
+                setPadding(new Insets(5, 0, 5, 10));
+            }
+        });
+        maxSamples = new TextField("50000");
+        maxSamples.setBackground(new Background(new BackgroundFill(
+            Color.WHITE,
+            new CornerRadii(0, 2, 2, 0, false),
+            new Insets(2, 2, 2, 0)
+        )));
+        
+        maxSamples.setBorder(new Border(new BorderStroke(
+            Color.rgb(220, 220, 220),       // A soft, light gray color
+            BorderStrokeStyle.SOLID,        // Solid line style
+            new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+        )));
+        maxSamples.setPadding(new Insets(5, 0, 5, 0));
+
+        maxSamples.textProperty().addListener((obs, oldValue, newValue) -> {
+            try {
+                buildPlot();
+            } catch (Exception e1) {
+                System.out.println(e1.getMessage());
+            }
+        });
+
+        maxSamples.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            if (newText.matches("\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+        sampleBox.getChildren().add(maxSamples);
+        sampleBox.setPadding(new Insets(5, 0, 5, 25));
+
+        advancedOptionsPanel.getChildren().add(sampleBox);
         try {
             buildPlot();
-        } catch(Exception e1) {
-            System.out.println(e1.getMessage());
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
     }
 
@@ -331,11 +534,15 @@ public class FunctionPlotEditor extends PlotEditor{
                         Set.of(independent)
                     );
             plotManager.removePlot(plot);
-            plot = new FunctionPlot(dependent, 
+            plot = new PolarPlot(dependent, 
                 x -> {
                     map.put(independent, x);
                     return node.evaluate(map);
-                }, colorChooser.getSelectedColor());       
+                },
+                Double.parseDouble(minimum.getText()),
+                Double.parseDouble(maximum.getText()),
+                Double.parseDouble(maxSamples.getText()),
+                colorChooser.getSelectedColor());       
             plotManager.addPlot(plot);
         }catch(Exception e1){
             System.out.println(e1.getMessage());

@@ -2,7 +2,6 @@ package core.parser.node;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class NumberNode extends ExpressionNode {
     private final double number;

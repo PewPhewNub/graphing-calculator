@@ -1,14 +1,8 @@
 package engine.UI;
 
-import java.util.function.Function;
-
-import core.math.Core.Point;
-import core.parser.Lexer;
-import core.parser.Parser;
-import engine.plotting.plots.FunctionPlot;
-import engine.plotting.plots.ODEPlot;
-import engine.plotting.plots.ParametricPlot;
-import engine.plotting.plots.PolarPlot;
+import engine.UI.plotEditor.FunctionPlotEditor;
+import engine.UI.plotEditor.ODEPlotEditor;
+import engine.UI.plotEditor.PolarPlotEditor;
 import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
@@ -27,14 +21,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -127,12 +119,15 @@ public class Main extends Application {
         functionItem.setOnAction(e ->{
             ui.getChildren().add(new FunctionPlotEditor(graph.plotManager));
         });
-        MenuItem parametricItem = new MenuItem("ODE");
-        parametricItem.setOnAction(e ->{
+        MenuItem odeItem = new MenuItem("ODE");
+        odeItem.setOnAction(e ->{
             ui.getChildren().add(new ODEPlotEditor(graph.plotManager));
         });
         MenuItem polarItem = new MenuItem("Parametric");
-        MenuItem odeItem = new MenuItem("Polar");
+        MenuItem parametricItem = new MenuItem("Polar");
+        parametricItem.setOnAction(e ->{
+            ui.getChildren().add(new PolarPlotEditor(graph.plotManager));
+        });
 
         addPlotButton.getItems().addAll(
             functionItem,

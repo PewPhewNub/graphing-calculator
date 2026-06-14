@@ -2,9 +2,6 @@ package core.parser.node;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import core.parser.TokenType;
 
 public class BinaryNode extends ExpressionNode{
     private final ExpressionNode left;

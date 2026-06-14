@@ -1,6 +1,5 @@
 package engine.plotting;
 
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
 import core.model.CurveData;

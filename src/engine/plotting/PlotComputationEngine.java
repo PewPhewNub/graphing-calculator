@@ -18,7 +18,6 @@ import engine.plotting.plots.Plot;
 import engine.plotting.plots.PolarPlot;
 import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
-import javafx.scene.effect.Light.Point;
 
 public class PlotComputationEngine {
 
@@ -145,8 +144,8 @@ public class PlotComputationEngine {
             Point2D point = points.get(i);
             if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
-                prev = point;
             }
+            prev = point;
         }
         return new CurveData(plot, list);
     }
@@ -212,7 +211,7 @@ public class PlotComputationEngine {
         }
         return new CurveData(plot, list);
     }
-    
+
     public static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
         ArrayList<Point2D> points = plot.sample(viewport.width);
         ArrayList<Segment2D> list = new ArrayList<>();
@@ -229,7 +228,9 @@ public class PlotComputationEngine {
     }
     
     public static CurveData computeCurveData(PolarPlot plot, Viewport viewport){
-        ArrayList<Point2D> points = plot.sample(viewport.width);
+        plot.recomputePoints(viewport, 0.5);
+        ArrayList<Point2D> points = plot.currentList;
+        System.out.println(points.size());
         ArrayList<Segment2D> list = new ArrayList<>();
         if(points.isEmpty()) return new CurveData(plot, list);
         Point2D prev = points.getFirst();

@@ -1,9 +1,5 @@
 package core.parser;
 
-import java.util.Map;
-import java.util.function.Function;
-
-import core.parser.node.DefinitionNode;
 import core.parser.node.ExpressionNode;
 
 public class Main {

@@ -47,10 +47,6 @@ public class Lexer {
         if (isAtEnd()) return '\0';
         return inputString.charAt(position);
     }
-    private char currentChar(){
-        if (isAtEnd()) return '\0';
-        return inputString.charAt(position);
-    }
     private boolean isAtEnd(){
         return position >= inputString.length();
     }

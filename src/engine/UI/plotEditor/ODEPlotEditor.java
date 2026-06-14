@@ -1,4 +1,4 @@
-package engine.UI;
+package engine.UI.plotEditor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +8,7 @@ import core.math.Core.Point;
 import core.parser.Lexer;
 import core.parser.Parser;
 import core.parser.node.DefinitionNode;
+import engine.UI.ColorChooser;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.ODEPlot;
 import javafx.application.Platform;
@@ -230,7 +231,6 @@ public class ODEPlotEditor extends PlotEditor{
         
         box1.getChildren().add(independentVarLabel);
         independentVarField = new TextField();
-        independentVarField.setText("y");
 
         independentVarField.setBackground(new Background(new BackgroundFill(
             Color.WHITE,
@@ -288,7 +288,7 @@ public class ODEPlotEditor extends PlotEditor{
         topPanel = new BorderPane();
         getChildren().add(0, topPanel);
         topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Function Plot"){
+        topPanel.setCenter(new Label("ODE Plot"){
             {
                 setAlignment(Pos.CENTER);
             }
@@ -320,8 +320,7 @@ public class ODEPlotEditor extends PlotEditor{
             if(plot != null) ((ODEPlot)plot).setAutoGenerate(autoGenerate.isSelected());
         });
         autoGenerate.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        autoGenerate.setPadding(new Insets(5, 0, 5, 25));
-
+        autoGenerate.setPadding(new Insets(5, 28, 5, 25));
         advancedOptionsPanel.getChildren().add(autoGenerate);
 
         try {

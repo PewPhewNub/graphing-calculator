@@ -27,9 +27,6 @@ public class Parser{
     private Token peek(){
         return tokenList.get(position);
     }
-    private boolean isAtEnd(){
-        return peek().type == TokenType.EOF;
-    }
     private boolean match(TokenType type){
         if(peek().type != type) return false; 
         advance();

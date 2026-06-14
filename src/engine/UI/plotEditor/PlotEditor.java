@@ -1,11 +1,10 @@
-package engine.UI;
+package engine.UI.plotEditor;
 
 import engine.plotting.PlotManager;
 import engine.plotting.plots.Plot;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 public abstract class PlotEditor extends VBox {
     Plot plot;
