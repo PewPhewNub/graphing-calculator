@@ -1,6 +1,6 @@
 package engine.UI;
 
-import engine.UI.plotEditor.FunctionPlotEditor;
+import engine.UI.plotEditor.ParametricPlotEditor;
 import engine.rendering.Graph;
 import javafx.scene.layout.VBox;
 public class UIPanel extends VBox {
@@ -11,7 +11,7 @@ public class UIPanel extends VBox {
         setWidth(width);
         this.graph = graph;
 
-        getChildren().add(new FunctionPlotEditor(graph.plotManager));
+        getChildren().add(new ParametricPlotEditor(graph.plotManager));
     }
     public void setGraph(Graph graph) {
         this.graph = graph;

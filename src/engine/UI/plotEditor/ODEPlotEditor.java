@@ -62,6 +62,7 @@ public class ODEPlotEditor extends PlotEditor{
 
     private Button generate;
     private CheckBox autoGenerate;
+    private CheckBox slopeField;
 
     public ODEPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
@@ -230,7 +231,7 @@ public class ODEPlotEditor extends PlotEditor{
         )));
         
         box1.getChildren().add(independentVarLabel);
-        independentVarField = new TextField();
+        independentVarField = new TextField("x");
 
         independentVarField.setBackground(new Background(new BackgroundFill(
             Color.WHITE,
@@ -248,7 +249,7 @@ public class ODEPlotEditor extends PlotEditor{
 
         independentVarField.textProperty().addListener((obs, oldValue, newValue) -> {
             independent = independentVarField.getText();
-            functionInputLabel.setText("d(" + (dependent) + ")/(" + independent + ")");
+            functionInputLabel.setText("d(" + (dependent) + ")/d(" + independent + ") = ");
         });
 
         box1.getChildren().add(independentVarField);
@@ -273,7 +274,7 @@ public class ODEPlotEditor extends PlotEditor{
 
         dependentVarField.textProperty().addListener((obs, oldValue, newValue) -> {
             dependent = dependentVarField.getText();
-            functionInputLabel.setText("d(" + (dependent) + ")/(" + independent + ")");
+            functionInputLabel.setText("d(" + (dependent) + ")/d(" + independent + ") = ");
         });
 
         box2.getChildren().add(dependentVarField);
@@ -322,6 +323,16 @@ public class ODEPlotEditor extends PlotEditor{
         autoGenerate.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         autoGenerate.setPadding(new Insets(5, 28, 5, 25));
         advancedOptionsPanel.getChildren().add(autoGenerate);
+        
+        slopeField = new CheckBox("Show Slope Fields");
+        slopeField.setFont(new Font(12));
+        slopeField.setSelected(false);
+        slopeField.setOnAction(e ->{
+            if(plot != null) ((ODEPlot)plot).setShowSlopeField(slopeField.isSelected());
+        });
+        slopeField.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        slopeField.setPadding(new Insets(5, 28, 5, 25));
+        advancedOptionsPanel.getChildren().add(slopeField);
 
         try {
             buildPlot();
@@ -351,6 +362,7 @@ public class ODEPlotEditor extends PlotEditor{
                     return node.evaluate(map);
                 }, new Point(0, 1), colorChooser.getSelectedColor());       
             plotManager.addPlot(plot);
+            ((ODEPlot)plot).setShowSlopeField(slopeField.isSelected());
         }catch(Exception e1){
             System.out.println(e1.getMessage());
         }

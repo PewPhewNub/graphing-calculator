@@ -7,6 +7,8 @@ import core.model.ViewportState;
 import engine.UI.InputController;
 import engine.plotting.PlotInteractionController;
 import engine.plotting.PlotManager;
+import engine.plotting.plots.ODEPlot;
+import engine.plotting.plots.Plot;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
@@ -87,6 +89,9 @@ public class Graph extends Canvas{
         plotManager.recompute(viewport);
         for(CurveData i : plotManager.curveCache) renderer.drawCurveSegmented(i.visiblePoints(), i.originalPlot().getColor());
         for(Point2D i : plotManager.featureCache) renderer.drawMarker(i, 6, Color.LIGHTGRAY);
+        for(Plot i : plotManager.plots){
+            if(i instanceof ODEPlot) ((ODEPlot)i).drawSlopeField(renderer, gridData);
+        }
         if(PIController.inspectionPoint != null){
             renderer.drawMarker(PIController.inspectionPoint, 7, PIController.currentColor);
             renderer.drawInspectionLabel(PIController.inspectionPoint, Color.LIGHTGRAY);

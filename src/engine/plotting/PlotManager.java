@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import core.model.CurveData;
 import core.model.ViewportState;
 import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ImplicitPlot;
 import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
@@ -54,6 +55,12 @@ public class PlotManager{
                 ((PolarPlot)plot).accurateComputedPoints.clear();
                 curveCache.add(    
                     PlotComputationEngine.computeCurveData((PolarPlot)plot, viewport)
+                );
+            }
+            
+            if(plot instanceof ImplicitPlot){
+                curveCache.add(    
+                    PlotComputationEngine.computeCurveData((ImplicitPlot)plot, viewport)
                 );
             }
         }

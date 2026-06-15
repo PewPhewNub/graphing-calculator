@@ -4,6 +4,13 @@
             "type": "java",
             "name": "Main",
             "request": "launch",
+            "mainClass": "engine.plotting.plots.Main",
+            "projectName": "NumericalPhysics_d4922de1"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
             "mainClass": "engine.UI.Main",
             "projectName": "NumericalPhysics_d4922de1",
             "vmArgs": "--module-path \"D:/Vikram/JavaFX/javafx-sdk-25/lib\" --add-modules javafx.controls"

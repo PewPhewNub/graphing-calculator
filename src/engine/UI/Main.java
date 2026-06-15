@@ -2,7 +2,9 @@ package engine.UI;
 
 import engine.UI.plotEditor.FunctionPlotEditor;
 import engine.UI.plotEditor.ODEPlotEditor;
+import engine.UI.plotEditor.ParametricPlotEditor;
 import engine.UI.plotEditor.PolarPlotEditor;
+import engine.plotting.plots.ImplicitPlot;
 import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
@@ -124,6 +126,9 @@ public class Main extends Application {
             ui.getChildren().add(new ODEPlotEditor(graph.plotManager));
         });
         MenuItem polarItem = new MenuItem("Parametric");
+        polarItem.setOnAction(e ->{
+            ui.getChildren().add(new ParametricPlotEditor(graph.plotManager));
+        });
         MenuItem parametricItem = new MenuItem("Polar");
         parametricItem.setOnAction(e ->{
             ui.getChildren().add(new PolarPlotEditor(graph.plotManager));
@@ -188,6 +193,8 @@ public class Main extends Application {
         //graph.plotManager.addPlot(new FunctionPlot("F3", x -> Math.sin(x - 2*Math.PI/3), Color.PURPLE));
         //graph.plotManager.addPlot(new ODEPlot("ODE1", (x,y) -> y, new Point(0, 1), Color.BLUE));
         //graph.plotManager.addPlot(new ParametricPlot("Para1", t -> Math.sin(t) * Math.exp(t/10), t -> Math.cos(t) * Math.exp(t/100), -50, 50, 50000, Color.BLACK));
+        graph.plotManager.addPlot(new ImplicitPlot("1", (x,y) -> x*y - 1, Color.GREEN));
+
 
         for(Node i : graphStack.getChildren()){
             if(i instanceof Graph){  

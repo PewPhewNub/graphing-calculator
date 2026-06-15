@@ -27,6 +27,7 @@ public class ODEPlot implements Plot {
     String name;
     Color color;
     boolean autoGenerate = false;
+    boolean showSlopeField = false;
     ArrayList<Point2D> fullData;
     public final Set<String> knownVariables = Set.of("x", "y");
     public ODEPlot(String name, BiFunction<Double, Double, Double> equation, Point initial, Color color){
@@ -104,6 +105,7 @@ public class ODEPlot implements Plot {
     }
 
     public void drawSlopeField(Renderer r, GridData data) {
+        if(!showSlopeField) return;
         double pixelLength = 20; // fixed screen length
         for (Point2D p : data.points) {
 
@@ -247,5 +249,9 @@ public class ODEPlot implements Plot {
 
     public void setAutoGenerate(boolean autoGenerate) {
         this.autoGenerate = autoGenerate;
+    }
+
+    public void setShowSlopeField(boolean showSlopeField) {
+        this.showSlopeField = showSlopeField;
     }
 }

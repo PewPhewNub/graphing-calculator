@@ -12,6 +12,7 @@ import core.model.CurveData;
 import core.model.Segment2D;
 import core.model.ViewportState;
 import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ImplicitPlot;
 import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
@@ -144,8 +145,8 @@ public class PlotComputationEngine {
             Point2D point = points.get(i);
             if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
+                prev = point;
             }
-            prev = point;
         }
         return new CurveData(plot, list);
     }
@@ -221,8 +222,8 @@ public class PlotComputationEngine {
             Point2D point = points.get(i);
             if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
+                prev = point;
             }
-            prev = point;
         }
         return new CurveData(plot, list);
     }
@@ -238,10 +239,14 @@ public class PlotComputationEngine {
             Point2D point = points.get(i);
             if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
                 list.add(new Segment2D(prev, point));
+                prev = point;
             }
-            prev = point;
         }
         return new CurveData(plot, list);
+    }
+
+    public static CurveData computeCurveData(ImplicitPlot plot, Viewport viewport){
+        return new CurveData(plot, plot.sample(viewport));
     }
     public static void ensureCoverage(ODEPlot plot, double worldMinX, double worldMaxX, double marginX){
         plot.extendCoverage(worldMinX, worldMaxX, marginX);
