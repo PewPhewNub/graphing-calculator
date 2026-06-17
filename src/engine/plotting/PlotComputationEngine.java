@@ -339,7 +339,7 @@ public class PlotComputationEngine {
         double midX = x1 + (x2 - x1) / 2;
         double midY = f.apply(midX);
         // Base case
-        if (depth > 50) {
+        if (depth > 25) {
 
             if (Math.abs(y2 - y1) > toleranceY * 20) {
                 points.add(null);
@@ -373,7 +373,6 @@ public class PlotComputationEngine {
             error > toleranceY ||
             Math.abs(y2 - y1) > toleranceY * 4
         ) {
-            
             adaptiveSample(f, derivative, state, x1, midX, points, toleranceX, toleranceY, depth + 1);
             adaptiveSample(f, derivative, state, midX, x2, points, toleranceX, toleranceY, depth + 1);
         } else {
@@ -395,14 +394,14 @@ public class PlotComputationEngine {
                 (y1 > state.bottom && y2 < state.bottom);
 
             if (crossesTop && crossesBottom) {
-    adaptiveSample(f, derivative, state, x1, midX,
-        points, toleranceX, toleranceY, depth + 1);
+                adaptiveSample(f, derivative, state, x1, midX,
+                    points, toleranceX, toleranceY, depth + 1);
 
-    adaptiveSample(f, derivative, state, midX, x2,
-        points, toleranceX, toleranceY, depth + 1);
+                adaptiveSample(f, derivative, state, midX, x2,
+                    points, toleranceX, toleranceY, depth + 1);
 
-    return;
-}
+                return;
+            }
 
             if (crossesBottom) {
                 Function<Double, Double> boundary =
@@ -468,7 +467,7 @@ public class PlotComputationEngine {
     static double highest;
     public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
-        double samples = (int)(viewport.width);
+        double samples = (int)(viewport.width + 17);
         double stepX = (state.right - state.left)/samples;
         double toleranceY = Math.abs(
                 viewport.screenToWorldY(1)
@@ -478,34 +477,25 @@ public class PlotComputationEngine {
                 viewport.screenToWorldX(1)
             - viewport.screenToWorldX(0)
         );
-        highest = Double.NEGATIVE_INFINITY;
+        double offset = stepX * 0.123;
+
         ArrayList<Segment2D> segments = new ArrayList<>();
         Function<Double, Double> function = plot.getFunction();
         Function<Double, Double> derivative = Calculus.derivative(function, 1e-7);
         for(int i = 0; i < samples - 1; i+=2){
-            double x = state.left + i*stepX;
+            double x = state.left + i*stepX + offset;
             ArrayList<Point2D> points = new ArrayList<>();
-            adaptiveSample(function, derivative, state, x - stepX, x + stepX, points, toleranceX, toleranceY, 0);
+            adaptiveSample(function, derivative, state, x - stepX, x + stepX + offset, points, toleranceX, toleranceY, 0);
             //points.add(new Point2D(x + stepX, plot.getFunction().apply(x + stepX)));
             for (int j = 1; j < points.size(); j++) {
                 Point2D p1 = points.get(j - 1);
                 Point2D p2 = points.get(j);
-                 if (p1 == null || p2 == null) {
+                if (p1 == null || p2 == null) {
                     continue;
                 }
-                // Clip both endpoints to viewport using Liang-Barsky
-                double[] clipped = liangBarsky(
-                    p1.getX(), p1.getY(), p2.getX(), p2.getY(),
-                    state.left, state.right, state.bottom, state.top
-                );
-                if (clipped != null) {
-                    segments.add(new Segment2D(
-                        new Point2D(clipped[0], clipped[1]),
-                        new Point2D(clipped[2], clipped[3])
-                        ));
-                    }
-                }
+                segments.add(new Segment2D(p1, p2));
             }
+        }
 
         return new CurveData(plot, segments);
     }
