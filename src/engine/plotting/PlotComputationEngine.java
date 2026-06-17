@@ -1,10 +1,14 @@
 package engine.plotting;
 
+import java.net.PortUnreachableException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.function.Function;
 
 import core.math.Core.Calculus;
 import core.math.Core.Interval;
+import core.math.Core.Point;
 import core.math.Core.RootSolution;
 import core.math.Core.SolverStatus;
 import core.math.RootFindingAlgorithms.HybridSolvers;
@@ -150,7 +154,7 @@ public class PlotComputationEngine {
         return new CurveData(plot, list);
     }
 
-    public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport) {
+    /*public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport) {
         ArrayList<Segment2D> list = new ArrayList<>();
         Function<Double, Double> function = plot.getFunction();
         ViewportState state = new ViewportState(viewport);
@@ -210,7 +214,7 @@ public class PlotComputationEngine {
             }
         }
         return new CurveData(plot, list);
-    }
+    }*/
 
     public static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
         ArrayList<Point2D> points = plot.sample(viewport.width);
@@ -325,5 +329,199 @@ public class PlotComputationEngine {
             return false;
         }
         return true;
+    }
+
+    private static void adaptiveSample(Function<Double, Double> f, Function<Double, Double> derivative, ViewportState state, double x1, double x2,
+        ArrayList<Point2D> points, double toleranceX, double toleranceY, int depth) {
+        double y1 = f.apply(x1);
+        double y2 = f.apply(x2);
+
+        double midX = x1 + (x2 - x1) / 2;
+        double midY = f.apply(midX);
+        // Base case
+        if (depth > 50) {
+
+            if (Math.abs(y2 - y1) > toleranceY * 20) {
+                points.add(null);
+                return;
+            }
+
+            points.add(new Point2D(x1,y1));
+            points.add(new Point2D(x2,y2));
+            return;
+        }
+        if (!Double.isFinite(y1) || !Double.isFinite(y2) || !Double.isFinite(midY)) {
+            points.add(null);
+            return;
+        }
+
+        boolean allAbove =
+            y1 > state.top &&
+            midY > state.top &&
+            y2 > state.top;
+
+        boolean allBelow =
+            y1 < state.bottom &&
+            midY < state.bottom &&
+            y2 < state.bottom;
+
+        if ((allAbove || allBelow)) {
+            return;
+        }
+        double error = Math.abs(midY - (y1 + (y2 - y1) / 2));
+        if (
+            error > toleranceY ||
+            Math.abs(y2 - y1) > toleranceY * 4
+        ) {
+            
+            adaptiveSample(f, derivative, state, x1, midX, points, toleranceX, toleranceY, depth + 1);
+            adaptiveSample(f, derivative, state, midX, x2, points, toleranceX, toleranceY, depth + 1);
+        } else {
+            double slope = Math.abs((y2 - y1) / (x2 - x1));
+
+            if (Double.isFinite(slope) && slope > 1.0 / toleranceX) {
+                if (Math.abs(y2 - y1) > toleranceY * 10) {
+                    points.add(null);
+                    return;
+                }
+            }
+
+            boolean crossesTop =
+                (y1 < state.top && y2 > state.top) ||
+                (y1 > state.top && y2 < state.top);
+
+            boolean crossesBottom =
+                (y1 < state.bottom && y2 > state.bottom) ||
+                (y1 > state.bottom && y2 < state.bottom);
+
+            if (crossesTop && crossesBottom) {
+    adaptiveSample(f, derivative, state, x1, midX,
+        points, toleranceX, toleranceY, depth + 1);
+
+    adaptiveSample(f, derivative, state, midX, x2,
+        points, toleranceX, toleranceY, depth + 1);
+
+    return;
+}
+
+            if (crossesBottom) {
+                Function<Double, Double> boundary =
+                    t -> f.apply(t) - state.bottom;
+
+                Interval interval =
+                    (y1 - state.bottom) * (midY - state.bottom) <= 0
+                    ? new Interval(x1, midX)
+                    : new Interval(midX, x2);
+
+                RootSolution solution =
+                    HybridSolvers.findRootHybrid2(
+                        boundary,
+                        interval,
+                        midX,
+                        1e-6,
+                        100
+                    );
+
+                double root = solution.root();     
+                if(y1 > state.bottom){           
+                    points.add(new Point2D(root, state.bottom));
+                    points.add(null);
+                }else{
+                    points.add(null);
+                    points.add(new Point2D(root, state.bottom));
+                }
+                return;
+            }
+            if (crossesTop) {
+                Function<Double, Double> boundary =
+                    t -> f.apply(t) - state.top;
+
+                Interval interval =
+                    (y1 - state.top) * (midY - state.top) <= 0
+                    ? new Interval(x1, midX)
+                    : new Interval(midX, x2);
+
+                RootSolution solution =
+                    HybridSolvers.findRootHybrid2(
+                        boundary,
+                        interval,
+                        midX,
+                        1e-6,
+                        100
+                    );
+
+                double root = solution.root();
+                if(y1 < state.top){           
+                    points.add(new Point2D(root, state.top));
+                    points.add(null);
+                }else{
+                    points.add(null);
+                    points.add(new Point2D(root, state.top));
+                }
+                return;
+            }
+            points.add(new Point2D(x1, y1));
+            points.add(new Point2D(x2, y2));
+        }
+    }
+
+    static double highest;
+    public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
+        ViewportState state = new ViewportState(viewport);
+        double samples = (int)(viewport.width);
+        double stepX = (state.right - state.left)/samples;
+        double toleranceY = Math.abs(
+                viewport.screenToWorldY(1)
+            - viewport.screenToWorldY(0)
+        );
+        double toleranceX = Math.abs(
+                viewport.screenToWorldX(1)
+            - viewport.screenToWorldX(0)
+        );
+        highest = Double.NEGATIVE_INFINITY;
+        ArrayList<Segment2D> segments = new ArrayList<>();
+        Function<Double, Double> function = plot.getFunction();
+        Function<Double, Double> derivative = Calculus.derivative(function, 1e-7);
+        for(int i = 0; i < samples - 1; i+=2){
+            double x = state.left + i*stepX;
+            ArrayList<Point2D> points = new ArrayList<>();
+            adaptiveSample(function, derivative, state, x - stepX, x + stepX, points, toleranceX, toleranceY, 0);
+            //points.add(new Point2D(x + stepX, plot.getFunction().apply(x + stepX)));
+            for (int j = 1; j < points.size(); j++) {
+                Point2D p1 = points.get(j - 1);
+                Point2D p2 = points.get(j);
+                 if (p1 == null || p2 == null) {
+                    continue;
+                }
+                // Clip both endpoints to viewport using Liang-Barsky
+                double[] clipped = liangBarsky(
+                    p1.getX(), p1.getY(), p2.getX(), p2.getY(),
+                    state.left, state.right, state.bottom, state.top
+                );
+                if (clipped != null) {
+                    segments.add(new Segment2D(
+                        new Point2D(clipped[0], clipped[1]),
+                        new Point2D(clipped[2], clipped[3])
+                        ));
+                    }
+                }
+            }
+
+        return new CurveData(plot, segments);
+    }
+
+    private static double[] liangBarsky(double x1, double y1, double x2, double y2,
+        double left, double right, double bottom, double top) {
+        double dx = x2 - x1, dy = y2 - y1;
+        double t0 = 0, t1 = 1;
+        double[] p = {-dx, dx, -dy, dy};
+        double[] q = {x1 - left, right - x1, y1 - bottom, top - y1};
+        for (int i = 0; i < 4; i++) {
+            if (p[i] == 0) { if (q[i] < 0) return null; }
+            else if (p[i] < 0) t0 = Math.max(t0, q[i] / p[i]);
+            else               t1 = Math.min(t1, q[i] / p[i]);
+            if (t0 > t1) return null;
+        }
+        return new double[]{x1+t0*dx, y1+t0*dy, x1+t1*dx, y1+t1*dy};
     }
 }

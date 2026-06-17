@@ -155,4 +155,8 @@ public class FunctionPlot implements Plot{
 
         return true;
     }
+
+    public double sample(double x, double y){
+        return function.apply(x);
+    }
 }
