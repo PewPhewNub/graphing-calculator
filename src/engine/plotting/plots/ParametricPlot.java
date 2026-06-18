@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
+import core.math.Core.Interval;
+import core.model.CurveChunk;
 import engine.rendering.Viewport;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class ParametricPlot implements Plot{
+public class ParametricPlot extends Plot{
     public Function<Double, Double> x;
     public Function<Double, Double> y;
-    public String name;
-    public Color color;
     public double tMin;
     public double tMax;
     public double maxSamples;
-    public ArrayList<Point2D> initialList;
+    public ArrayList<CurveChunk> chunks;
     public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("t");
+    ArrayList<Point2D> initialList;
     public ParametricPlot(String name, Function<Double, Double> x, Function<Double, Double> y, double tMin, double tMax, double maxSamples, Color color){
         this.x = x;
         this.y = y;
@@ -28,37 +30,46 @@ public class ParametricPlot implements Plot{
         this.tMax = tMax;
         this.maxSamples = maxSamples;
 
-        initialList = sample(Double.POSITIVE_INFINITY);
+        chunks = new ArrayList<>();    
+        initializeChunks();
         accurateComputedPoints = new ArrayList<>();
     }
 
-    public ArrayList<Point2D> sample(double viewportWidth) {
-        ArrayList<Point2D> list = new ArrayList<>();
-        int samples = (int)Math.min(maxSamples, 2 * viewportWidth);
+    public void initializeChunks(){
+        double chunkSize = 0.5; // radians
 
-        double stepSize = (tMax - tMin) / samples;
+        for(double t = tMin; t < tMax; t += chunkSize){
+            chunks.add(
+                new CurveChunk(
+                    new Interval(t, Math.min(t + chunkSize, tMax)),
+                    computeBounds(t, Math.min(t + chunkSize, tMax))
+                )
+            );
+        }
+    }
 
-        for (double t = tMin; t <= tMax; t += stepSize) {
-            double xVal = x.apply(t);
-            double yVal = y.apply(t);
+    public BoundingBox computeBounds(double t0, double t1){
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
 
-            if (!Double.isFinite(xVal) || !Double.isFinite(yVal)) continue;
+        int samples = 128;
 
-            list.add(new Point2D(xVal, yVal));
+        for(int i=0;i<=samples;i++){
+            double t = t0 + (t1-t0)*i/(double)samples;
+
+            double xt = x.apply(t);
+            double yt = y.apply(t);
+
+            minX = Math.min(minX, xt);
+            minY = Math.min(minY, yt);
+            maxX = Math.max(maxX, xt);
+            maxY = Math.max(maxY, yt);
         }
 
-        return list;
+        return new BoundingBox(minX,minY,maxX - minX,maxY - minY);
     }
-
-    public String getName() {
-        return name;
-    }
-    public Color getColor() {
-        return color;
-    }
-    public Point2D evaluate(double t){
-        return new Point2D(x.apply(t), y.apply(t));
-    } 
 
     @Override
     public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
@@ -101,10 +112,5 @@ public class ParametricPlot implements Plot{
     @Override
     public boolean contains(Point2D point) {
         return initialList.contains(point) || accurateComputedPoints.contains(point);
-    }
-
-    @Override
-    public void setColor(Color color) {
-        this.color = color;
     }
 }

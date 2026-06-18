@@ -4,71 +4,83 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
+import core.math.Core.Interval;
+import core.model.CurveChunk;
 import core.model.ViewportState;
 import engine.rendering.Viewport;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class PolarPlot implements Plot {
+public class PolarPlot extends Plot {
     public Function<Double, Double> r;
-    public String name;
-    public Color color;
+    public Function<Double, Double> x;
+    public Function<Double, Double> y;
     public double tMin;
     public double tMax;
     public double maxSamples;
-    public ArrayList<Point2D> initialList;
+    public ArrayList<CurveChunk> chunks;
     public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("\u03B8");
 
     public ArrayList<Point2D> currentList;
     public PolarPlot(String name, Function<Double, Double> r, double tMin, double tMax, double maxSamples, Color color){
         this.r = r;
+        x = t-> r.apply(t)*Math.cos(t);
+        y = t-> r.apply(t)*Math.sin(t);
         this.name = name;
         this.color = color;
         this.tMin = tMin;
         this.tMax = tMax;
         this.maxSamples = maxSamples;
-        currentList = new ArrayList<>();
-        initialList = sample(maxSamples);
         accurateComputedPoints = new ArrayList<>();
+
+        chunks = new ArrayList<>();
+        initializeChunks();
     }
 
-    public Point2D samplePoint(double t){
+    public void initializeChunks(){
+        double chunkSize = 0.5; // radians
+
+        for(double t = tMin; t < tMax; t += chunkSize){
+            chunks.add(
+                new CurveChunk(
+                    new Interval(t, Math.min(t + chunkSize, tMax)),
+                    computeBounds(t, Math.min(t + chunkSize, tMax))
+                )
+            );
+        }
+    }
+
+    public BoundingBox computeBounds(double t0, double t1){
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+
+        int samples = 128;
+
+        for(int i=0;i<=samples;i++){
+            double t = t0 + (t1-t0)*i/(double)samples;
+
+            double xt = x.apply(t);
+            double yt = y.apply(t);
+
+            minX = Math.min(minX, xt);
+            minY = Math.min(minY, yt);
+            maxX = Math.max(maxX, xt);
+            maxY = Math.max(maxY, yt);
+        }
+
+        return new BoundingBox(minX,minY,maxX - minX,maxY - minY);
+    }
+
+    public Point2D sample(double t){
         double rVal = r.apply(t);
         double xVal = rVal * Math.cos(t);
         double yVal = rVal * Math.sin(t);
         return new Point2D(xVal, yVal);
     }
-
-    public ArrayList<Point2D> sample(double viewportWidth) {
-        ArrayList<Point2D> list = new ArrayList<>();
-        int samples = 4 * (int)viewportWidth;
-
-        double stepSize = (tMax - tMin) / samples;
-
-        for (double t = tMin; t <= tMax; t += stepSize) {
-            double rVal = r.apply(t);
-            double xVal = rVal * Math.cos(t);
-            double yVal = rVal * Math.sin(t);
-
-            if (!Double.isFinite(xVal) || !Double.isFinite(yVal)) continue;
-
-            list.add(new Point2D(xVal, yVal));
-        }
-        initialList = list;
-        return list;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public Color getColor() {
-        return color;
-    }
-    public Point2D evaluate(double t){
-        double rVal = r.apply(t);
-        return new Point2D(rVal * Math.cos(t), rVal * Math.sin(t));
-    } 
 
     @Override
     public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
@@ -113,160 +125,7 @@ public class PolarPlot implements Plot {
         return currentList.contains(point) || accurateComputedPoints.contains(point);
     }
 
-    @Override
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public void adaptiveSample(
-        double t0,
-        double t1,
-        double tolerance,
-        Viewport viewport,
-        int depth) {
-
-        if (depth > 20) {
-            currentList.add(new Point2D(
-                r.apply(t0) * Math.cos(t0),
-                r.apply(t0) * Math.sin(t0)
-            ));
-            return;
-        }
-
-        ViewportState state = new ViewportState(viewport);
-
-        double r0 = r.apply(t0);
-        double x0 = r0 * Math.cos(t0);
-        double y0 = r0 * Math.sin(t0);
-
-        double r1 = r.apply(t1);
-        double x1 = r1 * Math.cos(t1);
-        double y1 = r1 * Math.sin(t1);
-
-        if (Math.abs(t1 - t0) < 1e-8) {
-            currentList.add(new Point2D(x0, y0));
-            return;
-        }
-
-        double vx = x1 - x0;
-        double vy = y1 - y0;
-        double len2 = vx * vx + vy * vy;
-
-        double maxError2 = 0;
-        double maxX = Double.NEGATIVE_INFINITY; double maxY = Double.NEGATIVE_INFINITY;
-        double minX = Double.POSITIVE_INFINITY; double minY = Double.POSITIVE_INFINITY;
-
-        double[] ts = {
-            t0 + (t1 - t0) * 0.125,
-            t0 + (t1 - t0) * 0.250,
-            t0 + (t1 - t0) * 0.375,
-            t0 + (t1 - t0) * 0.500,
-            t0 + (t1 - t0) * 0.625,
-            t0 + (t1 - t0) * 0.750,
-            t0 + (t1 - t0) * 0.875
-        };
-
-        for (double t : ts) {
-
-            double rt = r.apply(t);
-            double xt = rt * Math.cos(t);
-            double yt = rt * Math.sin(t);
-            maxX = Math.max(maxX, xt);
-            maxY = Math.max(maxY, yt);
-            minX = Math.min(minX, xt);
-            minY = Math.min(minY, yt);
-            double error2;
-
-            if (len2 < 1e-20) {
-
-                double dx = viewport.worldToScreenX(xt)
-                        - viewport.worldToScreenX(x0);
-
-                double dy = viewport.worldToScreenY(yt)
-                        - viewport.worldToScreenY(y0);
-
-                error2 = dx * dx + dy * dy;
-
-            } else {
-
-                double u =
-                    ((xt - x0) * vx + (yt - y0) * vy) / len2;
-
-                u = Math.max(0.0, Math.min(1.0, u));
-
-                double closestX = x0 + u * vx;
-                double closestY = y0 + u * vy;
-
-                double dx =
-                    viewport.worldToScreenX(xt)
-                - viewport.worldToScreenX(closestX);
-
-                double dy =
-                    viewport.worldToScreenY(yt)
-                - viewport.worldToScreenY(closestY);
-
-                error2 = dx * dx + dy * dy;
-            }
-
-            maxError2 = Math.max(maxError2, error2);
-        }
-        boolean intersects =
-            maxX >= state.left   - state.marginX &&
-            minX <= state.right  + state.marginX &&
-            maxY >= state.bottom - state.marginY &&
-            minY <= state.top    + state.marginY;
-
-        if(!intersects) return;
-
-        if (maxError2 > tolerance * tolerance) {
-
-            double tm = (t0 + t1) * 0.5;
-
-            adaptiveSample(
-                t0,
-                tm,
-                tolerance,
-                viewport,
-                depth + 1
-            );
-
-            adaptiveSample(
-                tm,
-                t1,
-                tolerance,
-                viewport,
-                depth + 1
-            );
-
-        } else {
-            currentList.add(new Point2D(x0, y0));
-        }
-    }
-
-    public void recomputePoints(Viewport viewport, double tolerance){
-        currentList.clear();
-        int segments = Math.max(
-            128,
-            (int)(new ViewportState(viewport).worldWidth / 20)
-        );
-
-        double step = (tMax - tMin) / segments;
-
-        for(double t = tMin; t < tMax; t += step){
-            adaptiveSample(
-                t,
-                Math.min(t + step, tMax),
-                tolerance,
-                viewport,
-                0
-            );
-        }
-        double r1 = r.apply(tMax);
-        currentList.add(
-            new Point2D(
-                r1 * Math.cos(tMax),
-                r1 * Math.sin(tMax)
-            )
-        );
+    public void update(){
+        initializeChunks();
     }
 }

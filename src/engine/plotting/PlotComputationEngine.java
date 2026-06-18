@@ -1,17 +1,14 @@
 package engine.plotting;
 
-import java.net.PortUnreachableException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.function.Function;
 
 import core.math.Core.Calculus;
 import core.math.Core.Interval;
-import core.math.Core.Point;
 import core.math.Core.RootSolution;
 import core.math.Core.SolverStatus;
 import core.math.RootFindingAlgorithms.HybridSolvers;
+import core.model.CurveChunk;
 import core.model.CurveData;
 import core.model.Segment2D;
 import core.model.ViewportState;
@@ -21,11 +18,12 @@ import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
 import engine.plotting.plots.PolarPlot;
 import engine.rendering.Viewport;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 
 public class PlotComputationEngine {
 
-    public static ArrayList<Point2D> computeRoots(FunctionPlot plot1, double minWorldX, double maxWorldX, double stepSize){
+    public static ArrayList<Point2D> computeIntercepts(FunctionPlot plot1, double minWorldX, double maxWorldX, double stepSize){
         Function<Double, Double> function = plot1.getFunction();
         double prev = function.apply(minWorldX);
         ArrayList<Point2D> list = new ArrayList<>();
@@ -33,7 +31,7 @@ public class PlotComputationEngine {
             double i1 = (i - 1) * stepSize + minWorldX;
             double i2 = i * stepSize + minWorldX;
             double current = function.apply(i2);
-            if(prev * current < 0){
+            if(prev * current <= 0){
                 RootSolution solution = HybridSolvers.findRootHybrid2(function, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(solution.root(), 0));
@@ -41,10 +39,11 @@ public class PlotComputationEngine {
             }
             prev = current;
         }
+        list.add(new Point2D(0, function.apply(0d)));
         return list;
     }
 
-    public static ArrayList<Point2D> computeRoots(ParametricPlot plot1){
+    public static ArrayList<Point2D> computeIntercepts(ParametricPlot plot1){
         Function<Double, Double> x = plot1.x;
         Function<Double, Double> y = plot1.y;
         double prevX = x.apply(plot1.tMin);
@@ -54,13 +53,41 @@ public class PlotComputationEngine {
         for (double t = plot1.tMin + stepSize; t <= plot1.tMax; t += stepSize) {
             double currentX = x.apply(t);
             double currentY = y.apply(t);
-            if(prevX * currentX < 0){
+            if(prevX * currentX <= 0){
                 RootSolution solution = HybridSolvers.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
-            if(prevY * currentY < 0){
+            if(prevY * currentY <= 0){
+                RootSolution solution = HybridSolvers.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                if(solution.status() == SolverStatus.SUCCESS){
+                    list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
+                } 
+            }
+            prevX = currentX;
+            prevY = currentY;
+        }
+        return list;
+    }
+
+    public static ArrayList<Point2D> computeIntercepts(PolarPlot plot1){
+        Function<Double, Double> x = plot1.x;
+        Function<Double, Double> y = plot1.y;
+        double prevX = x.apply(plot1.tMin);
+        double prevY = y.apply(plot1.tMin);
+        ArrayList<Point2D> list = new ArrayList<>();
+        double stepSize = (plot1.tMax - plot1.tMin) / plot1.maxSamples;
+        for (double t = plot1.tMin + stepSize; t <= plot1.tMax; t += stepSize) {
+            double currentX = x.apply(t);
+            double currentY = y.apply(t);
+            if(prevX * currentX <= 0){
+                RootSolution solution = HybridSolvers.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                if(solution.status() == SolverStatus.SUCCESS){
+                    list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
+                } 
+            }
+            if(prevY * currentY <= 0){
                 RootSolution solution = HybridSolvers.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
@@ -154,99 +181,6 @@ public class PlotComputationEngine {
         return new CurveData(plot, list);
     }
 
-    /*public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport) {
-        ArrayList<Segment2D> list = new ArrayList<>();
-        Function<Double, Double> function = plot.getFunction();
-        ViewportState state = new ViewportState(viewport);
-        double stepSize = (state.right - state.left) / state.viewportWidth;
-        double viewportHeight = Math.abs(state.top - state.bottom);
-
-        Point2D prev = new Point2D(state.left - stepSize,
-                                function.apply(state.left - stepSize));
-
-        for (double i = 1; i <= state.viewportWidth; i++) {
-            double x = i * stepSize + state.left;
-            double rawY = function.apply(x);
-
-            boolean prevFinite = Double.isFinite(prev.getY());
-            boolean currFinite = Double.isFinite(rawY);
-
-            if (prevFinite && currFinite) {
-                Point2D point = new Point2D(x, rawY);
-
-                // Discontinuity guard: sign-flip AND big jump == asymptote crossing
-                boolean prevPos = prev.getY() > 0, prevNeg = prev.getY() < 0;
-                boolean currPos = rawY > 0,        currNeg = rawY < 0;
-                boolean signFlip = (prevPos && currNeg) || (prevNeg && currPos);
-                boolean bigJump  = Math.abs(rawY - prev.getY()) > viewportHeight;
-
-                if (!(signFlip && bigJump) && isWithinBounds(prev, point, viewport)) {
-                    list.add(new Segment2D(prev, point));
-                }
-                prev = point;
-
-            } else if (prevFinite && Double.isInfinite(rawY)) {
-                // Branch heading to ±∞ — extend visually to one viewport-height past the edge
-                double extY = (prev.getY() >= 0)
-                        ? state.top    + viewportHeight
-                        : state.bottom - viewportHeight;
-                Point2D extension = new Point2D(x, extY);
-                if (isWithinBounds(prev, extension, viewport)) {
-                    list.add(new Segment2D(prev, extension));
-                }
-                prev = new Point2D(x, rawY);  // keep the ±Inf value so next iter detects it
-
-            } else if (Double.isInfinite(prev.getY()) && currFinite) {
-                // Branch arriving from ±∞ — start one viewport-height past the edge
-                double extY = (rawY >= 0)
-                        ? state.top    + viewportHeight
-                        : state.bottom - viewportHeight;
-                Point2D extension = new Point2D(prev.getX(), extY);
-                Point2D point     = new Point2D(x, rawY);
-                if (isWithinBounds(extension, point, viewport)) {
-                    list.add(new Segment2D(extension, point));
-                }
-                prev = point;
-
-            } else {
-                // NaN (domain gap) or both non-finite — just reset the branch
-                prev = new Point2D(x, rawY);
-            }
-        }
-        return new CurveData(plot, list);
-    }*/
-
-    public static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
-        ArrayList<Point2D> points = plot.sample(viewport.width);
-        ArrayList<Segment2D> list = new ArrayList<>();
-        if(points.isEmpty()) return new CurveData(plot, list);
-        Point2D prev = points.getFirst();
-        for(int i = 1; i < points.size(); i+=1){
-            Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
-                list.add(new Segment2D(prev, point));
-            }
-            prev = point;
-        }
-        return new CurveData(plot, list);
-    }
-    
-    public static CurveData computeCurveData(PolarPlot plot, Viewport viewport){
-        plot.recomputePoints(viewport, 0.5);
-        ArrayList<Point2D> points = plot.currentList;
-        System.out.println(points.size());
-        ArrayList<Segment2D> list = new ArrayList<>();
-        if(points.isEmpty()) return new CurveData(plot, list);
-        Point2D prev = points.getFirst();
-        for(int i = 1; i < points.size(); i+=1){
-            Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
-                list.add(new Segment2D(prev, point));
-            }
-            prev = point;
-        }
-        return new CurveData(plot, list);
-    }
     public static void ensureCoverage(ODEPlot plot, double worldMinX, double worldMaxX, double marginX){
         plot.extendCoverage(worldMinX, worldMaxX, marginX);
     }
@@ -258,12 +192,12 @@ public class PlotComputationEngine {
                 if(i == j){
                     if(plots.get(i) instanceof ParametricPlot){
                         ParametricPlot plot = (ParametricPlot)(plots.get(i));
-                        ArrayList<Point2D> accuratePoints = computeRoots(plot);
+                        ArrayList<Point2D> accuratePoints = computeIntercepts(plot);
                         list.addAll(accuratePoints);
                         plot.accurateComputedPoints.addAll(accuratePoints);
                     }
                     else if(plots.get(i) instanceof FunctionPlot){
-                        list.addAll(computeRoots((FunctionPlot)(plots.get(i)), minWorldX, maxWorldX, stepSize));
+                        list.addAll(computeIntercepts((FunctionPlot)(plots.get(i)), minWorldX, maxWorldX, stepSize));
                         list.addAll(computeCriticalPoints((FunctionPlot)(plots.get(i)), minWorldX, maxWorldX, stepSize));
                     }
                 }
@@ -331,7 +265,7 @@ public class PlotComputationEngine {
         return true;
     }
 
-    private static void adaptiveSample(Function<Double, Double> f, Function<Double, Double> derivative, ViewportState state, double x1, double x2,
+    private static void adaptiveSampleFunction(Function<Double, Double> f, ViewportState state, double x1, double x2,
         ArrayList<Point2D> points, double toleranceX, double toleranceY, int depth) {
         double y1 = f.apply(x1);
         double y2 = f.apply(x2);
@@ -373,8 +307,8 @@ public class PlotComputationEngine {
             error > toleranceY ||
             Math.abs(y2 - y1) > toleranceY * 4
         ) {
-            adaptiveSample(f, derivative, state, x1, midX, points, toleranceX, toleranceY, depth + 1);
-            adaptiveSample(f, derivative, state, midX, x2, points, toleranceX, toleranceY, depth + 1);
+            adaptiveSampleFunction(f, state, x1, midX, points, toleranceX, toleranceY, depth + 1);
+            adaptiveSampleFunction(f, state, midX, x2, points, toleranceX, toleranceY, depth + 1);
         } else {
             double slope = Math.abs((y2 - y1) / (x2 - x1));
 
@@ -394,10 +328,10 @@ public class PlotComputationEngine {
                 (y1 > state.bottom && y2 < state.bottom);
 
             if (crossesTop && crossesBottom) {
-                adaptiveSample(f, derivative, state, x1, midX,
+                adaptiveSampleFunction(f, state, x1, midX,
                     points, toleranceX, toleranceY, depth + 1);
 
-                adaptiveSample(f, derivative, state, midX, x2,
+                adaptiveSampleFunction(f, state, midX, x2,
                     points, toleranceX, toleranceY, depth + 1);
 
                 return;
@@ -464,10 +398,9 @@ public class PlotComputationEngine {
         }
     }
 
-    static double highest;
     public static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
-        double samples = (int)(viewport.width + 17);
+        double samples = (int)(viewport.width);
         double stepX = (state.right - state.left)/samples;
         double toleranceY = Math.abs(
                 viewport.screenToWorldY(1)
@@ -481,11 +414,10 @@ public class PlotComputationEngine {
 
         ArrayList<Segment2D> segments = new ArrayList<>();
         Function<Double, Double> function = plot.getFunction();
-        Function<Double, Double> derivative = Calculus.derivative(function, 1e-7);
         for(int i = 0; i < samples - 1; i+=2){
             double x = state.left + i*stepX + offset;
             ArrayList<Point2D> points = new ArrayList<>();
-            adaptiveSample(function, derivative, state, x - stepX, x + stepX + offset, points, toleranceX, toleranceY, 0);
+            adaptiveSampleFunction(function, state, x - stepX, x + stepX + offset, points, toleranceX, toleranceY, 0);
             //points.add(new Point2D(x + stepX, plot.getFunction().apply(x + stepX)));
             for (int j = 1; j < points.size(); j++) {
                 Point2D p1 = points.get(j - 1);
@@ -513,5 +445,182 @@ public class PlotComputationEngine {
             if (t0 > t1) return null;
         }
         return new double[]{x1+t0*dx, y1+t0*dy, x1+t1*dx, y1+t1*dy};
+    }
+
+    public static CurveData computeCurveData(PolarPlot plot, Viewport viewport){
+        ViewportState state = new ViewportState(viewport);
+        BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
+        Function<Double, Double> x = plot.x;
+        Function<Double, Double> y = plot.y;    
+        double toleranceY = Math.abs(
+                viewport.screenToWorldY(.25)
+            - viewport.screenToWorldY(0)
+        );
+        double toleranceX = Math.abs(
+                viewport.screenToWorldX(.25)
+            - viewport.screenToWorldX(0)
+        );ArrayList<Point2D> points = new ArrayList<>();
+        ArrayList<Segment2D> segments = new ArrayList<>();
+        for(CurveChunk chunk : plot.chunks){
+            if(viewportBox.intersects(chunk.bounds)){
+                points.clear();
+                adaptiveSampleParametric(x, y, state, chunk.parameterRange.a, chunk.parameterRange.b, points, toleranceX, toleranceY, 0);
+                for (int j = 1; j < points.size(); j++) {
+                    Point2D p1 = points.get(j - 1);
+                    Point2D p2 = points.get(j);
+                    segments.add(new Segment2D(p1, p2));
+                }
+            }
+        }
+
+        return new CurveData(plot, segments);
+    }
+
+    public static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
+        ViewportState state = new ViewportState(viewport);
+        BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
+        Function<Double, Double> x = plot.x;
+        Function<Double, Double> y = plot.y;    
+        double toleranceY = Math.abs(
+                viewport.screenToWorldY(.25)
+            - viewport.screenToWorldY(0)
+        );
+        double toleranceX = Math.abs(
+                viewport.screenToWorldX(.25)
+            - viewport.screenToWorldX(0)
+        );ArrayList<Point2D> points = new ArrayList<>();
+        ArrayList<Segment2D> segments = new ArrayList<>();
+        for(CurveChunk chunk : plot.chunks){
+            if(viewportBox.intersects(chunk.bounds)){
+                points.clear();
+                adaptiveSampleParametric(x, y, state, chunk.parameterRange.a, chunk.parameterRange.b, points, toleranceX, toleranceY, 0);
+                for (int j = 1; j < points.size(); j++) {
+                    Point2D p1 = points.get(j - 1);
+                    Point2D p2 = points.get(j);
+                    segments.add(new Segment2D(p1, p2));
+                }
+            }
+        }
+
+        return new CurveData(plot, segments);
+    }
+    
+    public static void adaptiveSampleParametric(
+        Function<Double, Double> x, Function<Double, Double> y, ViewportState state,
+        double t0, double t1, ArrayList<Point2D> points,
+        double toleranceX, double toleranceY, int depth) {
+
+        if (depth > 14) {
+            points.add(new Point2D(
+                x.apply(t0),
+                y.apply(t0)
+            ));
+            return;
+        }
+
+        double x0 = x.apply(t0);
+        double y0 = y.apply(t0);
+
+        double x1 = x.apply(t1);
+        double y1 = y.apply(t1);
+
+        if (Math.abs(t1 - t0) < 1e-8) {
+            points.add(new Point2D(x0, y0));
+            points.add(new Point2D(x1, y1));
+            return;
+        }
+
+        double vx = x1 - x0;
+        double vy = y1 - y0;
+
+        if((vx*vx)/(toleranceX*toleranceX) + (vy*vy)/(toleranceY*toleranceY) < 1){
+            points.add(new Point2D(x0, y0));
+            points.add(new Point2D(x1, y1));
+            return;
+        }
+        double len2 = vx * vx + vy * vy;
+
+        double maxError2 = 0;
+        
+        double maxX = Math.max(x0, x1);
+        double maxY = Math.max(y0, y1);
+        double minX = Math.min(x0, x1);
+        double minY = Math.min(y0, y1);
+
+        double[] ts = {
+            t0 + (t1 - t0) * 0.125,
+            t0 + (t1 - t0) * 0.250,
+            t0 + (t1 - t0) * 0.375,
+            t0 + (t1 - t0) * 0.500,
+            t0 + (t1 - t0) * 0.625,
+            t0 + (t1 - t0) * 0.750,
+            t0 + (t1 - t0) * 0.875
+        };
+
+        for (double t : ts) {
+
+            double xt = x.apply(t);
+            double yt = y.apply(t);
+            double error2;
+            maxX = Math.max(maxX, xt);
+            maxY = Math.max(maxY, yt);
+
+            minX = Math.min(minX, xt);
+            minY = Math.min(minY, yt);
+
+            if (len2 < 1e-20) {
+
+                double dx = (xt - x0)/toleranceX;
+
+                double dy = (yt - y0)/toleranceY;
+
+                error2 = dx * dx + dy * dy;
+
+            } else {
+
+                double u =
+                    ((xt - x0) * vx + (yt - y0) * vy) / len2;
+
+                u = Math.max(0.0, Math.min(1.0, u));
+
+                double closestX = x0 + u * vx;
+                double closestY = y0 + u * vy;
+
+                double dx = (xt - closestX)/toleranceX;
+
+                double dy = (yt - closestY)/toleranceY;
+
+                error2 = dx * dx + dy * dy;
+            }
+
+            maxError2 = Math.max(maxError2, error2);
+        }
+        boolean intersects =
+            maxX >= state.left   - state.marginX &&
+            minX <= state.right  + state.marginX &&
+            maxY >= state.bottom - state.marginY &&
+            minY <= state.top    + state.marginY;
+
+        if(!intersects) return;
+
+        if (maxError2 > 1) {
+
+            double tm = (t0 + t1) * 0.5;
+
+            adaptiveSampleParametric(
+                x, y, state,
+                t0, tm, points,
+                toleranceX, toleranceY, depth + 1
+            );
+            adaptiveSampleParametric(
+                x, y, state,
+                tm, t1, points,
+                toleranceX, toleranceY, depth + 1
+            );
+
+        } else {
+            points.add(new Point2D(x0, y0));
+            points.add(new Point2D(x1, y1));
+        }
     }
 }

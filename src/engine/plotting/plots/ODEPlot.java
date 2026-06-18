@@ -16,7 +16,7 @@ import engine.rendering.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class ODEPlot implements Plot {
+public class ODEPlot extends Plot {
 
     public BiFunction<Double, Double, Double> equation;
     ODEStatus statusLeft;
@@ -24,8 +24,6 @@ public class ODEPlot implements Plot {
     public Point initial;
     ArrayList<Point2D> leftBranch;
     ArrayList<Point2D> rightBranch;
-    String name;
-    Color color;
     boolean autoGenerate = false;
     ArrayList<Point2D> fullData;
     public final Set<String> knownVariables = Set.of("x", "y");
@@ -114,13 +112,6 @@ public class ODEPlot implements Plot {
 
             r.drawArrowScreen(p, angle, color, pixelLength);
         }
-    }
-    
-    public String getName() {
-        return name;
-    }
-    public Color getColor() {
-        return color;
     }
 
     public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
