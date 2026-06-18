@@ -22,6 +22,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -34,6 +35,7 @@ public class UIPanel extends BorderPane {
     boolean isVisible = true;
     double maxWidth;
     double minWidth;
+    public MenuButton addPlotButton;
     public UIPanel(double width, double height, Graph graph){
         super();
         setHeight(height);
@@ -77,7 +79,7 @@ public class UIPanel extends BorderPane {
         showButton.setPrefSize(50, 50);
         showButton.setMaxSize(50, 50);
 
-        MenuButton addPlotButton = new MenuButton("Add Plot");
+        addPlotButton = new MenuButton(" Add Plot");
 
         MenuItem functionItem = new MenuItem("Function");
         functionItem.setOnAction(e ->{
@@ -167,6 +169,9 @@ public class UIPanel extends BorderPane {
                 Insets.EMPTY
             )
         ));
+
+        // Use a look-up to find the arrow node
+        
     }
     public void setGraph(Graph graph) {
         this.graph = graph;

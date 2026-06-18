@@ -5,7 +5,7 @@ import javafx.geometry.Point2D;
 public class Viewport {
     public double cameraX;
     public double cameraY;
-    private double zoom = 100;
+    private double zoom = 90;
 
     public double width;
     public double height;
@@ -64,6 +64,10 @@ public class Viewport {
         cameraX += (worldBeforeX - worldAfterX);
         cameraY += (worldBeforeY - worldAfterY);
     }
+
+    public void computeZoomAt(double mouseX, double mouseY, double delta){
+
+    }
     public void setScaleX(double scaleX) {
         this.scaleX = scaleX;
     }
@@ -77,5 +81,12 @@ public class Viewport {
         x2 = screenToWorldX(x2);
         y2 = screenToWorldY(y2);
         return new Point2D(x2 - x1, y2 - y1);
+    }
+
+    public double screenToWorldX(double screenX, double cameraX, double zoom){
+        return (screenX - width/2)/zoom*scaleX + cameraX; 
+    }
+    public double screenToWorldY(double screenY, double cameraY, double zoom){
+        return -(screenY - height/2)/zoom*scaleY + cameraY;
     }
 }

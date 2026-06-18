@@ -1,12 +1,6 @@
 package engine.UI;
 
 import core.model.CameraIntent;
-import engine.UI.plotEditor.FunctionPlotEditor;
-import engine.UI.plotEditor.ODEPlotEditor;
-import engine.UI.plotEditor.ParametricPlotEditor;
-import engine.UI.plotEditor.PolarPlotEditor;
-import engine.plotting.plots.ImplicitPlot;
-import engine.rendering.CameraSystem;
 import engine.rendering.Graph;
 import engine.rendering.Renderer;
 import javafx.animation.AnimationTimer;
@@ -15,17 +9,16 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -40,7 +33,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.LayoutInfo;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -126,6 +118,13 @@ public class Main extends Application {
         stage.setMinWidth(400);
         stage.setMinHeight(300);
         stage.show();
+
+        StackPane arrow = (StackPane) ui.addPlotButton.lookup(".arrow");
+        if (arrow != null) {
+            arrow.setVisible(false);
+            arrow.setManaged(false); // Ensures the space is reclaimed
+        }
+        ui.addPlotButton.setPadding(new Insets(5, 10, 5, 10));
 
         for(Node i : graphStack.getChildren()){
             if(i instanceof Graph){  
@@ -423,6 +422,103 @@ public class Main extends Application {
                     @Override
                     public void handle(ActionEvent e){
                         graph.getCameraSystem().resetAspectRatio();
+                    }
+                });
+            }
+        });
+
+        viewControls.getChildren().add(new HBox(){
+            {
+                setAlignment(Pos.CENTER);
+                getChildren().add(new Label("Go to"){
+                    {
+                        setFont(new Font(12));
+                        setPadding(new Insets(5, 10, 5, 0));
+                    }
+                });
+                getChildren().add(new Label("x: "){
+                    {
+                        setFont(new Font(9));
+                        setBorder(new Border(new BorderStroke(
+                            Color.rgb(220, 220, 220),       // A soft, light gray color
+                            BorderStrokeStyle.SOLID,        // Solid line style
+                            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+                        )));
+                        setPadding(new Insets(3, 0, 3, 5));
+                    }
+                });
+                TextField xField = new TextField("0");
+                getChildren().add(xField);
+                
+                getChildren().add(new Label(" y:"){
+                    {
+                        setFont(new Font(9));
+                        setBorder(new Border(new BorderStroke(
+                            Color.rgb(220, 220, 220),       // A soft, light gray color
+                            BorderStrokeStyle.SOLID,        // Solid line style
+                            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+                        )));
+                        setPadding(new Insets(3, 0, 3, 5));
+                    }
+                });
+                TextField yField = new TextField("0");
+                getChildren().add(yField);
+
+                xField.setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                xField.setBorder(new Border(new BorderStroke(
+                    Color.rgb(220, 220, 220),       // A soft, light gray color
+                    BorderStrokeStyle.SOLID,        // Solid line style
+                    new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+                    new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+                )));
+                xField.setPadding(new Insets(3,0,3,0));
+                xField.setFont(new Font(9));
+                xField.setPrefWidth(30);
+
+                yField.setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                yField.setBorder(new Border(new BorderStroke(
+                    Color.rgb(220, 220, 220),       // A soft, light gray color
+                    BorderStrokeStyle.SOLID,        // Solid line style
+                    new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+                    new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+                )));
+                yField.setPadding(new Insets(3,0,3,0));
+                yField.setFont(new Font(9));
+                yField.setPrefWidth(30);
+                
+                setPadding(new Insets(0, 0, 0, 0));
+                setPrefSize(170, 35);
+                setMaxHeight(35);
+                setBorder(new Border(
+                    new BorderStroke(
+                        Color.LIGHTGRAY,
+                        BorderStrokeStyle.SOLID,
+                        new CornerRadii(3),
+                        new BorderWidths(2)
+                    )
+                ));
+                setBackground(new Background(
+                    new BackgroundFill(
+                        Color.WHITE,
+                        new CornerRadii(3),
+                        new Insets(2)
+                    )
+                ));
+
+                setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent e){
+                        graph.getCameraSystem().goTo(Double.parseDouble(xField.getText()), Double.parseDouble(yField.getText()));
                     }
                 });
             }

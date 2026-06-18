@@ -177,6 +177,7 @@ public class Graph extends Canvas{
         viewport.width = (getWidth());
         input.handle();
         handleInput();
+        cameraSystem.update();
         updateCursor();
     }
     @Override
@@ -224,7 +225,7 @@ public class Graph extends Canvas{
                 cameraSystem.handle(new CameraIntent(
                     0, 0,
                     0,
-                    input.deltaScrollX / 1000,
+                    input.deltaScrollX / 400,
                     0,
                     false,
                     input.mouseX,
@@ -235,7 +236,7 @@ public class Graph extends Canvas{
                     0, 0,
                     0,
                     0,
-                    input.deltaScrollY / 1000,
+                    input.deltaScrollY / 400,
                     false,
                     input.mouseX,
                     input.mouseY
@@ -243,7 +244,7 @@ public class Graph extends Canvas{
             } else {
                 cameraSystem.handle(new CameraIntent(
                     0, 0,
-                    input.deltaScrollY / 1000,
+                    input.deltaScrollY / 400,
                     0, 0,
                     input.isAltDown,
                     input.mouseX,
