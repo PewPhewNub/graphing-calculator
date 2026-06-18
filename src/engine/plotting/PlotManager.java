@@ -39,7 +39,6 @@ public class PlotManager{
                     PlotComputationEngine.computeCurveData((FunctionPlot)plot, viewport)
                 );
             if(plot instanceof ODEPlot){
-                PlotComputationEngine.ensureCoverage((ODEPlot)plot, state.left, state.right, state.marginX);
                 curveCache.add(    
                     PlotComputationEngine.computeCurveData((ODEPlot)plot, viewport)
                 );

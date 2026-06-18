@@ -101,7 +101,7 @@ public class ODEPlotEditor extends PlotEditor{
         functionInputLabel.setTextAlignment(TextAlignment.LEFT);
         functionInputLabel.setPadding(new Insets(5,0,5,15));
 
-        functionInputField = new TextField("x");
+        functionInputField = new TextField("y");
         functionInputField.setFont(new Font(20));
         functionInputField.setAlignment(Pos.CENTER_LEFT);
         functionInputField.setTextFormatter(new TextFormatter<>(change ->{

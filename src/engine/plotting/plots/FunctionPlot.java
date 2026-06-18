@@ -23,7 +23,6 @@ public class FunctionPlot extends Plot{
         settings = new FunctionPlotSettings();
     }
 
-    
     public String getName() {
         return name;
     }

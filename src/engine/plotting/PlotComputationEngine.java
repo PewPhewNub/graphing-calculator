@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import core.math.Core.Calculus;
 import core.math.Core.Interval;
+import core.math.Core.Point;
 import core.math.Core.RootSolution;
 import core.math.Core.SolverStatus;
 import core.math.RootFindingAlgorithms.HybridSolvers;
@@ -159,32 +160,6 @@ public class PlotComputationEngine {
         return list;
     }
 
-    public static ArrayList<Point2D> computeODETrajectory(ODEPlot plot, Point2D initial, double stepSize, double maxSteps){
-        return plot.solve(initial, stepSize, maxSteps);
-    }
-
-    public static CurveData computeCurveData(ODEPlot plot, Viewport viewport){
-        ArrayList<Point2D> points = plot.list();
-        ArrayList<Segment2D> list = new ArrayList<>();
-
-        if(points.isEmpty()) return new CurveData(plot, list);
-
-        Point2D prev = points.getFirst();
-
-        for(int i = 1; i < points.size(); i++){
-            Point2D point = points.get(i);
-            if(isWithinBounds(prev, point, viewport) && isSignificant(prev, point, viewport)){
-                list.add(new Segment2D(prev, point));
-            }
-            prev = point;
-        }
-        return new CurveData(plot, list);
-    }
-
-    public static void ensureCoverage(ODEPlot plot, double worldMinX, double worldMaxX, double marginX){
-        plot.extendCoverage(worldMinX, worldMaxX, marginX);
-    }
-    
     public static ArrayList<Point2D> generatePoints(ArrayList<Plot> plots, double minWorldX, double maxWorldX, double stepSize){//TODO: deduplicate points
         ArrayList<Point2D> list = new ArrayList<>();
         for(int i = 0; i < plots.size(); i++){
@@ -219,50 +194,6 @@ public class PlotComputationEngine {
             }
         }
         return list;
-    }
-
-    private static boolean isWithinBounds(Point2D prev, Point2D point, Viewport viewport){
-    // Reject any segment with non-finite coordinates before doing anything else
-    if (!Double.isFinite(prev.getX()) || !Double.isFinite(prev.getY()) ||
-        !Double.isFinite(point.getX()) || !Double.isFinite(point.getY())) {
-        return false;
-    }
-    // ... rest of your existing code unchanged
-
-        ViewportState state = new ViewportState(viewport);
-        boolean prevVisible =
-            prev.getX() >= state.left - state.marginX &&
-            prev.getX() <= state.right + state.marginX &&
-            prev.getY() >= state.bottom - state.marginY &&
-            prev.getY() <= state.top + state.marginY; 
-
-        boolean currVisible =
-            point.getX() >= state.left - state.marginX &&
-            point.getX() <= state.right + state.marginX&&
-            point.getY() >= state.bottom - state.marginY &&
-            point.getY() <= state.top + state.marginY;
-
-        boolean overlapsViewport =
-            Math.max(prev.getX(), point.getX()) >= state.left &&
-            Math.min(prev.getX(), point.getX()) <= state.right &&
-            Math.max(prev.getY(), point.getY()) >= state.bottom &&
-            Math.min(prev.getY(), point.getY()) <= state.top;
-        
-        if(!(prevVisible || currVisible || overlapsViewport)) return false;
-
-        return true;
-    }
-    private static boolean isSignificant(Point2D prev, Point2D point, Viewport viewport){
-        if (!Double.isFinite(prev.getX()) || !Double.isFinite(prev.getY()) ||
-            !Double.isFinite(point.getX()) || !Double.isFinite(point.getY())) {
-            return false;
-        }
-        double dx = viewport.worldToScreenX(point.getX()) - viewport.worldToScreenX(prev.getX());
-        double dy = viewport.worldToScreenY(point.getY()) - viewport.worldToScreenY(prev.getY());
-        if ((dx * dx + dy * dy) < 1.0) {
-            return false;
-        }
-        return true;
     }
 
     private static void adaptiveSampleFunction(Function<Double, Double> f, ViewportState state, double x1, double x2,
@@ -622,5 +553,43 @@ public class PlotComputationEngine {
             points.add(new Point2D(x0, y0));
             points.add(new Point2D(x1, y1));
         }
+    }
+
+    public static CurveData computeCurveData(ODEPlot plot, Viewport viewport) {
+        ViewportState state = new ViewportState(viewport);
+        BoundingBox viewportBox = new BoundingBox(state.left, state.bottom,
+                                                state.worldWidth, state.worldHeight);
+
+        // extend solution if viewport has moved beyond current range
+        plot.ensureCovers(state.left, state.right);
+
+        ArrayList<Segment2D> segments = new ArrayList<>();
+
+        for (CurveChunk chunk : plot.leftBranch) {
+            if (!viewportBox.intersects(chunk.bounds)) continue;
+            for (int j = chunk.initial + 1; j <= chunk.end; j++) {
+                Point p1 = plot.leftPoints.get(j - 1);
+                Point p2 = plot.leftPoints.get(j);
+                if (!Double.isFinite(p1.x) || !Double.isFinite(p1.y) ||
+                    !Double.isFinite(p2.x) || !Double.isFinite(p2.y)) continue;
+                segments.add(new Segment2D(new Point2D(p1.x, p1.y), new Point2D(p2.x, p2.y)));
+            }
+        }
+
+        for (CurveChunk chunk : plot.rightBranch) {
+            if (!viewportBox.intersects(chunk.bounds)) continue;
+            for (int j = chunk.initial + 1; j <= chunk.end; j++) {
+                Point p1 = plot.rightPoints.get(j - 1);
+                Point p2 = plot.rightPoints.get(j);
+                if (!Double.isFinite(p1.x) || !Double.isFinite(p1.y) ||
+                    !Double.isFinite(p2.x) || !Double.isFinite(p2.y)) continue;
+                segments.add(new Segment2D(new Point2D(p1.x, p1.y), new Point2D(p2.x, p2.y)));
+            }
+        }
+        System.out.println("Left chunks: " + plot.leftBranch.size());
+System.out.println("Right chunks: " + plot.rightBranch.size());
+System.out.println("Segments: " + segments.size());
+
+        return new CurveData(plot, segments);
     }
 }
