@@ -27,6 +27,7 @@ public class Graph extends Canvas{
     public PlotInteractionController PIController;
     public CurrentMode currentMode;
     public GridData gridData;
+    public GraphSettings settings;
 
     public void updateGrid(double roughPixels){
         gridData.points.clear();
@@ -74,7 +75,7 @@ public class Graph extends Canvas{
         gridData = new GridData();
         PIController = new PlotInteractionController();
         currentMode = CurrentMode.NONE;
-
+        settings = new GraphSettings();
         addHandlers();
     }
 
@@ -82,9 +83,9 @@ public class Graph extends Canvas{
         renderer.clearCanvas();
         updateGrid(75);
         renderer.setState(new ViewportState(viewport));
-        renderer.drawGridlines(gridData);
-        renderer.drawAxesTicks(gridData);
-        renderer.drawLabels(gridData);
+        if(settings.showGridlines)renderer.drawGridlines(gridData);
+        if(settings.showAxesTicks)renderer.drawAxesTicks(gridData);
+        if(settings.showTickNumbering)renderer.drawLabels(gridData);
         renderer.drawAxes();
         plotManager.recompute(viewport);
         for(CurveData i : plotManager.curveCache) renderer.drawCurveSegmented(i.visiblePoints(), i.originalPlot().getColor());
@@ -268,6 +269,12 @@ public class Graph extends Canvas{
         else if(currentMode == CurrentMode.RESCALE_Y) setCursor(Cursor.V_RESIZE);
         else if(currentMode == CurrentMode.INSPECTING) setCursor(Cursor.CROSSHAIR);
         else setCursor(Cursor.DEFAULT);
+    }
+    public CameraSystem getCameraSystem() {
+        return cameraSystem;
+    }
+    public InputController getInput() {
+        return input;
     }
 }
 enum CurrentMode{

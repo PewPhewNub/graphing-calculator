@@ -95,12 +95,12 @@ public class FunctionPlotEditor extends PlotEditor{
             new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
             new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
         )));
-        functionInputLabel.setFont(new Font(20));
+        functionInputLabel.setFont(new Font(15));
         functionInputLabel.setTextAlignment(TextAlignment.LEFT);
         functionInputLabel.setPadding(new Insets(5,0,5,15));
 
         functionInputField = new TextField("x");
-        functionInputField.setFont(new Font(20));
+        functionInputField.setFont(new Font(15));
         functionInputField.setAlignment(Pos.CENTER_LEFT);
         functionInputField.textProperty().addListener(
             (obs, oldValue, newValue) -> {
@@ -192,6 +192,8 @@ public class FunctionPlotEditor extends PlotEditor{
         dependentVarLabel = new Label("Dependent Variable   :");
         independentVarLabel.setPadding(new Insets(5, 5, 5, 10));
         dependentVarLabel.setPadding(new Insets(5, 5, 5, 10));
+        independentVarLabel.setFont(new Font(12));
+        dependentVarLabel.setFont(new Font(12));
         independentVarLabel.setBackground(new Background(new BackgroundFill(
             Color.WHITE,
             new CornerRadii(2, 0, 0, 2, false),
@@ -220,6 +222,7 @@ public class FunctionPlotEditor extends PlotEditor{
         box1.getChildren().add(independentVarLabel);
         independentVarField = new TextField();
         independentVarField.setText("x");
+        independentVarField.setFont(new Font(12));
 
         independentVarField.setBackground(new Background(new BackgroundFill(
             Color.WHITE,
@@ -250,6 +253,7 @@ public class FunctionPlotEditor extends PlotEditor{
         box2.getChildren().add(dependentVarLabel);
         dependentVarField = new TextField();
         dependentVarField.setText("y");
+        dependentVarField.setFont(new Font(12));
 
         dependentVarField.setBackground(new Background(new BackgroundFill(
             Color.WHITE,
