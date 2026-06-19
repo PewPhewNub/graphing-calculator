@@ -10,7 +10,7 @@ import core.math.Core.ODEStatus;
 import core.math.Core.Point;
 import core.math.ODESolvers.RungeKuttaMethod;
 import core.model.ODECurveChunk;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

@@ -1,6 +1,6 @@
 package engine.plotting.plots;
 
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 

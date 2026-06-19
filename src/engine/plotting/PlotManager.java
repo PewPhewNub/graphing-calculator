@@ -10,7 +10,7 @@ import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
 import engine.plotting.plots.PolarPlot;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 
 public class PlotManager{
@@ -74,7 +74,7 @@ public class PlotManager{
         for(int i = 0; i < plots.size(); i++){
             Plot plot1 = plots.get(i);
             for(int j = i + 1; j < plots.size(); j++){
-                featureCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
+                //featureCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
             }
         }
     }

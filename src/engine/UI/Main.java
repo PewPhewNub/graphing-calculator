@@ -1,8 +1,10 @@
 package engine.UI;
 
-import core.model.CameraIntent;
-import engine.rendering.Graph;
-import engine.rendering.Renderer;
+import engine.rendering.camera.CameraIntent;
+import engine.rendering.core.Renderer;
+import engine.rendering.graph.Graph;
+import engine.scene.FunctionGraphScene;
+import engine.scene.GraphScene;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -40,8 +42,7 @@ import javafx.stage.StageStyle;
 public class Main extends Application {
     Renderer renderer;
     Scene scene;
-    Graph graph;
-    Graph currentGraph;
+    GraphScene currentScene;
     StackPane graphStack;
     UIPanel ui;
     HBox toolBar;
@@ -52,12 +53,13 @@ public class Main extends Application {
     HBox renderControls;
     VBox mainGraphPane;
     ComboBox<GraphType> modeType;
+    Graph graph;
     public static void main(String[] args){
         launch();
     }
 
     public void start(Stage stage) throws Exception{
-        graph = new Graph(1200, 900);
+        currentScene = new FunctionGraphScene(1200, 900);
         initializeMenus();
         initializePlotControls();
 
@@ -67,13 +69,13 @@ public class Main extends Application {
         initializeViewControls();
         initializeRenderControls();
         
-        currentGraph = graph;
         graphStack = new StackPane();
         graphStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         graphStack.setMinSize(0, 100);
 
-        graphStack.getChildren().add(graph);
-        graph.setVisible(true);
+        graphStack.getChildren().add(currentScene.getGraph());
+        currentScene.getGraph().setVisible(true);
+        graph = currentScene.getGraph();
         
         toolBar = new HBox();
         HBox.setHgrow(graphControls, Priority.ALWAYS);
@@ -134,8 +136,8 @@ public class Main extends Application {
         }
         new AnimationTimer() {
             public void handle(long arg0){
-                currentGraph.update();
-                currentGraph.render();
+                currentScene.update();
+                currentScene.render();
             }
         }.start();
     }
@@ -154,7 +156,7 @@ public class Main extends Application {
         menuBar.getMenus().add(new Menu("View"));
     }
     public void initializePlotControls(){
-        ui = new UIPanel(400, 900, graph);
+        ui = new UIPanel(400, 900, currentScene);
         ui.setMinWidth(400);
     }
 
@@ -236,7 +238,7 @@ public class Main extends Application {
         showGridLines.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e){
-                currentGraph.settings.setShowGridlines(showGridLines.isSelected());
+                currentScene.getGraph().settings.setShowGridlines(showGridLines.isSelected());
             }
         });
         options.getChildren().add(showGridLines);
@@ -245,7 +247,7 @@ public class Main extends Application {
         showAxesTicks.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e){
-                currentGraph.settings.setShowAxesTicks(showAxesTicks.isSelected());
+                currentScene.getGraph().settings.setShowAxesTicks(showAxesTicks.isSelected());
             }
         });
         options.getChildren().add(showAxesTicks);
@@ -254,7 +256,7 @@ public class Main extends Application {
         showTickNumbering.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e){
-                currentGraph.settings.setShowTickNumbering(showTickNumbering.isSelected());
+                currentScene.getGraph().settings.setShowTickNumbering(showTickNumbering.isSelected());
             }
         });
         options.getChildren().add(showTickNumbering);
@@ -311,7 +313,7 @@ public class Main extends Application {
                 setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e){
-                        graph.getCameraSystem().handle(new CameraIntent(
+                        currentScene.getCameraSystem().handle(new CameraIntent(
                             0, 0,
                             .2,
                             0, 0,
@@ -348,7 +350,7 @@ public class Main extends Application {
                 setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e){
-                     graph.getCameraSystem().handle(new CameraIntent(
+                    currentScene.getCameraSystem().handle(new CameraIntent(
                             0, 0,
                             -.2,
                             0, 0,
@@ -388,7 +390,7 @@ public class Main extends Application {
                 setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e){
-                        graph.getCameraSystem().resetView();
+                        currentScene.getCameraSystem().resetView();
                     }
                 });
             }
@@ -421,7 +423,7 @@ public class Main extends Application {
                 setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e){
-                        graph.getCameraSystem().resetAspectRatio();
+                        currentScene.getCameraSystem().resetAspectRatio();
                     }
                 });
             }
@@ -518,7 +520,7 @@ public class Main extends Application {
                 setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent e){
-                        graph.getCameraSystem().goTo(Double.parseDouble(xField.getText()), Double.parseDouble(yField.getText()));
+                        currentScene.getCameraSystem().goTo(Double.parseDouble(xField.getText()), Double.parseDouble(yField.getText()));
                     }
                 });
             }

@@ -1,6 +1,6 @@
 package core.model;
 
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 
 public class ViewportState {
     public double viewportHeight, viewportWidth;

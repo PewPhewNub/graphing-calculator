@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.Plot;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
@@ -38,13 +38,8 @@ public class PlotInteractionController {
         ArrayList<Point2D> featurePoints,
         Viewport viewport,
         double mouseX,
-        double mouseY,
-        boolean mousePressed
+        double mouseY
     ){
-        if(!mousePressed){
-            reset();
-            return;
-        }
         double worldX =  viewport.screenToWorldX(mouseX);
         double worldY = viewport.screenToWorldY(mouseY);    
         if(selectedPlot == null) selectedPlot = nearestPlot(plots, viewport, worldX, worldY);
@@ -70,13 +65,8 @@ public class PlotInteractionController {
         ArrayList<Plot> plots,
         Viewport viewport,
         double mouseX,
-        double mouseY,
-        boolean mousePressed
+        double mouseY
     ){
-        if(!mousePressed){
-            reset();
-            return false;
-        }
         double worldX =  viewport.screenToWorldX(mouseX);
         double worldY = viewport.screenToWorldY(mouseY);    
         Plot nearest = nearestPlot(plots, viewport, worldX, worldY);

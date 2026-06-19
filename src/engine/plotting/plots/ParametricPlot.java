@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import core.math.Core.Interval;
 import core.model.ParametricCurveChunk;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -36,7 +36,7 @@ public class ParametricPlot extends Plot{
     }
 
     public void initializeChunks(){
-        double chunkSize = 0.5; // radians
+        double chunkSize = 5; // radians
 
         for(double t = tMin; t < tMax; t += chunkSize){
             chunks.add(

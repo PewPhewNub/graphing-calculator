@@ -20,7 +20,7 @@ import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
 import engine.plotting.plots.PolarPlot;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 
@@ -214,7 +214,8 @@ public class PlotComputationEngine {
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
-            prev = point;
+            prevX = currentX;
+            prevY = currentY;
         }
         return list;
     }
@@ -426,11 +427,11 @@ public class PlotComputationEngine {
         Function<Double, Double> x = plot.x;
         Function<Double, Double> y = plot.y;    
         double toleranceY = Math.abs(
-                viewport.screenToWorldY(.25)
+                viewport.screenToWorldY(1)
             - viewport.screenToWorldY(0)
         );
         double toleranceX = Math.abs(
-                viewport.screenToWorldX(.25)
+                viewport.screenToWorldX(1)
             - viewport.screenToWorldX(0)
         );
         ArrayList<Segment2D> segments = new ArrayList<>();
@@ -461,11 +462,11 @@ public class PlotComputationEngine {
         Function<Double, Double> x = plot.x;
         Function<Double, Double> y = plot.y;    
         double toleranceY = Math.abs(
-                viewport.screenToWorldY(.25)
+                viewport.screenToWorldY(1)
             - viewport.screenToWorldY(0)
         );
         double toleranceX = Math.abs(
-                viewport.screenToWorldX(.25)
+                viewport.screenToWorldX(1)
             - viewport.screenToWorldX(0)
         );
         ArrayList<Segment2D> segments = new ArrayList<>();
@@ -836,6 +837,10 @@ public class PlotComputationEngine {
             }
         }
         return points;
+    }
+
+    public static CurveData computeCurveData(ImplicitPlot plot, Viewport viewport){
+        return new CurveData(plot, plot.sample(viewport));
     }
 }
 

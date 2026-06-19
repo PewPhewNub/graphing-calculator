@@ -7,7 +7,7 @@ import core.model.CurveData;
 import core.model.Segment2D;
 import core.model.ViewportState;
 import engine.plotting.settings.FunctionPlotSettings;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 

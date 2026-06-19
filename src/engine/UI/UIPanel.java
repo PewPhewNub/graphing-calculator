@@ -1,15 +1,15 @@
 package engine.UI;
 
-import engine.UI.plotEditor.FunctionPlotEditor;
-import engine.UI.plotEditor.ODEPlotEditor;
-import engine.UI.plotEditor.ParametricPlotEditor;
-import engine.UI.plotEditor.PolarPlotEditor;
-import engine.rendering.Graph;
+import engine.UI.controls.FunctionPlotEditor;
+import engine.UI.controls.ODEPlotEditor;
+import engine.UI.controls.ParametricPlotEditor;
+import engine.UI.controls.PolarPlotEditor;
+import engine.rendering.graph.Graph;
+import engine.scene.GraphScene;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -21,13 +21,11 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 public class UIPanel extends BorderPane {
-    Graph graph;
+    GraphScene graphScene;
     Button showButton;
     VBox sidePane;
     BorderPane plotPane;
@@ -36,11 +34,11 @@ public class UIPanel extends BorderPane {
     double maxWidth;
     double minWidth;
     public MenuButton addPlotButton;
-    public UIPanel(double width, double height, Graph graph){
+    public UIPanel(double width, double height, GraphScene graphScene){
         super();
         setHeight(height);
         setWidth(width);
-        this.graph = graph;
+        this.graphScene = graphScene;
         maxWidth = width;
 
         sidePane = new VBox();
@@ -83,19 +81,19 @@ public class UIPanel extends BorderPane {
 
         MenuItem functionItem = new MenuItem("Function");
         functionItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new FunctionPlotEditor(graph.plotManager));
+            plotEditorPane.getChildren().add(new FunctionPlotEditor(graphScene.getPlotManager()));
         });
         MenuItem odeItem = new MenuItem("ODE");
         odeItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new ODEPlotEditor(graph.plotManager));
+            plotEditorPane.getChildren().add(new ODEPlotEditor(graphScene.getPlotManager()));
         });
         MenuItem polarItem = new MenuItem("Parametric");
         polarItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new ParametricPlotEditor(graph.plotManager));
+            plotEditorPane.getChildren().add(new ParametricPlotEditor(graphScene.getPlotManager()));
         });
         MenuItem parametricItem = new MenuItem("Polar");
         parametricItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new PolarPlotEditor(graph.plotManager));
+            plotEditorPane.getChildren().add(new PolarPlotEditor(graphScene.getPlotManager()));
         });
 
         addPlotButton.getItems().addAll(
@@ -172,9 +170,6 @@ public class UIPanel extends BorderPane {
 
         // Use a look-up to find the arrow node
         
-    }
-    public void setGraph(Graph graph) {
-        this.graph = graph;
     }
     public void collapse(){
         isVisible = false;

@@ -7,7 +7,7 @@ import java.util.function.Function;
 import core.math.Core.Interval;
 import core.model.ParametricCurveChunk;
 import core.model.ViewportState;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -40,7 +40,7 @@ public class PolarPlot extends Plot {
     }
 
     public void initializeChunks(){
-        double chunkSize = 0.5; // radians
+        double chunkSize = 2; // radians
 
         for(double t = tMin; t < tMax; t += chunkSize){
             chunks.add(

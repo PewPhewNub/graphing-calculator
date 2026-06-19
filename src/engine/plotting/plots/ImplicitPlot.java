@@ -5,11 +5,11 @@ import java.util.function.BiFunction;
 
 import core.model.Segment2D;
 import core.model.ViewportState;
-import engine.rendering.Viewport;
+import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class ImplicitPlot implements Plot{
+public class ImplicitPlot extends Plot{
     public BiFunction<Double, Double, Double> function;
     public Color color;
     public String name;
