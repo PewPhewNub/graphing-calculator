@@ -9,7 +9,7 @@ import core.math.Core.ODESolution;
 import core.math.Core.ODEStatus;
 import core.math.Core.Point;
 import core.math.ODESolvers.RungeKuttaMethod;
-import core.model.CurveChunk;
+import core.model.ODECurveChunk;
 import engine.rendering.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
@@ -23,8 +23,8 @@ public class ODEPlot extends Plot {
 
     public ArrayList<Point> rightPoints = new ArrayList<>();
     public ArrayList<Point> leftPoints  = new ArrayList<>();
-    public ArrayList<CurveChunk> rightBranch = new ArrayList<>();
-    public ArrayList<CurveChunk> leftBranch  = new ArrayList<>();
+    public ArrayList<ODECurveChunk> rightBranch = new ArrayList<>();
+    public ArrayList<ODECurveChunk> leftBranch  = new ArrayList<>();
     
     double rightExtent;
     double leftExtent;
@@ -40,8 +40,8 @@ public class ODEPlot extends Plot {
         this.equation = equation;
         this.initial = initial;
         this.name = name;
-        leftBranch = new ArrayList<CurveChunk>();
-        rightBranch = new ArrayList<CurveChunk>();
+        leftBranch = new ArrayList<ODECurveChunk>();
+        rightBranch = new ArrayList<ODECurveChunk>();
 
         this.color = color;
         initialize();
@@ -91,7 +91,7 @@ public class ODEPlot extends Plot {
         leftExtent = targetX;
     }
 
-    private void buildChunks(ArrayList<Point> points, ArrayList<CurveChunk> chunks, int fromIndex) {
+    private void buildChunks(ArrayList<Point> points, ArrayList<ODECurveChunk> chunks, int fromIndex) {
         int i = fromIndex;
         while (i < points.size() - 1) {
             double chunkStartX = points.get(i).x;
@@ -111,7 +111,7 @@ public class ODEPlot extends Plot {
                 minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
             }
             if (minX < Double.MAX_VALUE)
-                chunks.add(new CurveChunk(i, end,
+                chunks.add(new ODECurveChunk(i, end,
                     new BoundingBox(minX, minY, maxX - minX, maxY - minY)));
             if(end == i) end++;
             i = end;

@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import core.math.Core.Interval;
-import core.model.CurveChunk;
+import core.model.ParametricCurveChunk;
 import engine.rendering.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
@@ -17,7 +17,7 @@ public class ParametricPlot extends Plot{
     public double tMin;
     public double tMax;
     public double maxSamples;
-    public ArrayList<CurveChunk> chunks;
+    public ArrayList<ParametricCurveChunk> chunks;
     public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("t");
     ArrayList<Point2D> initialList;
@@ -40,8 +40,10 @@ public class ParametricPlot extends Plot{
 
         for(double t = tMin; t < tMax; t += chunkSize){
             chunks.add(
-                new CurveChunk(
+                new ParametricCurveChunk(
                     new Interval(t, Math.min(t + chunkSize, tMax)),
+                    sample(t),
+                    sample(Math.min(t + chunkSize, tMax)),
                     computeBounds(t, Math.min(t + chunkSize, tMax))
                 )
             );
@@ -112,5 +114,9 @@ public class ParametricPlot extends Plot{
     @Override
     public boolean contains(Point2D point) {
         return initialList.contains(point) || accurateComputedPoints.contains(point);
+    }
+
+    public Point2D sample(double t){
+        return new Point2D(x.apply(t), y.apply(t));
     }
 }

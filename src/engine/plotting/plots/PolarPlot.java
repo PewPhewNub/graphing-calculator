@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import core.math.Core.Interval;
-import core.model.CurveChunk;
+import core.model.ParametricCurveChunk;
 import core.model.ViewportState;
 import engine.rendering.Viewport;
 import javafx.geometry.BoundingBox;
@@ -19,7 +19,7 @@ public class PolarPlot extends Plot {
     public double tMin;
     public double tMax;
     public double maxSamples;
-    public ArrayList<CurveChunk> chunks;
+    public ArrayList<ParametricCurveChunk> chunks;
     public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("\u03B8");
 
@@ -44,8 +44,10 @@ public class PolarPlot extends Plot {
 
         for(double t = tMin; t < tMax; t += chunkSize){
             chunks.add(
-                new CurveChunk(
+                new ParametricCurveChunk(
                     new Interval(t, Math.min(t + chunkSize, tMax)),
+                    sample(t),
+                    sample(Math.min(t + chunkSize, tMax)),
                     computeBounds(t, Math.min(t + chunkSize, tMax))
                 )
             );
@@ -76,10 +78,7 @@ public class PolarPlot extends Plot {
     }
 
     public Point2D sample(double t){
-        double rVal = r.apply(t);
-        double xVal = rVal * Math.cos(t);
-        double yVal = rVal * Math.sin(t);
-        return new Point2D(xVal, yVal);
+        return new Point2D(x.apply(t), y.apply(t));
     }
 
     @Override

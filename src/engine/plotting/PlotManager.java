@@ -31,7 +31,6 @@ public class PlotManager{
     }
     public void computeCurves(Viewport viewport){
         curveCache.clear();
-        ViewportState state = new ViewportState(viewport);
         for(Plot plot : plots){
             if(plot == null) continue;
             if(plot instanceof FunctionPlot)
@@ -57,12 +56,24 @@ public class PlotManager{
             }
         }
     }
-    public void computeFeaturePoints(ViewportState state){
-        featureCache = PlotComputationEngine.generatePoints(plots,state.left, state.right, state.worldWidth*0.2);
+    public void computeFeaturePoints(Viewport viewport){
+        featureCache.clear();
+        ViewportState state = new ViewportState(viewport);
+        for(Plot plot : plots){
+            featureCache.addAll(PlotComputationEngine.computeIntercepts(plot, state));
+            featureCache.addAll(PlotComputationEngine.computeCriticalPoints(plot, state));
+        }
+
+        for(int i = 0; i < plots.size(); i++){
+            Plot plot1 = plots.get(i);
+            for(int j = i + 1; j < plots.size(); j++){
+                featureCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
+            }
+        }
     }
 
     public void recompute(Viewport viewport){
         computeCurves(viewport);
-        computeFeaturePoints(new ViewportState(viewport));
+        computeFeaturePoints(viewport);
     }
 }
