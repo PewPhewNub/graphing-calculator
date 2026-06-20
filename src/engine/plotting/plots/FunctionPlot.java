@@ -11,7 +11,7 @@ import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class FunctionPlot extends Plot{
+public class FunctionPlot extends Plot implements CartesianPlot{
 
     public Function<Double, Double> function;
     public FunctionPlotSettings settings;

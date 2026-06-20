@@ -11,7 +11,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class ParametricPlot extends Plot{
+public class ParametricPlot extends Plot implements CartesianPlot{
     public Function<Double, Double> x;
     public Function<Double, Double> y;
     public double tMin;

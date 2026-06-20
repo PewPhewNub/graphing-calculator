@@ -12,7 +12,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-public class PolarPlot extends Plot {
+public class PolarPlot extends Plot implements CartesianPlot{
     public Function<Double, Double> r;
     public Function<Double, Double> x;
     public Function<Double, Double> y;

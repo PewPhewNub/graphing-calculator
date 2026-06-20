@@ -114,6 +114,11 @@ public class Parser{
 
     public DefinitionNode parseDefinition(String dependentVariable, Set<String> knownVariables) throws Exception {
         ExpressionNode expr = parseExpression();
+        if(peek().type == TokenType.ASSIGN){
+            advance();
+            ExpressionNode expr2 = parseExpression();
+            return new DefinitionNode(new BinaryNode(expr, BinaryOp.SUBTRACT, expr2), dependentVariable, knownVariables);
+        }
         return new DefinitionNode(expr, dependentVariable, knownVariables);
-    }  
+    } 
 }

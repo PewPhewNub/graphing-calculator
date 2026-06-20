@@ -70,7 +70,7 @@ public class CurveRenderer {
             x2 = Math.max(-limit, Math.min(limit, x2));
             y2 = Math.max(-limit, Math.min(limit, y2));
 
-            if(dx*dx + dy*dy > 1)
+//            if(dx*dx + dy*dy > 1)
                 context.getGc().strokeLine(x1, y1, x2, y2);
         }
     }

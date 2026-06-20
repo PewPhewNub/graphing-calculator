@@ -20,6 +20,7 @@ import engine.plotting.plots.ODEPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
 import engine.plotting.plots.PolarPlot;
+import engine.plotting.plots.VectorFieldPlot;
 import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
@@ -841,6 +842,9 @@ public class PlotComputationEngine {
 
     public static CurveData computeCurveData(ImplicitPlot plot, Viewport viewport){
         return new CurveData(plot, plot.sample(viewport));
+    }
+    public static CurveData computeCurveData(VectorFieldPlot plot, Viewport viewport){
+        return new CurveData(plot, plot.sample());
     }
 }
 

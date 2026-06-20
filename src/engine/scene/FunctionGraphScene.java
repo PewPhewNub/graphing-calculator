@@ -1,11 +1,11 @@
 package engine.scene;
 
-import core.model.CurveData;
 import core.model.GridData;
-import core.model.ViewportState;
 import engine.UI.InputController;
 import engine.plotting.PlotInteractionController;
 import engine.plotting.PlotManager;
+import engine.plotting.plots.CartesianPlot;
+import engine.plotting.plots.Plot;
 import engine.rendering.camera.CameraIntent;
 import engine.rendering.camera.CameraSystem;
 import engine.rendering.camera.Viewport;
@@ -216,6 +216,11 @@ public class FunctionGraphScene extends GraphScene{
         input.deltaScrollY == 0){
             currentMode = CurrentMode.NONE;
         }
+    }
+
+    public boolean canAdd(Plot plot){
+        if(plot instanceof CartesianPlot) return true;
+        return false;
     }
 }
     

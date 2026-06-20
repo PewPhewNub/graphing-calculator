@@ -1,10 +1,10 @@
 package engine.UI;
 
 import engine.UI.controls.FunctionPlotEditor;
+import engine.UI.controls.ImplicitPlotEditor;
 import engine.UI.controls.ODEPlotEditor;
 import engine.UI.controls.ParametricPlotEditor;
 import engine.UI.controls.PolarPlotEditor;
-import engine.rendering.graph.Graph;
 import engine.scene.GraphScene;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -96,11 +96,17 @@ public class UIPanel extends BorderPane {
             plotEditorPane.getChildren().add(new PolarPlotEditor(graphScene.getPlotManager()));
         });
 
+        MenuItem implicitItem = new MenuItem("Implicit");
+        implicitItem.setOnAction(e ->{
+            plotEditorPane.getChildren().add(new ImplicitPlotEditor(graphScene.getPlotManager()));
+        });
+
         addPlotButton.getItems().addAll(
             functionItem,
             parametricItem,
             polarItem,
-            odeItem
+            odeItem,
+            implicitItem
         );
         addPlotButton.setBorder(new Border(
             new BorderStroke(

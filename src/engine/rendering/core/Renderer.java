@@ -40,7 +40,9 @@ public class Renderer {
                 curve.originalPlot().getColor()
             );
         }
-
+        for(Point2D point : scene.getPlotManager().featureCache){
+            drawMarker(point, 7, labelColor);
+        }
     }
 
     public void setColor(Color axesColor, Color gridColor, Color labelColor){
