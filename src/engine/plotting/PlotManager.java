@@ -2,8 +2,9 @@ package engine.plotting;
 
 import java.util.ArrayList;
 
-import core.model.CurveData;
 import core.model.ViewportState;
+import core.model.curve.CurveData;
+import core.model.curve.Intersection;
 import engine.plotting.plots.FunctionPlot;
 import engine.plotting.plots.ImplicitPlot;
 import engine.plotting.plots.ODEPlot;
@@ -17,13 +18,16 @@ import javafx.geometry.Point2D;
 public class PlotManager{
     public ArrayList<Plot> plots;
     public ArrayList<CurveData> curveCache;
-    public ArrayList<Point2D> featureCache;
+    public ArrayList<Intersection> intersectionCache;
+    public PlotInteractionController interactionController;
     boolean dirty;
 
-    public PlotManager(){
+    public PlotManager(PlotInteractionController plotInteractionController){
         plots = new ArrayList<>();
         curveCache = new ArrayList<>();
-        featureCache = new ArrayList<>();
+        interactionController = plotInteractionController;
+        intersectionCache = new ArrayList<>();
+        plotInteractionController.setCaches(curveCache, intersectionCache);
     }
     public void addPlot(Plot plot){
         plots.add(plot);
@@ -31,63 +35,49 @@ public class PlotManager{
     public void removePlot(Plot plot){
         plots.remove(plot);
     }
-    public void computeCurves(Viewport viewport){
+    public void computeCurveData(Viewport viewport){
         curveCache.clear();
         for(Plot plot : plots){
             if(plot == null) continue;
-            if(plot instanceof FunctionPlot)
+            if(plot instanceof FunctionPlot p)
                 curveCache.add(
-                    PlotComputationEngine.computeCurveData((FunctionPlot)plot, viewport)
+                    PlotComputationEngine.computeCurveData(p, viewport)
                 );
-            if(plot instanceof ODEPlot){
+            if(plot instanceof ODEPlot p){
                 curveCache.add(    
-                    PlotComputationEngine.computeCurveData((ODEPlot)plot, viewport)
-                );
-            }
-            if(plot instanceof ParametricPlot){
-                ((ParametricPlot)plot).accurateComputedPoints.clear();
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData((ParametricPlot)plot, viewport)
+                    PlotComputationEngine.computeCurveData(p, viewport)
                 );
             }
-            if(plot instanceof PolarPlot){
-                ((PolarPlot)plot).accurateComputedPoints.clear();
+            if(plot instanceof ParametricPlot p){
                 curveCache.add(    
-                    PlotComputationEngine.computeCurveData((PolarPlot)plot, viewport)
+                    PlotComputationEngine.computeCurveData(p, viewport)
+                );
+            }
+            if(plot instanceof PolarPlot p){
+                curveCache.add(    
+                    PlotComputationEngine.computeCurveData(p, viewport)
                 );
             }
             
-            if(plot instanceof ImplicitPlot){
+            if(plot instanceof ImplicitPlot p){
                 curveCache.add(    
-                    PlotComputationEngine.computeCurveData((ImplicitPlot)plot, viewport)
+                    PlotComputationEngine.computeCurveData(p, viewport)
                 );
             }
 
-            if(plot instanceof VectorFieldPlot){
+            if(plot instanceof VectorFieldPlot p){
                 curveCache.add(    
-                    PlotComputationEngine.computeCurveData((VectorFieldPlot)plot, viewport)
+                    PlotComputationEngine.computeCurveData(p, viewport)
                 );
             }
         }
-    }
-    public void computeFeaturePoints(Viewport viewport){
-        featureCache.clear();
-        ViewportState state = new ViewportState(viewport);
-        for(Plot plot : plots){
-            featureCache.addAll(PlotComputationEngine.computeIntercepts(plot, state));
-            featureCache.addAll(PlotComputationEngine.computeCriticalPoints(plot, state));
-        }
-
+        
+        intersectionCache.clear();
         for(int i = 0; i < plots.size(); i++){
             Plot plot1 = plots.get(i);
             for(int j = i + 1; j < plots.size(); j++){
-                featureCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
+                intersectionCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
             }
         }
-    }
-
-    public void recompute(Viewport viewport){
-        computeCurves(viewport);
-        computeFeaturePoints(viewport);
     }
 }

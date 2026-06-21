@@ -1,11 +1,15 @@
 package engine.plotting.plots;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.BiFunction;
 
+import core.math.Core.Point;
+import core.model.ImplicitChunk;
 import core.model.Segment2D;
 import core.model.ViewportState;
 import engine.rendering.camera.Viewport;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
@@ -13,38 +17,49 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
     public BiFunction<Double, Double, Double> function;
     public Color color;
     public String name;
+    public HashMap<Point2D, ImplicitChunk> chunks;
+    public final double CHUNK_SIZE = 16;
+    private final double BASE_SIZE = 16;
     
     public ImplicitPlot(String name, BiFunction<Double, Double, Double> function, Color color){
         this.name = name;
         this.function = function;
         this.color = color;
+
+        chunks = new HashMap<>();
     }
 
-    public ArrayList<Segment2D> sample(Viewport viewport){ //using marching squares
-        ViewportState state = new ViewportState(viewport);
-        int maxCells = 512;
-        double stepX = state.worldWidth/maxCells;
-        double stepY = state.worldHeight/maxCells;
+    public ArrayList<Segment2D> marchingSquares(ImplicitChunk chunk, int LOD){
         ArrayList<Segment2D> segments = new ArrayList<>();
+
+        double left = chunk.bounds.getMinX();
+        double bottom = chunk.bounds.getMinY();
+
+        double step = BASE_SIZE / (1 << LOD);
+
+        double stepX = step;
+        double stepY = step;
+
+        int maxCells = (int)(chunk.bounds.getHeight()/step);
         // We need maxCells + 1 points to create maxCells cells (0 to maxCells)
         double[] prevRow = new double[maxCells + 1];
         for (int j = 0; j <= maxCells; j++) {
-            prevRow[j] = function.apply(state.bottom, state.bottom + j * stepY);
+            prevRow[j] = function.apply(left, bottom + j * stepY);
         }
 
-        for (int i = 0; i <= maxCells; i++) {
-            double x0 = state.left + i * stepX;
-            double x1 = state.left + (i + 1) * stepX;
+        for (int i = 0; i < maxCells; i++) {
+            double x0 = left + i * stepX;
+            double x1 = left + (i + 1) * stepX;
             double[] nextRow = new double[maxCells + 1];
 
             // Pre-calculate the new Point2D(x1, tCB*stepY + y0) column for this strip of cells
             for (int j = 0; j <= maxCells; j++) {
-                nextRow[j] = function.apply(x1 + Math.random()*1e-10, state.bottom + j * stepY + Math.random()*1e-10);
+                nextRow[j] = function.apply(x1, bottom + j * stepY);
             }
 
             for (int j = 0; j < maxCells; j++) {
-                double y0 = state.bottom + j * stepY;
-                double y1 = state.bottom + (j + 1) * stepY;
+                double y0 = bottom + j * stepY;
+                double y1 = bottom + (j + 1) * stepY;
 
                 // Corners: A=TL, B=TR, C=BR, D=BL
                 // Mapping based on your grid:
@@ -100,6 +115,83 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
             prevRow = nextRow;
         }  
         return segments; 
+    }
+
+    public void ensureCoverage(Viewport viewport){
+        ViewportState state = new ViewportState(viewport);
+        int count = 0;
+
+        int LOD = calculateLOD(viewport);
+
+        int minChunkX = (int)(Math.floor(state.left/CHUNK_SIZE));
+        int maxChunkX = (int)(Math.floor(state.right/CHUNK_SIZE));
+        int minChunkY = (int)(Math.floor(state.bottom/CHUNK_SIZE));
+        int maxChunkY = (int)(Math.floor(state.top/CHUNK_SIZE));
+
+        for(int cx = minChunkX; cx <= maxChunkX; cx++){
+            for(int cy = minChunkY; cy <= maxChunkY; cy++){
+                Point2D key = new Point2D(cx, cy);
+
+                if(!chunks.containsKey(key)) {
+                    generateChunk(cx, cy, LOD);
+                    continue;
+                }
+
+                ImplicitChunk chunk = chunks.get(key);
+                if(!chunk.generated) continue;
+                if(chunk.LOD != LOD){
+                    generateChunk(cx, cy, LOD);
+                    count++;
+                }
+            }
+        }
+        System.out.println("generated " + count);
+
+        System.out.println(chunks.size());
+    }
+
+    public int calculateLOD(Viewport viewport) {
+        ViewportState state = new ViewportState(viewport);
+
+        double worldUnitsPerPixel =
+            state.worldWidth / state.viewportWidth;
+
+        double desiredStep =
+            worldUnitsPerPixel * 4.0;
+
+        int lod = (int)Math.round(
+            Math.log(BASE_SIZE / desiredStep) / Math.log(2)
+        );
+
+        return Math.max(0, lod);
+    }
+
+    public void generateChunk(double cx, double cy, int LOD){
+        ImplicitChunk chunk = new ImplicitChunk();
+        chunk.bounds = new BoundingBox(cx * CHUNK_SIZE, cy*CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
+        ArrayList<Segment2D> segments = marchingSquares(chunk, LOD);
+        if(segments== null){
+            chunk.generated = false;
+            return;
+        }
+        if(segments.isEmpty()){
+            chunk.generated = true;
+            chunk.hasCurve = false;
+            return;
+        }
+        chunk.segments = segments;
+        chunk.LOD = LOD;
+        chunk.generated = true;
+        System.out.println(
+    "Chunk " + cx + "," + cy +
+    " segments=" + segments.size()
+);
+
+        chunks.put(new Point2D(cx, cy), chunk);
+    }
+
+    public boolean sample(double x, double y){ //using marching squares
+        return Math.abs(function.apply(x, y)) < 1e-6;
     }
 
     public Color getColor() {

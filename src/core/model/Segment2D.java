@@ -41,4 +41,35 @@ public class Segment2D {
     public boolean equals(Segment2D segment){
         return point1.equals(segment.point1) && point2.equals(segment.point2) ;
     }
+
+    public Point2D nearestPoint(double mouseX, double mouseY){
+        double BAx = (point2.getX() - point1.getX());
+        double BAy = (point2.getY() - point1.getY());
+
+        double lenSq = BAx*BAx + BAy*BAy;
+
+        if(lenSq < 1e-14) return midpoint();
+
+        double QAx = (mouseX - point1.getX());
+        double QAy = (mouseY - point1.getY());
+
+        double t = (QAx*BAx + QAy*BAy)/(BAx*BAx + BAy*BAy);
+        t = Math.max(0, Math.min(1, t));
+
+        return new Point2D(
+            point1.getX() + BAx*t,
+            point1.getY() + BAy*t
+        );
+    }
+
+    public double distanceSquared(double mouseX, double mouseY){
+        Point2D closestPoint = nearestPoint(mouseX, mouseY);
+        double dx = mouseX - closestPoint.getX();
+        double dy = mouseY - closestPoint.getY();
+        return dx*dx + dy*dy;
+    }
+
+    public Point2D midpoint(){
+        return new Point2D((point1.getX() + point2.getX())/2, (point1.getY() + point2.getY())/2);
+    }
 }

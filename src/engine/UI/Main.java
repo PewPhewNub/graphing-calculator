@@ -1,6 +1,7 @@
 package engine.UI;
 
 import core.math.Core.Point;
+import engine.plotting.plots.ImplicitPlot;
 import engine.plotting.plots.VectorFieldPlot;
 import engine.rendering.camera.CameraIntent;
 import engine.rendering.core.Renderer;
@@ -129,14 +130,6 @@ public class Main extends Application {
             arrow.setManaged(false); // Ensures the space is reclaimed
         }
         ui.addPlotButton.setPadding(new Insets(5, 10, 5, 10));
-
-        currentScene.getPlotManager().addPlot(
-            new VectorFieldPlot("yes",
-            (x, y) -> y,
-            (x, y) -> (1 - x*x)*y - x,
-            0,
-            new Point(1,1), 
-            Color.RED));
 
         for(Node i : graphStack.getChildren()){
             if(i instanceof Graph){  

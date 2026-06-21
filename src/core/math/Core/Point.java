@@ -1,5 +1,7 @@
 package core.math.Core;
 
+import java.util.Objects;
+
 public class Point {
     public final double x; public final double y;
 
@@ -27,5 +29,9 @@ public class Point {
 
     public Point add(Point a){
         return new Point(a.x + this.x, a.y + this.y);
+    }
+
+    public int hashCode(){
+        return 31 * (int)Math.ceil(x) + (int)Math.floor(y);
     }
 }

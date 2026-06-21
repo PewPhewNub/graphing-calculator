@@ -2,17 +2,16 @@ package engine.rendering.core;
 
 import java.util.ArrayList;
 
-import core.model.CurveData;
 import core.model.GridData;
 import core.model.Segment2D;
-import engine.plotting.plots.Plot;
+import core.model.curve.CurveData;
+import core.model.curve.Intersection;
 import engine.rendering.layers.AxisRenderer;
 import engine.rendering.layers.CurveRenderer;
 import engine.rendering.layers.GridRenderer;
 import engine.rendering.layers.OverlayRenderer;
 import engine.scene.GraphScene;
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Renderer {
@@ -27,6 +26,7 @@ public class Renderer {
         this.gridLinesColor = Color.BLACK;
         this.labelColor =  Color.GREY;
         this.context = context;
+        context.getGc().setImageSmoothing(true);
     }
 
     public void render(GraphScene scene){
@@ -36,13 +36,19 @@ public class Renderer {
         drawLabels(scene.gridData());
         for(CurveData curve : (scene.getPlotManager()).curveCache){
             drawCurveSegmented(
-                curve.visiblePoints(),
-                curve.originalPlot().getColor()
+                curve.visibleSegments(),
+                curve.plot().getColor()
             );
+            if(null == curve.featurePoints()) continue;
+            for(Point2D point: curve.featurePoints()){
+                drawMarker(point, 7, labelColor);    
+            }  
         }
-        for(Point2D point : scene.getPlotManager().featureCache){
-            drawMarker(point, 7, labelColor);
+        for(Intersection intersection : scene.getPlotManager().intersectionCache){
+            drawMarker(intersection.getPoint(), 7, labelColor);
         }
+        Point2D selectedPoint = scene.getPlotManager().interactionController.getSelectedPoint();
+        if(selectedPoint!= null) drawMarker(selectedPoint, 7, scene.getPlotManager().interactionController.getSelectedPlot().getColor());
     }
 
     public void setColor(Color axesColor, Color gridColor, Color labelColor){

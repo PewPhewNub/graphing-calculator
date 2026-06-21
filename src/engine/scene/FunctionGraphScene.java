@@ -2,7 +2,7 @@ package engine.scene;
 
 import core.model.GridData;
 import engine.UI.InputController;
-import engine.plotting.PlotInteractionController;
+import engine.plotting.CartesianInteractionController;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.CartesianPlot;
 import engine.plotting.plots.Plot;
@@ -18,15 +18,16 @@ import javafx.scene.Cursor;
 public class FunctionGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
+    private CartesianInteractionController interaction;
     
     public FunctionGraphScene(double width, double height){
         this.graph = new Graph(width, height);
-        this.plotManager = new PlotManager();
+        interaction = new CartesianInteractionController();
+        this.plotManager = new PlotManager(interaction);
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
         this.renderer = new Renderer(context);
         cameraSystem = new CameraSystem(graph.viewport);
         currentMode = CurrentMode.NONE;
-        interaction = new PlotInteractionController();
         gridData = new GridData();
     }
 
@@ -121,15 +122,7 @@ public class FunctionGraphScene extends GraphScene{
             }
             input.deltaScrollX = 0;
             input.deltaScrollY = 0;
-        }else if(currentMode == CurrentMode.INSPECTING){
-            interaction.update(plotManager.plots,
-                plotManager.featureCache,
-                viewport, 
-                input.mouseX,
-                input.mouseY
-            );
         }
-
         
         cameraSystem.update();
     }
@@ -148,10 +141,10 @@ public class FunctionGraphScene extends GraphScene{
         InputController input = graph.getInput();
         input.update();
 
-        updateMode();       // decide what user is doing
         handleCamera();     // apply camera changes
+        plotManager.computeCurveData(graph.viewport);
+        updateMode();       // decide what user is doing
         handleInteraction();// apply plot interaction
-        plotManager.recompute(graph.viewport);
         generateGridData(75);
         updateCursor();
         input.clearFrameEvents();
@@ -159,45 +152,32 @@ public class FunctionGraphScene extends GraphScene{
 
     private void handleInteraction(){
         InputController input = graph.getInput();
-        if(currentMode == CurrentMode.INSPECTING){
-            if(graph.input.mouseDown)
-                interaction.update(
-                    plotManager.plots,
-                    plotManager.featureCache,
-                    graph.viewport,
-                    input.mouseX,
-                    input.mouseY
-                );
-        }
+        double worldX = graph.viewport.screenToWorldX(input.mouseX);
+        double worldY = graph.viewport.screenToWorldY(input.mouseY);
+        interaction.update(graph.viewport, worldX, worldY);
     }
 
     private void updateMode(){
         InputController input = graph.getInput();
         if(input.mousePressed){
-
-        input.pressedWorldX =
-            graph.viewport.screenToWorldX(input.pressedX);
-
-        input.pressedWorldY =
-            graph.viewport.screenToWorldY(input.pressedY);
-
-
-            if(interaction.canInteract(
-                    plotManager.plots,
-                    graph.viewport,
-                    input.mouseX,
-                    input.mouseY
-            )){
+            if(interaction.getHoveredCurve() != null){
                 currentMode = CurrentMode.INSPECTING;
+                interaction.selectHovered(plotManager.intersectionCache, graph.viewport);
             }
             else{
                 currentMode = CurrentMode.PANNING;
+                interaction.clearSelection();
             }
+
+            input.pressedWorldX =
+                graph.viewport.screenToWorldX(input.pressedX);
+
+            input.pressedWorldY =
+                graph.viewport.screenToWorldY(input.pressedY);
+            
         }
         if(input.mouseReleased){
-
             currentMode = CurrentMode.NONE;
-            interaction.reset();
         }
         if(input.deltaScrollX != 0 || input.deltaScrollY != 0){
 
@@ -215,6 +195,10 @@ public class FunctionGraphScene extends GraphScene{
         input.deltaScrollX == 0 && 
         input.deltaScrollY == 0){
             currentMode = CurrentMode.NONE;
+        }
+        if(input.mousePressed){
+
+            
         }
     }
 

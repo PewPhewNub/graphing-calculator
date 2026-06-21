@@ -1,8 +1,8 @@
 package engine.rendering.graph;
 
-import core.model.CurveData;
 import core.model.GridData;
 import core.model.ViewportState;
+import core.model.curve.CurveData;
 import engine.UI.InputController;
 import engine.plotting.PlotInteractionController;
 import engine.plotting.PlotManager;
