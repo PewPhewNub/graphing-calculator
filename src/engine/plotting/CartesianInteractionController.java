@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import core.model.curve.CurveData;
 import core.model.curve.FunctionCurveData;
+import core.model.curve.ImplicitCurveData;
 import core.model.curve.Intersection;
 import core.model.curve.ParametricCurveData;
 import core.model.curve.PolarCurveData;
@@ -105,6 +106,13 @@ public class CartesianInteractionController extends PlotInteractionController{
                 viewport
             );
         }if(selectedCurve instanceof PolarCurveData f){
+            selectedPoint = applySnapping(
+                f.targettedPoint(mouseX, mouseY),
+                selectedCurve,
+                intersections,
+                viewport
+            );
+        }if(selectedCurve instanceof ImplicitCurveData f){
             selectedPoint = applySnapping(
                 f.targettedPoint(mouseX, mouseY),
                 selectedCurve,

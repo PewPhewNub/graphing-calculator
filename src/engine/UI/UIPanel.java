@@ -1,5 +1,4 @@
 package engine.UI;
-
 import engine.UI.controls.FunctionPlotEditor;
 import engine.UI.controls.ImplicitPlotEditor;
 import engine.UI.controls.ODEPlotEditor;
@@ -21,6 +20,7 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -37,14 +37,13 @@ public class UIPanel extends BorderPane {
     public UIPanel(double width, double height, GraphScene graphScene){
         super();
         setHeight(height);
-        setWidth(width);
+        setPrefWidth(width);
         this.graphScene = graphScene;
         maxWidth = width;
 
         sidePane = new VBox();
         minWidth = 56;
-        sidePane.setMinSize(50, height);
-        sidePane.setSpacing(5);
+        sidePane.setMinSize(50, 0);
         plotPane = new BorderPane();
 
         showButton = new Button();
@@ -173,6 +172,13 @@ public class UIPanel extends BorderPane {
                 Insets.EMPTY
             )
         ));
+
+        StackPane arrow = (StackPane) this.addPlotButton.lookup(".arrow");
+        if (arrow != null) {
+            arrow.setVisible(false);
+            arrow.setManaged(false); // Ensures the space is reclaimed
+        }
+        this.addPlotButton.setPadding(new Insets(5, 10, 5, 10));
 
         // Use a look-up to find the arrow node
         

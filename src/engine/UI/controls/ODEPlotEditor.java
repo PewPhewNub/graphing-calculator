@@ -8,7 +8,7 @@ import core.math.Core.Point;
 import core.parser.Lexer;
 import core.parser.Parser;
 import core.parser.node.DefinitionNode;
-import engine.UI.ColorChooser;
+import engine.UI.UIElements.ColorChooser;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.ODEPlot;
 import javafx.application.Platform;

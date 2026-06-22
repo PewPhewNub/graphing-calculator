@@ -93,6 +93,14 @@ public class Graph extends Canvas{
         addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             input.keysPressed.remove(e.getCode());
         });
+
+        widthProperty().addListener((obs, oldV, newV) -> {
+            viewport.width = newV.doubleValue();
+        });
+
+        heightProperty().addListener((obs, oldV, newV) -> {
+            viewport.height = newV.doubleValue();
+        });
     }
 
     @Override

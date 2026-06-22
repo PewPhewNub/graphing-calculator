@@ -38,38 +38,9 @@ public class PlotManager{
     public void computeCurveData(Viewport viewport){
         curveCache.clear();
         for(Plot plot : plots){
-            if(plot == null) continue;
-            if(plot instanceof FunctionPlot p)
-                curveCache.add(
-                    PlotComputationEngine.computeCurveData(p, viewport)
+            curveCache.add(
+                    PlotComputationEngine.computeCurveData(plot, viewport)
                 );
-            if(plot instanceof ODEPlot p){
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData(p, viewport)
-                );
-            }
-            if(plot instanceof ParametricPlot p){
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData(p, viewport)
-                );
-            }
-            if(plot instanceof PolarPlot p){
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData(p, viewport)
-                );
-            }
-            
-            if(plot instanceof ImplicitPlot p){
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData(p, viewport)
-                );
-            }
-
-            if(plot instanceof VectorFieldPlot p){
-                curveCache.add(    
-                    PlotComputationEngine.computeCurveData(p, viewport)
-                );
-            }
         }
         
         intersectionCache.clear();

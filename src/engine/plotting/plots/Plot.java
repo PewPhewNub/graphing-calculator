@@ -17,8 +17,5 @@ public abstract class Plot {
     public void setColor(Color color){
         this.color = color;
     }
-    public abstract Point2D nearestPoint(double worldX, double worldY, Viewport viewport);
-    public abstract double distanceSquaredFrom(double worldX, double worldY, Viewport viewport);
-    public abstract boolean contains(Point2D point);
 }
 

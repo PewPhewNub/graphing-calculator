@@ -20,6 +20,7 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
     public HashMap<Point2D, ImplicitChunk> chunks;
     public final double CHUNK_SIZE = 16;
     private final double BASE_SIZE = 16;
+    private final int maxCellsPerSide = 128;
     
     public ImplicitPlot(String name, BiFunction<Double, Double, Double> function, Color color){
         this.name = name;
@@ -41,6 +42,10 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
         double stepY = step;
 
         int maxCells = (int)(chunk.bounds.getHeight()/step);
+        if(maxCells > maxCellsPerSide){
+            maxCells = maxCellsPerSide;
+            step = chunk.bounds.getHeight() / (double)maxCells;
+        }
         // We need maxCells + 1 points to create maxCells cells (0 to maxCells)
         double[] prevRow = new double[maxCells + 1];
         for (int j = 0; j <= maxCells; j++) {
@@ -119,7 +124,6 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
 
     public void ensureCoverage(Viewport viewport){
         ViewportState state = new ViewportState(viewport);
-        int count = 0;
 
         int LOD = calculateLOD(viewport);
 
@@ -141,13 +145,9 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
                 if(!chunk.generated) continue;
                 if(chunk.LOD != LOD){
                     generateChunk(cx, cy, LOD);
-                    count++;
                 }
             }
         }
-        System.out.println("generated " + count);
-
-        System.out.println(chunks.size());
     }
 
     public int calculateLOD(Viewport viewport) {
@@ -163,7 +163,7 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
             Math.log(BASE_SIZE / desiredStep) / Math.log(2)
         );
 
-        return Math.max(0, lod);
+        return Math.min(Math.max(0, lod), 4);
     }
 
     public void generateChunk(double cx, double cy, int LOD){
@@ -182,10 +182,6 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
         chunk.segments = segments;
         chunk.LOD = LOD;
         chunk.generated = true;
-        System.out.println(
-    "Chunk " + cx + "," + cy +
-    " segments=" + segments.size()
-);
 
         chunks.put(new Point2D(cx, cy), chunk);
     }
@@ -202,23 +198,5 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
     }
     public String getName() {
         return name;
-    }
-
-    @Override
-    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'nearestPoint'");
-    }
-
-    @Override
-    public double distanceSquaredFrom(double worldX, double worldY, Viewport viewport) {
-        // TODO Auto-generated method stub
-        return Double.POSITIVE_INFINITY;
-    }
-
-    @Override
-    public boolean contains(Point2D point) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'contains'");
     }
 }

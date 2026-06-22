@@ -7,19 +7,14 @@ import java.util.Set;
 import core.parser.Lexer;
 import core.parser.Parser;
 import core.parser.node.DefinitionNode;
-import engine.UI.ColorChooser;
+import engine.UI.UIElements.CloseButton;
+import engine.UI.UIElements.ColorChooser;
+import engine.UI.UIElements.EquationInput;
 import engine.plotting.PlotManager;
-import engine.plotting.plots.FunctionPlot;
 import engine.plotting.plots.ImplicitPlot;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -28,29 +23,17 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 
 public class ImplicitPlotEditor extends PlotEditor{
 
     public ColorChooser colorChooser;
     public BorderPane topPanel;
 
-    public String inputFunction;
-    public HBox functionInputPanel;
-    public TextField functionInputField;
+   private EquationInput box0;
 
     public String dependent = "y";
     public String independent = "x";
-
-    private Button advancedButton;
-    private boolean isAdvancedShow = false;
-    private VBox advancedOptionsPanel;
 
     public ImplicitPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
@@ -82,131 +65,34 @@ public class ImplicitPlotEditor extends PlotEditor{
             }
         });
 
-        functionInputField = new TextField("x");
-        functionInputField.setFont(new Font(15));
-        functionInputField.setAlignment(Pos.CENTER_LEFT);
-        functionInputField.textProperty().addListener(
+        box0 = new EquationInput("", 14, "y = x");
+        box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
-                try {
-                    buildPlot();
-                } catch (Exception e1) {
-                    System.out.println(e1.getMessage());
-                }
+                buildPlot();
             }
         );
-        functionInputField.setTextFormatter(new TextFormatter<>(change ->{
-            String text = change.getText();
-            if(text.equals("(")) text = "()";
-            change.setText(text);
-            return change;
-        }));
-        functionInputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.contains("theta")) {
-                // Use Platform.runLater to avoid conflicts with the ongoing text update
-                Platform.runLater(() -> {
-                    int caretPosition = functionInputField.getCaretPosition();
-                    
-                    // Replace the text
-                    String replaced = newValue.replace("theta", "\u03B8");
-                    functionInputField.setText(replaced);
-                    
-                    // Adjust caret position so it doesn't jump to the beginning
-                    functionInputField.positionCaret(caretPosition - 4); 
-                });
-            }
-        });
-
-        functionInputField.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(2, 2, 2, 2, false),
-            new Insets(2, 2, 2, 2)
-        )));
-        
-        functionInputField.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(2, 2, 2, 2, false),              // Perfectly square corners
-            new BorderWidths(2, 2, 2, 2)             // 1-pixel thickness
-        )));
-        functionInputField.setPadding(new Insets(5,5,5,5));
-        
-        functionInputPanel = new HBox();
-        functionInputPanel.getChildren().add(functionInputField);
-        functionInputPanel.setPadding(new Insets(5, 25, 5, 25));
-
-        advancedButton = new Button();
-        advancedButton.setBorder(
-            Border.EMPTY
-        );
-
-        advancedButton.setBackground(
-                new Background(
-                    new BackgroundFill(
-                        Color.WHITE,
-                        new CornerRadii(0, 0, 0, 15, false),
-                        new Insets(0)
-                    )
-                )
-            );
-        advancedButton.setPadding(new Insets(5, 25, 5, 5));
-        advancedButton.setFont(new Font(10));
-        advancedButton.setText('\u25BE' + " Show " + "more options");
-        advancedButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e){
-                isAdvancedShow = !isAdvancedShow;
-                advancedButton.setText(((isAdvancedShow)?'\u25B6' + " Hide ":'\u25BE' + " Show ") + "more options");
-                advancedOptionsPanel.setVisible(isAdvancedShow);
-                advancedOptionsPanel.setManaged(isAdvancedShow);
-            }
-        });
-
-        advancedOptionsPanel =new VBox();
-        advancedOptionsPanel.setVisible(false);
-        advancedOptionsPanel.setManaged(false);
-
-        this.getChildren().add(functionInputPanel);
-        this.getChildren().add(advancedButton);
-        this.getChildren().add(advancedOptionsPanel);
+   
+        this.getChildren().add(box0);
 
         topPanel = new BorderPane();
         getChildren().add(0, topPanel);
         topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Function Plot"){
+        topPanel.setCenter(new Label("Implicit Plot"){
             {
                 setAlignment(Pos.CENTER);
             }
         });
 
-        Pane icon = new Pane();
+        CloseButton button = new CloseButton();
+        button.setOnMouseClicked(e -> close());
+        topPanel.setRight(button);
 
-        Line l1 = new Line(8, 8, 22, 22);
-        Line l2 = new Line(22, 8, 8, 22);
-
-        l1.setStrokeWidth(2.5);
-        l2.setStrokeWidth(2.5);
-        l1.setStroke(Color.GRAY);
-        l2.setStroke(Color.GRAY);
-
-        icon.getChildren().addAll(l1, l2);
-
-        icon.setPadding(new Insets(5, 5, 0, 0));
-        
-        topPanel.setRight(icon);
-        icon.setOnMouseClicked(e ->{
-            close();
-        });
-
-        try {
-            buildPlot();
-        } catch(Exception e1) {
-            System.out.println(e1.getMessage());
-        }
+        buildPlot();
     }
 
     @Override
-    public void buildPlot() throws Exception {
-        String text = functionInputField.getText();
+    public void buildPlot() {
+        String text = box0.getText();
         
         Lexer lexer = new Lexer(text);
         Map<String, Double> map = new HashMap<>();

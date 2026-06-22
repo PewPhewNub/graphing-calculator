@@ -21,11 +21,11 @@ public class FunctionGraphScene extends GraphScene{
     private CartesianInteractionController interaction;
     
     public FunctionGraphScene(double width, double height){
-        this.graph = new Graph(width, height);
+        graph = new Graph(width, height);
         interaction = new CartesianInteractionController();
-        this.plotManager = new PlotManager(interaction);
+        plotManager = new PlotManager(interaction);
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
-        this.renderer = new Renderer(context);
+        renderer = new Renderer(context);
         cameraSystem = new CameraSystem(graph.viewport);
         currentMode = CurrentMode.NONE;
         gridData = new GridData();

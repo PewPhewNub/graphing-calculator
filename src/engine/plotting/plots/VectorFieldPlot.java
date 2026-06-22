@@ -171,19 +171,6 @@ public class VectorFieldPlot extends Plot {
             i = end;
         }
     }
-      
-    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
-        return null;
-    }
-
-    public double distanceSquaredFrom(double worldX, double worldY, Viewport viewport) {
-        return Double.POSITIVE_INFINITY;
-    }
-
-    public boolean contains(Point2D point){
-        return false;
-    }
-
     public void setAutoGenerate(boolean autoGenerate) {
         this.autoGenerate = autoGenerate;
     }
