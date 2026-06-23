@@ -4,17 +4,8 @@
     ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.base.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.controls.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.fxml.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.graphics.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.media.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.swing.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx.web.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\javafx-swt.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\jdk.jsobject.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\jfx.incubator.input.jar",
-        "d:\\Vikram\\JavaFX\\javafx-sdk-25\\lib\\jfx.incubator.richtext.jar"
+         "lib/javafx-sdk-25/**/*.jar",
+         "lib/jackson/**/*.jar"
     ],
     "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable"
 }

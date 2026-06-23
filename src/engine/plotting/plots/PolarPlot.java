@@ -18,6 +18,7 @@ public class PolarPlot extends Plot implements CartesianPlot{
     public Function<Double, Double> y;
     public double tMin;
     public double tMax;
+    public String expression;
     public ArrayList<ParametricCurveChunk> chunks;
     public final Set<String> knownVariables = Set.of("\u03B8");
 

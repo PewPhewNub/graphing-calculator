@@ -51,4 +51,8 @@ public class PlotManager{
             }
         }
     }
+
+    public void removeAll(){
+        plots.clear();
+    }
 }

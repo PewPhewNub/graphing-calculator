@@ -18,6 +18,8 @@ public class ImplicitPlot extends Plot implements CartesianPlot{
     public Color color;
     public String name;
     public HashMap<Point2D, ImplicitChunk> chunks;
+    public String expression1;
+    public String expression2;
     public final double CHUNK_SIZE = 16;
     private final double BASE_SIZE = 16;
     private final int maxCellsPerSide = 128;

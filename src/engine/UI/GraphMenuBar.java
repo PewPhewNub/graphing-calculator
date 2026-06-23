@@ -6,17 +6,19 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class GraphMenuBar extends MenuBar{
 
     Menu file;
 
-    public GraphMenuBar(MainWindow window, WindowManager windowManager){
+    public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions){
         setBackground(new Background(
             new BackgroundFill(
                 Color.rgb(230, 230, 230),
@@ -32,16 +34,30 @@ public class GraphMenuBar extends MenuBar{
             windowManager.createWindow();
         });
         newWindow.setAccelerator(KeyCombination.keyCombination("CTRL + SHIFT + N"));
-        
-        MenuItem newGraph = new MenuItem("New window");
+        MenuItem newGraph = new MenuItem("New");
         file.getItems().add(newGraph);
         newGraph.setOnAction(e -> {
-            window.addGraphScene("yes");
+            window.addGraphScene("New Graph");
         });
         newGraph.setAccelerator(KeyCombination.keyCombination("CTRL + N"));
-        file.getItems().add(new MenuItem("Open Graph"));
-        file.getItems().add(new MenuItem("Save Graph"));
-        file.getItems().add(new MenuItem("Save Graph as"));
+        MenuItem openGraph = new MenuItem("Open");
+        file.getItems().add(openGraph);
+        openGraph.setOnAction(e -> {
+            fileActions.open();
+        });
+        openGraph.setAccelerator(KeyCombination.keyCombination("CTRL + O"));
+        MenuItem saveGraph = new MenuItem("Save");
+        file.getItems().add(saveGraph);
+        saveGraph.setOnAction(e -> {
+            fileActions.save((GraphTab)(tabPane.getSelectionModel().getSelectedItem()));
+        });
+        saveGraph.setAccelerator(KeyCombination.keyCombination("CTRL + S"));
+        MenuItem saveAsGraph = new MenuItem("Save as");
+        file.getItems().add(saveAsGraph);
+        saveAsGraph.setOnAction(e -> {
+            fileActions.saveAs((GraphTab)(tabPane.getSelectionModel().getSelectedItem()));
+        });
+        saveAsGraph.setAccelerator(KeyCombination.keyCombination("CTRL + A"));
         file.getItems().add(new SeparatorMenuItem());
         file.getItems().add(new MenuItem("New Project"));
         file.getItems().add(new MenuItem("Open Project"));
@@ -72,4 +88,6 @@ public class GraphMenuBar extends MenuBar{
         getMenus().add(new Menu("Plot"));
         getMenus().add(new Menu("View"));
     }
+
+    
 }

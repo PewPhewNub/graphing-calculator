@@ -4,6 +4,9 @@ import engine.UI.controls.ImplicitPlotEditor;
 import engine.UI.controls.ODEPlotEditor;
 import engine.UI.controls.ParametricPlotEditor;
 import engine.UI.controls.PolarPlotEditor;
+import engine.plotting.PlotManager;
+import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.Plot;
 import engine.scene.GraphScene;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -203,5 +206,20 @@ public class UIPanel extends BorderPane {
         setPrefWidth(maxWidth);
         setMinWidth(maxWidth);
         setMaxWidth(maxWidth);
+    }
+
+    public void rebuildEditors(){
+        plotEditorPane.getChildren().clear();
+        PlotManager plotManager = graphScene.getPlotManager();
+        for(Plot plot : plotManager.plots){
+            if(plot instanceof FunctionPlot p) {
+                plotEditorPane.getChildren().add(
+                    new FunctionPlotEditor(
+                        plotManager,
+                        p
+                    )
+                );
+            }
+        }
     }
 }

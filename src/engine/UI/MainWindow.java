@@ -23,16 +23,19 @@ public class MainWindow {
     private TabPane tabPane;
     private GraphApplication app;
     private WindowManager windowManager;
+    private FileActions fileActions;
     Scene scene;
     MenuBar menuBar;
 
     public MainWindow(Stage stage, GraphApplication app, WindowManager windowManager){
         this.app = app;
+        tabPane = new TabPane();
         this.windowManager = windowManager;
+        this.fileActions = new FileActions(stage, tabPane);
         this.stage = stage;
+        
         initializeMenus();
         
-        tabPane = new TabPane();
         tabPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tabPane.setMinSize(0, 100);
 
@@ -65,7 +68,7 @@ public class MainWindow {
     }
 
     public void initializeMenus(){
-        menuBar = new GraphMenuBar(this, windowManager);
+        menuBar = new GraphMenuBar(tabPane, this, windowManager, fileActions);
     }
     public void close(){
         stage.close();

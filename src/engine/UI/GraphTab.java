@@ -1,8 +1,8 @@
 package engine.UI;
 
-import engine.rendering.graph.Graph;
+import java.io.File;
+
 import engine.scene.GraphScene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -14,9 +14,13 @@ public class GraphTab extends Tab{
     private GraphScene scene;
     private GraphToolBar toolBar;
     private UIPanel uiPanel;
+    private File projectFile;
+    private String name;
 
     public GraphTab(String text, GraphScene scene){
         this.scene = scene;
+        this.projectFile = null;
+        this.name = text;
         setText(text);
         toolBar = new GraphToolBar(scene);
         uiPanel = new UIPanel(400, 900, scene);
@@ -50,10 +54,25 @@ public class GraphTab extends Tab{
         setContent(mainPane);
     }
 
+    public GraphTab(File file, GraphScene scene){
+        this(file.getName(), scene);
+        this.projectFile = file;
+    }
+
     public GraphScene getGraphScene() {
         return scene;
     }
     public HBox getToolBar(){
         return toolBar;
+    }
+    public UIPanel getUiPanel() {
+        return uiPanel;
+    }
+
+    public File getProjectFile() {
+        return projectFile;
+    }
+    public void setProjectFile(File projectFile) {
+        this.projectFile = projectFile;
     }
 }

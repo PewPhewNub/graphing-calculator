@@ -9,4 +9,5 @@
             "vmArgs": "--module-path \"D:/Vikram/JavaFX/javafx-sdk-25/lib\" --add-modules javafx.controls"
         }
     ]
+    
 }

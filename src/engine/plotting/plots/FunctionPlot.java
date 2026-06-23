@@ -14,13 +14,15 @@ import javafx.scene.paint.Color;
 public class FunctionPlot extends Plot implements CartesianPlot{
 
     public Function<Double, Double> function;
-    public FunctionPlotSettings settings;
+    public String expression;
+    public String dependent = "y";
+    public String independent = "x";
 
-    public FunctionPlot(String name, Function<Double, Double> f, Color color){
+    public FunctionPlot(String name, String expression, Function<Double, Double> f, Color color){
         function = f;
         this.name = name;
         this.color = color;
-        settings = new FunctionPlotSettings();
+        this.expression = expression;
     }
 
     public String getName() {
@@ -71,11 +73,11 @@ public class FunctionPlot extends Plot implements CartesianPlot{
     }
     
     public void setDependentVariable(String dependent){
-        settings.dependentVariable = dependent;
+        this.dependent = dependent;
     }
     
     public void setIndependentVariable(String independent){
-        settings.independentVariable = independent;
+        this.independent = independent;
     }
 
     public double sample(double x, double y){

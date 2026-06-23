@@ -14,6 +14,7 @@ import engine.UI.UIElements.LabelledInput;
 import engine.UI.UIElements.MoreOptionsButton;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.PlotGenerator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -43,8 +44,11 @@ public class FunctionPlotEditor extends PlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
+    private FunctionPlot plot;
+
     public FunctionPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
+        this.plot = null;
 
         setBackground(new Background(
             new BackgroundFill(
@@ -119,32 +123,24 @@ public class FunctionPlotEditor extends PlotEditor{
         CloseButton button = new CloseButton();
         button.setOnMouseClicked(e -> close());
         topPanel.setRight(button);
-
-        buildPlot();
     }
+    public FunctionPlotEditor(PlotManager plotManager, FunctionPlot plot){
+        this(plotManager);
+        this.plot = plot;
+        dependent = plot.dependent;
+        independent = plot.independent;
 
+        box0.setLabelText(dependent + "(" + independent + ") = ");
+        box0.setFieldText(plot.expression);
+
+        box1.setText(independent);
+        box2.setText(dependent);
+    }
     @Override
     public void buildPlot(){
         String text = box0.getText();
-        
-        Lexer lexer = new Lexer(text);
-        Map<String, Double> map = new HashMap<>();
-        try {
-            lexer.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent,
-                        Set.of(independent)
-                    );
-            plotManager.removePlot(plot);
-            plot = new FunctionPlot(dependent, 
-                x -> {
-                    map.put(independent, x);
-                    return node.evaluate(map);
-                }, colorChooser.getSelectedColor());       
-            plotManager.addPlot(plot);
-        }catch(Exception e1){
-            System.out.println(e1.getMessage());
-        }
+        if(plot!=null) plotManager.removePlot(plot);
+        plot = PlotGenerator.generateFunctionPlot("name", text, dependent, independent, colorChooser.getSelectedColor());
+        if(plot!= null) plotManager.addPlot(plot);
     }
 }

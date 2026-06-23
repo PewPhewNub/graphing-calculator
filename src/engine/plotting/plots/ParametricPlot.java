@@ -16,6 +16,8 @@ public class ParametricPlot extends Plot implements CartesianPlot{
     public Function<Double, Double> y;
     public double tMin;
     public double tMax;
+    public String expression1;
+    public String expression2;
     public ArrayList<ParametricCurveChunk> chunks;
     public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("t");
