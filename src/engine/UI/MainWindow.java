@@ -74,6 +74,14 @@ public class MainWindow {
     public Stage getStage() {
         return stage;
     }
+
+    public void addGraphScene(String text){
+        Tab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850));
+        tabPane.getTabs().add(graphTab);
+    }
+    public void removeGraphScene(){
+        tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedItem());
+    }
 }
 enum GraphType{
     CARTESIAN
