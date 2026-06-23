@@ -49,7 +49,7 @@ public class FileActions {
         chooser.getExtensionFilters().add(
         new FileChooser.ExtensionFilter(
             "JGraph Project",
-            "*jgraph")
+            "*.jgraph")
         );
         File file = chooser.showOpenDialog(stage);
         if(file == null) return;

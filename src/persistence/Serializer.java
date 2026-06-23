@@ -2,19 +2,19 @@ package persistence;
 
 import java.util.ArrayList;
 
-import engine.UI.GraphTab;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
 import engine.rendering.camera.Viewport;
 import engine.scene.GraphScene;
 import persistence.plotdata.FunctionPlotData;
+import persistence.plotdata.ParametricPlotData;
 
 public final class Serializer {
     Serializer(){}
 
-    public static ProjectData serialize(GraphTab tab){
-        GraphScene scene = tab.getGraphScene();
+    public static ProjectData serialize(GraphScene scene){
         ProjectData data = new ProjectData();
         serializeViewportData(data, scene.getGraph().viewport);
         serializePlotData(data, scene.getPlotManager());
@@ -42,6 +42,17 @@ public final class Serializer {
                 plotData.color = p.getColor().toString();
                 plotData.dependent = p.dependent;
                 plotData.independent = p.independent;
+
+                data.plots.add(plotData);
+            }
+            if(plot instanceof ParametricPlot p){
+                ParametricPlotData plotData = new ParametricPlotData();
+                plotData.expression1 = p.expression1;
+                plotData.expression2 = p.expression2;
+                plotData.name = p.getName();
+                plotData.color = p.getColor().toString();
+                plotData.minParameter = p.tMin;
+                plotData.maxParameter = p.tMax;
 
                 data.plots.add(plotData);
             }

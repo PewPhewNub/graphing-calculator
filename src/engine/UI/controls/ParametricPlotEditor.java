@@ -1,12 +1,5 @@
 package engine.UI.controls;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import core.parser.Lexer;
-import core.parser.Parser;
-import core.parser.node.DefinitionNode;
 import engine.UI.UIElements.CloseButton;
 import engine.UI.UIElements.ColorChooser;
 import engine.UI.UIElements.EquationInput;
@@ -14,6 +7,7 @@ import engine.UI.UIElements.LabelledInput;
 import engine.UI.UIElements.MoreOptionsButton;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.ParametricPlot;
+import engine.plotting.plots.PlotGenerator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -50,7 +44,25 @@ public class ParametricPlotEditor extends PlotEditor{
 
     public ParametricPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
+        initialize();
+        buildPlot();
+    }
 
+    public ParametricPlotEditor(PlotManager plotManager, ParametricPlot plot){
+        this(plotManager);
+        initialize();
+        this.plot = plot;
+
+        box0.setLabelText("x(t) = ");
+        box0.setFieldText(plot.expression1);
+        box1.setLabelText("y(t) = ");
+        box1.setFieldText(plot.expression2);
+
+        box2.setText(Double.toString(plot.tMin));
+        box3.setText(Double.toString(plot.tMax));
+    }
+
+    private void initialize(){
         setBackground(new Background(
             new BackgroundFill(
                 Color.WHITE,
@@ -130,47 +142,14 @@ public class ParametricPlotEditor extends PlotEditor{
         CloseButton button = new CloseButton();
         button.setOnMouseClicked(e -> close());
         topPanel.setRight(button);
-
-        buildPlot();
     }
 
     @Override
-    public void buildPlot() {
+    public void buildPlot(){
         String text = box0.getText();
         String text2 = box1.getText();
-        
-        Lexer lexer = new Lexer(text);
-        Lexer lexer2 = new Lexer(text2);
-        Map<String, Double> map = new HashMap<>();
-        try {
-            lexer.tokenize();
-            lexer2.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent1,
-                        Set.of(independent)
-                    );
-            Parser parser2 = new Parser(lexer2.tokenList);
-            DefinitionNode node2 = parser2.parseDefinition(
-                        dependent2,
-                        Set.of(independent)
-                    );
-            plotManager.removePlot(plot);
-            plot = new ParametricPlot(dependent1 + " " + dependent2, 
-                t -> {
-                    map.put(independent, t);
-                    return node.evaluate(map);
-                },
-                t -> {
-                    map.put(independent, t);
-                    return node2.evaluate(map);
-                },
-                minT,
-                maxT, 
-                colorChooser.getSelectedColor());       
-            plotManager.addPlot(plot);
-        }catch(Exception e1){
-            System.out.println(e1.getMessage());
-        }
+        if(plot!=null) plotManager.removePlot(plot);
+        plot = PlotGenerator.generateParametricPlot("name", text, text2, minT, maxT, colorChooser.getSelectedColor());
+        if(plot!= null) plotManager.addPlot(plot);
     }
 }

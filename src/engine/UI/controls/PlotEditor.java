@@ -13,7 +13,7 @@ public abstract class PlotEditor extends VBox {
         return this;
     }
 
-    public abstract void buildPlot()
+    protected abstract void buildPlot()
         throws Exception;
 
     public void close(){

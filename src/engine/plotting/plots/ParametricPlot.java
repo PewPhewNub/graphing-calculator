@@ -19,20 +19,33 @@ public class ParametricPlot extends Plot implements CartesianPlot{
     public String expression1;
     public String expression2;
     public ArrayList<ParametricCurveChunk> chunks;
-    public ArrayList<Point2D> accurateComputedPoints;
     public final Set<String> knownVariables = Set.of("t");
     ArrayList<Point2D> initialList;
-    public ParametricPlot(String name, Function<Double, Double> x, Function<Double, Double> y, double tMin, double tMax, Color color){
+    public ParametricPlot(String name, String expression1, String expression2, Function<Double, Double> x, Function<Double, Double> y, double tMin, double tMax, Color color){
         this.x = x;
         this.y = y;
         this.name = name;
         this.color = color;
         this.tMin = tMin;
         this.tMax = tMax;
+        this.expression1 = expression1;
+        this.expression2 = expression2;
 
         chunks = new ArrayList<>();    
         initializeChunks();
-        accurateComputedPoints = new ArrayList<>();
+    }
+    public ParametricPlot(String name, String expression1, String expression2, double tMin, double tMax, Color color){
+        this.x = PlotGenerator.generateFunction(expression1, "x", "t");
+        this.y = PlotGenerator.generateFunction(expression2, "y", "t");
+        this.name = name;
+        this.color = color;
+        this.tMin = tMin;
+        this.tMax = tMax;
+        this.expression1 = expression1;
+        this.expression2 = expression2;
+
+        chunks = new ArrayList<>();    
+        initializeChunks();
     }
 
     public void initializeChunks(){

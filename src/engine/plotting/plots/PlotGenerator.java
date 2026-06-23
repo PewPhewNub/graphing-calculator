@@ -35,4 +35,42 @@ public class PlotGenerator {
         }
         return null;
     }
+
+    public static ParametricPlot generateParametricPlot(String name, String expression1, String expression2, double tMin, double tMax, Color color){
+        Lexer lexer = new Lexer(expression1);
+        Lexer lexer2 = new Lexer(expression2);
+        Map<String, Double> map = new HashMap<>();
+        try {
+            lexer.tokenize();
+            lexer2.tokenize();
+            Parser parser = new Parser(lexer.tokenList);
+            DefinitionNode node = parser.parseDefinition(
+                        "x",
+                        Set.of("t")
+                    );
+            Parser parser2 = new Parser(lexer2.tokenList);
+            DefinitionNode node2 = parser2.parseDefinition(
+                        "y",
+                        Set.of("t")
+                    );
+            ParametricPlot plot = new ParametricPlot(name,
+                expression1,
+                expression2, 
+                t -> {
+                    map.put("t", t);
+                    return node.evaluate(map);
+                },
+                t -> {
+                    map.put("t", t);
+                    return node2.evaluate(map);
+                },
+                tMin,
+                tMax, 
+                color);
+            if(plot!= null) return plot;
+        }catch(Exception e1){
+            System.out.println(e1.getMessage());
+        }
+        return null;
+    }
 }
