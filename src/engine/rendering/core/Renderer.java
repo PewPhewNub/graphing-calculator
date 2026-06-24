@@ -31,9 +31,10 @@ public class Renderer {
 
     public void render(GraphScene scene){
         clearCanvas();
-        drawGridlines(scene.gridData());
-        drawAxes(scene.gridData());
-        drawLabels(scene.gridData());
+        if(scene.getSettings().showGrid)drawGridlines(scene.gridData());
+        if(scene.getSettings().showAxes)drawAxes();
+        if(scene.getSettings().showTickMarks)drawAxesTicks(scene.gridData());
+        if(scene.getSettings().showTickMarks)drawLabels(scene.gridData());
         for(CurveData curve : (scene.getPlotManager()).curveCache){
             drawCurveSegmented(
                 curve.visibleSegments(),
@@ -56,8 +57,10 @@ public class Renderer {
         this.gridLinesColor = gridColor;
         this.labelColor =  labelColor;
     }
-    public void drawAxes(GridData gridData){
+    public void drawAxes(){
         axesRenderer.drawAxes(context, axesColor);
+    }
+    public void drawAxesTicks(GridData gridData){
         axesRenderer.drawAxesTicks(context, gridData, axesColor);
     }
     public void clearCanvas(){

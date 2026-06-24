@@ -6,7 +6,9 @@ import engine.UI.controls.ParametricPlotEditor;
 import engine.UI.controls.PolarPlotEditor;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
+import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
+import engine.plotting.plots.PolarPlot;
 import engine.scene.GraphScene;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -215,6 +217,22 @@ public class UIPanel extends BorderPane {
             if(plot instanceof FunctionPlot p) {
                 plotEditorPane.getChildren().add(
                     new FunctionPlotEditor(
+                        plotManager,
+                        p
+                    )
+                );
+            }
+            if(plot instanceof ParametricPlot p) {
+                plotEditorPane.getChildren().add(
+                    new ParametricPlotEditor(
+                        plotManager,
+                        p
+                    )
+                );
+            }
+            if(plot instanceof PolarPlot p) {
+                plotEditorPane.getChildren().add(
+                    new PolarPlotEditor(
                         plotManager,
                         p
                     )

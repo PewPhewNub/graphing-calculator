@@ -57,6 +57,8 @@ public class ParametricPlotEditor extends PlotEditor{
         box0.setFieldText(plot.expression1);
         box1.setLabelText("y(t) = ");
         box1.setFieldText(plot.expression2);
+        
+        colorChooser.setSelectedColor(plot.getColor());
 
         box2.setText(Double.toString(plot.tMin));
         box3.setText(Double.toString(plot.tMax));

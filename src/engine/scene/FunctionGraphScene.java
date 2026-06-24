@@ -14,11 +14,13 @@ import engine.rendering.core.Renderer;
 import engine.rendering.graph.Graph;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 
 public class FunctionGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
     private CartesianInteractionController interaction;
+    private boolean dirty;
     
     public FunctionGraphScene(double width, double height){
         graph = new Graph(width, height);
@@ -29,6 +31,8 @@ public class FunctionGraphScene extends GraphScene{
         cameraSystem = new CameraSystem(graph.viewport);
         currentMode = CurrentMode.NONE;
         gridData = new GridData();
+        dirty = false;
+        this.settings = new SceneSettings();
     }
 
     @Override
@@ -205,6 +209,16 @@ public class FunctionGraphScene extends GraphScene{
     public boolean canAdd(Plot plot){
         if(plot instanceof CartesianPlot) return true;
         return false;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
+    public boolean isDirty() {
+        return dirty;
+    }
+    public SceneSettings getSettings(){
+        return settings;
     }
 }
     

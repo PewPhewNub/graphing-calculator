@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 
-import core.math.Core.Point;
 import core.model.ImplicitChunk;
 import core.model.Segment2D;
 import core.model.ViewportState;

@@ -6,10 +6,12 @@ import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
 import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
+import engine.plotting.plots.PolarPlot;
 import engine.rendering.camera.Viewport;
 import engine.scene.GraphScene;
 import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.ParametricPlotData;
+import persistence.plotdata.PolarPlotData;
 
 public final class Serializer {
     Serializer(){}
@@ -49,6 +51,16 @@ public final class Serializer {
                 ParametricPlotData plotData = new ParametricPlotData();
                 plotData.expression1 = p.expression1;
                 plotData.expression2 = p.expression2;
+                plotData.name = p.getName();
+                plotData.color = p.getColor().toString();
+                plotData.minParameter = p.tMin;
+                plotData.maxParameter = p.tMax;
+
+                data.plots.add(plotData);
+            }
+            if(plot instanceof PolarPlot p){
+                PolarPlotData plotData = new PolarPlotData();
+                plotData.expression = p.expression;
                 plotData.name = p.getName();
                 plotData.color = p.getColor().toString();
                 plotData.minParameter = p.tMin;

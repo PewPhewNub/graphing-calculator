@@ -1,7 +1,6 @@
 package engine.plotting.plots;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -9,11 +8,9 @@ import java.util.function.BiFunction;
 import core.math.Core.ODESolution;
 import core.math.Core.ODEStatus;
 import core.math.Core.Point;
-import core.math.ODESolvers.RungeKuttaMethod;
 import core.math.ODESolvers.SystemSolvers;
 import core.model.ODECurveChunk;
 import core.model.Segment2D;
-import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

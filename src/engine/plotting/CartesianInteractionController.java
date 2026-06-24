@@ -9,13 +9,6 @@ import core.model.curve.Intersection;
 import core.model.curve.ParametricCurveData;
 import core.model.curve.PolarCurveData;
 import engine.interaction.InteractionResult;
-import engine.plotting.plots.FunctionPlot;
-import engine.plotting.plots.ImplicitPlot;
-import engine.plotting.plots.ODEPlot;
-import engine.plotting.plots.ParametricPlot;
-import engine.plotting.plots.Plot;
-import engine.plotting.plots.PolarPlot;
-import engine.plotting.plots.VectorFieldPlot;
 import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 

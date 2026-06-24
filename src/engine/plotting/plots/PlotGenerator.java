@@ -73,4 +73,30 @@ public class PlotGenerator {
         }
         return null;
     }
+
+    public static PolarPlot generatePolarPlot(String name, String expression, double tMin, double tMax, Color color){
+        Lexer lexer = new Lexer(expression);
+        Map<String, Double> map = new HashMap<>();
+        try {
+            lexer.tokenize();
+            Parser parser = new Parser(lexer.tokenList);
+            DefinitionNode node = parser.parseDefinition(
+                        "x",
+                        Set.of("t")
+                    );
+            PolarPlot plot = new PolarPlot(name,
+                expression,
+                t -> {
+                    map.put("\u03B8", t);
+                    return node.evaluate(map);
+                },
+                tMin,
+                tMax, 
+                color);
+            if(plot!= null) return plot;
+        }catch(Exception e1){
+            System.out.println(e1.getMessage());
+        }
+        return null;
+    }
 }

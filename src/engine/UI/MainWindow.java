@@ -1,13 +1,19 @@
 package engine.UI;
 
+import java.util.Optional;
+
 import app.GraphApplication;
 import app.WindowManager;
 import engine.rendering.graph.Graph;
 import engine.scene.FunctionGraphScene;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Tab;
@@ -41,6 +47,12 @@ public class MainWindow {
 
         Tab graphTab = new GraphTab("Graph 1", new FunctionGraphScene(1200, 850));
         tabPane.getTabs().add(graphTab);
+
+        tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
+            if(tabPane.getTabs().isEmpty()){
+                close();
+            }
+        });
         
         BorderPane pane = new BorderPane();
 
@@ -60,6 +72,7 @@ public class MainWindow {
 
         new AnimationTimer() {
             public void handle(long arg0){
+                if(tabPane.getTabs().isEmpty()) return;
                 GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
                 tab.getGraphScene().update();
                 tab.getGraphScene().render();
@@ -79,11 +92,18 @@ public class MainWindow {
     }
 
     public void addGraphScene(String text){
-        Tab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850));
+        GraphTab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850));
+        graphTab.setOnCloseRequest(e -> {
+            if(!graphTab.isDirty()) return;
+            fileActions.unsaved(graphTab);
+        });
         tabPane.getTabs().add(graphTab);
     }
     public void removeGraphScene(){
         tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedItem());
+        if(tabPane.getTabs().isEmpty()){
+            close();
+        }
     }
 }
 enum GraphType{

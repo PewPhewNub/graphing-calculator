@@ -50,6 +50,7 @@ public class FunctionPlotEditor extends PlotEditor{
         this.plot = plot;
         dependent = plot.dependent;
         independent = plot.independent;
+        colorChooser.setSelectedColor(plot.getColor());
 
         box0.setLabelText(dependent + "(" + independent + ") = ");
         box0.setFieldText(plot.expression);

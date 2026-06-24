@@ -1,4 +1,4 @@
-package core.math.Core;
+package math;
 
 public record RootSolution(
     double root,

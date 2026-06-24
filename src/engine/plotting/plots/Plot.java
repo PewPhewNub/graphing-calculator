@@ -1,7 +1,5 @@
 package engine.plotting.plots;
 
-import engine.rendering.camera.Viewport;
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 public abstract class Plot {

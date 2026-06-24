@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
 import engine.plotting.plots.ParametricPlot;
+import engine.plotting.plots.PolarPlot;
 import engine.rendering.camera.Viewport;
 import engine.scene.GraphScene;
 import javafx.scene.paint.Color;
 import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PlotData;
+import persistence.plotdata.PolarPlotData;
 
 public final class Deserializer {
     Deserializer(){}
@@ -39,6 +41,10 @@ public final class Deserializer {
             }
             if(data instanceof ParametricPlotData d){
                 ParametricPlot plot = new ParametricPlot(d.name, d.expression1, d.expression2, d.minParameter, d.maxParameter, Color.web(d.color));
+                plotManager.addPlot(plot);
+            }
+            if(data instanceof PolarPlotData d){
+                PolarPlot plot = new PolarPlot(d.name, d.expression, d.minParameter, d.maxParameter, Color.web(d.color));
                 plotManager.addPlot(plot);
             }
         }

@@ -16,6 +16,7 @@ public class GraphTab extends Tab{
     private UIPanel uiPanel;
     private File projectFile;
     private String name;
+    private boolean dirty;
 
     public GraphTab(String text, GraphScene scene){
         this.scene = scene;
@@ -74,5 +75,11 @@ public class GraphTab extends Tab{
     }
     public void setProjectFile(File projectFile) {
         this.projectFile = projectFile;
+    }
+    public boolean isDirty(){
+        return dirty;
+    }
+    public void isDirty(boolean dirty){
+        this.dirty = dirty;
     }
 }

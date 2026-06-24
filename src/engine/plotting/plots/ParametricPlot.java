@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import core.math.Core.Interval;
 import core.model.ParametricCurveChunk;
-import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

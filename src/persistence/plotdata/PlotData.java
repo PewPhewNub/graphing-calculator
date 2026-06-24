@@ -3,8 +3,6 @@ package persistence.plotdata;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javafx.scene.paint.Color;
-
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -22,6 +20,10 @@ import javafx.scene.paint.Color;
     @JsonSubTypes.Type(
         value = ImplicitPlotData.class,
         name = "IMPLICIT"
+    ),
+    @JsonSubTypes.Type(
+        value = PolarPlotData.class,
+        name = "POLAR"
     )
 })
 public abstract class PlotData {

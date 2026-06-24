@@ -1,12 +1,7 @@
 package engine.plotting.plots;
 
-import java.util.ArrayList;
 import java.util.function.Function;
 
-import core.model.Segment2D;
-import core.model.ViewportState;
-import core.model.curve.CurveData;
-import engine.plotting.settings.FunctionPlotSettings;
 import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

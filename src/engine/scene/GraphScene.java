@@ -19,6 +19,7 @@ public abstract class GraphScene {
     protected Renderer renderer;
     protected PlotInteractionController interaction;
     protected RenderContext context;
+    protected SceneSettings settings;
 
     public abstract void render();
     public abstract void update();
@@ -43,5 +44,8 @@ public abstract class GraphScene {
     }
     public RenderContext getContext() {
         return context;
+    }
+    public SceneSettings getSettings() {
+        return settings;
     }
 }

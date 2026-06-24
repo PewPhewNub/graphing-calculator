@@ -6,8 +6,6 @@ import java.util.function.Function;
 
 import core.math.Core.Interval;
 import core.model.ParametricCurveChunk;
-import core.model.ViewportState;
-import engine.rendering.camera.Viewport;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -23,7 +21,7 @@ public class PolarPlot extends Plot implements CartesianPlot{
     public final Set<String> knownVariables = Set.of("\u03B8");
 
     public ArrayList<Point2D> currentList;
-    public PolarPlot(String name, Function<Double, Double> r, double tMin, double tMax, Color color){
+    public PolarPlot(String name, String expression, Function<Double, Double> r, double tMin, double tMax, Color color){
         this.r = r;
         x = t-> r.apply(t)*Math.cos(t);
         y = t-> r.apply(t)*Math.sin(t);
@@ -31,6 +29,19 @@ public class PolarPlot extends Plot implements CartesianPlot{
         this.color = color;
         this.tMin = tMin;
         this.tMax = tMax;
+        this.expression = expression;
+        chunks = new ArrayList<>();
+        initializeChunks();
+    }
+    public PolarPlot(String name, String expression, double tMin, double tMax, Color color){
+        this.r = PlotGenerator.generateFunction(expression, "r", "\u03B8");
+        x = t-> r.apply(t)*Math.cos(t);
+        y = t-> r.apply(t)*Math.sin(t);
+        this.name = name;
+        this.color = color;
+        this.tMin = tMin;
+        this.tMax = tMax;
+        this.expression = expression;
         chunks = new ArrayList<>();
         initializeChunks();
     }

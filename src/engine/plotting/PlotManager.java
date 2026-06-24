@@ -2,18 +2,10 @@ package engine.plotting;
 
 import java.util.ArrayList;
 
-import core.model.ViewportState;
 import core.model.curve.CurveData;
 import core.model.curve.Intersection;
-import engine.plotting.plots.FunctionPlot;
-import engine.plotting.plots.ImplicitPlot;
-import engine.plotting.plots.ODEPlot;
-import engine.plotting.plots.ParametricPlot;
 import engine.plotting.plots.Plot;
-import engine.plotting.plots.PolarPlot;
-import engine.plotting.plots.VectorFieldPlot;
 import engine.rendering.camera.Viewport;
-import javafx.geometry.Point2D;
 
 public class PlotManager{
     public ArrayList<Plot> plots;
@@ -28,12 +20,15 @@ public class PlotManager{
         interactionController = plotInteractionController;
         intersectionCache = new ArrayList<>();
         plotInteractionController.setCaches(curveCache, intersectionCache);
+        dirty = false;
     }
     public void addPlot(Plot plot){
         plots.add(plot);
+        dirty = true;
     }
     public void removePlot(Plot plot){
         plots.remove(plot);
+        dirty = true;
     }
     public void computeCurveData(Viewport viewport){
         curveCache.clear();
@@ -51,8 +46,15 @@ public class PlotManager{
             }
         }
     }
+    public boolean isDirty() {
+        return dirty;
+    }
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
 
     public void removeAll(){
         plots.clear();
+        dirty = true;
     }
 }

@@ -13,6 +13,7 @@ import engine.UI.UIElements.EquationInput;
 import engine.UI.UIElements.LabelledInput;
 import engine.UI.UIElements.MoreOptionsButton;
 import engine.plotting.PlotManager;
+import engine.plotting.plots.PlotGenerator;
 import engine.plotting.plots.PolarPlot;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,10 +45,30 @@ public class PolarPlotEditor extends PlotEditor{
 
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
+    private PolarPlot plot;
 
     public PolarPlotEditor(PlotManager plotManager){
         this.plotManager = plotManager;
+        initialize();
+        buildPlot();
+    }
 
+    public PolarPlotEditor(PlotManager plotManager, PolarPlot plot){
+        this.plotManager = plotManager;
+        initialize();
+        this.plot = plot;
+
+        box0.setLabelText("r(\u03B8) = ");
+        box0.setFieldText(plot.expression);
+        
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box1.setText(Double.toString(plot.tMin));
+        box2.setText(Double.toString(plot.tMax));
+    }
+
+    private void initialize(){
+        
         setBackground(new Background(
             new BackgroundFill(
                 Color.WHITE,
@@ -115,35 +136,13 @@ public class PolarPlotEditor extends PlotEditor{
         CloseButton button = new CloseButton();
         button.setOnMouseClicked(e -> close());
         topPanel.setRight(button);
-
-        buildPlot();
     }
 
     @Override
-    public void buildPlot(){
+    protected void buildPlot(){
         String text = box0.getText();
-        
-        Lexer lexer = new Lexer(text);
-        Map<String, Double> map = new HashMap<>();
-        try {
-            lexer.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent,
-                        Set.of(independent)
-                    );
-            plotManager.removePlot(plot);
-            plot = new PolarPlot(dependent, 
-                x -> {
-                    map.put(independent, x);
-                    return node.evaluate(map);
-                },
-                minT,
-                maxT,
-                colorChooser.getSelectedColor());       
-            plotManager.addPlot(plot);
-        }catch(Exception e1){
-            System.out.println(e1.getMessage());
-        }
+        if(plot!=null) plotManager.removePlot(plot);
+        plot = PlotGenerator.generatePolarPlot("name", text, minT, maxT, colorChooser.getSelectedColor());
+        if(plot!= null) plotManager.addPlot(plot);
     }
 }
