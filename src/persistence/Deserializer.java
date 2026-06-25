@@ -2,17 +2,17 @@ package persistence;
 
 import java.util.ArrayList;
 
-import engine.plotting.PlotManager;
-import engine.plotting.plots.FunctionPlot;
-import engine.plotting.plots.ParametricPlot;
-import engine.plotting.plots.PolarPlot;
-import engine.rendering.camera.Viewport;
-import engine.scene.GraphScene;
 import javafx.scene.paint.Color;
 import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PlotData;
 import persistence.plotdata.PolarPlotData;
+import plotting.PlotManager;
+import plotting.plots.FunctionPlot;
+import plotting.plots.ParametricPlot;
+import plotting.plots.PolarPlot;
+import rendering.camera.Viewport;
+import scene.GraphScene;
 
 public final class Deserializer {
     Deserializer(){}

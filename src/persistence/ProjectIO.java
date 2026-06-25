@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import engine.UI.GraphTab;
-import engine.scene.FunctionGraphScene;
-import engine.scene.GraphScene;
+import scene.FunctionGraphScene;
+import scene.GraphScene;
+import ui.GraphTab;
 
 public final class ProjectIO {
     private static final ObjectMapper MAPPER = new ObjectMapper();
