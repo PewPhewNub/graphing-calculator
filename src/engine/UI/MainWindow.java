@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import app.GraphApplication;
 import app.WindowManager;
+import engine.interaction.UndoManager;
+import engine.interaction.commands.AddGraphCommand;
+import engine.interaction.commands.RemoveGraphCommand;
 import engine.rendering.graph.Graph;
 import engine.scene.FunctionGraphScene;
 import javafx.animation.AnimationTimer;
@@ -30,11 +33,13 @@ public class MainWindow {
     private GraphApplication app;
     private WindowManager windowManager;
     private FileActions fileActions;
+    private UndoManager undoManager;
     Scene scene;
     MenuBar menuBar;
 
     public MainWindow(Stage stage, GraphApplication app, WindowManager windowManager){
         this.app = app;
+        undoManager = new UndoManager();
         tabPane = new TabPane();
         this.windowManager = windowManager;
         this.fileActions = new FileActions(stage, tabPane);
@@ -81,7 +86,7 @@ public class MainWindow {
     }
 
     public void initializeMenus(){
-        menuBar = new GraphMenuBar(tabPane, this, windowManager, fileActions);
+        menuBar = new GraphMenuBar(tabPane, this, windowManager, fileActions, undoManager);
     }
     public void close(){
         stage.close();
@@ -97,10 +102,17 @@ public class MainWindow {
             if(!graphTab.isDirty()) return;
             fileActions.unsaved(graphTab);
         });
-        tabPane.getTabs().add(graphTab);
+        undoManager.execute(new AddGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex() + 1,
+            graphTab, 
+            tabPane));
     }
     public void removeGraphScene(){
-        tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedItem());
+        GraphTab GraphTab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+        undoManager.execute(new RemoveGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex(), 
+            GraphTab, 
+            tabPane));
         if(tabPane.getTabs().isEmpty()){
             close();
         }

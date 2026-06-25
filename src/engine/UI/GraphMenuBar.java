@@ -1,6 +1,7 @@
 package engine.UI;
 
 import app.WindowManager;
+import engine.interaction.UndoManager;
 import engine.rendering.camera.CameraIntent;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckMenuItem;
@@ -19,8 +20,9 @@ public class GraphMenuBar extends MenuBar{
 
     Menu file;
     Menu view;
+    Menu edit;
 
-    public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions){
+    public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions, UndoManager undoManager){
         setBackground(new Background(
             new BackgroundFill(
                 Color.rgb(230, 230, 230),
@@ -31,6 +33,7 @@ public class GraphMenuBar extends MenuBar{
         populateFileMenu(tabPane, window, windowManager, fileActions);
         getMenus().add(new Menu("Plot"));
         populateViewMenu(tabPane);
+        populateEditMenu(undoManager);
     }
     public void populateFileMenu(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions){
         file = new Menu("File");
@@ -142,8 +145,25 @@ public class GraphMenuBar extends MenuBar{
         });
         resetView.setAccelerator(KeyCombination.keyCombination("CTRL + SHIFT + EQUALS"));
         
-
-        
         getMenus().add(view);
+    }
+
+    public void populateEditMenu(UndoManager undoManager){
+        edit = new Menu("Edit");
+        MenuItem undo = new MenuItem("Undo");
+        edit.getItems().add(undo);
+        undo.setOnAction(e -> {
+            if(undoManager.canUndo())undoManager.undo();
+        });
+        undo.setAccelerator(KeyCombination.keyCombination("CTRL + Z"));
+        
+        MenuItem redo = new MenuItem("Redo");
+        edit.getItems().add(redo);
+        redo.setOnAction(e -> {
+            if(undoManager.canRedo())undoManager.redo();
+        });
+        redo.setAccelerator(KeyCombination.keyCombination("CTRL + Y"));
+
+        getMenus().add(edit);
     }
 }

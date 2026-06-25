@@ -4,6 +4,7 @@ import engine.UI.controls.ImplicitPlotEditor;
 import engine.UI.controls.ODEPlotEditor;
 import engine.UI.controls.ParametricPlotEditor;
 import engine.UI.controls.PolarPlotEditor;
+import engine.plotting.PlotListener;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
 import engine.plotting.plots.ParametricPlot;
@@ -29,7 +30,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-public class UIPanel extends BorderPane {
+public class UIPanel extends BorderPane implements PlotListener{
     GraphScene graphScene;
     Button showButton;
     VBox sidePane;
@@ -239,5 +240,19 @@ public class UIPanel extends BorderPane {
                 );
             }
         }
+    }
+    @Override
+    public void plotAdded(Plot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotAdded'");
+    }
+    @Override
+    public void plotRemoved(Plot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotRemoved'");
+    }
+    @Override
+    public void plotsChanged() {
+        rebuildEditors();
     }
 }

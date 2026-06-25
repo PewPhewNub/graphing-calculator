@@ -49,6 +49,8 @@ public class GraphTab extends Tab{
         HBox.setHgrow(toolBar, Priority.ALWAYS);
         mainPane.setLeft(uiPanel);
         mainPane.setCenter(graphPane);
+
+        scene.getPlotManager().addListener(uiPanel);
         
         VBox.setVgrow(graphHolder, Priority.ALWAYS);
 

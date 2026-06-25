@@ -25,6 +25,6 @@ public abstract class PlotEditor extends VBox {
         if(parent instanceof Pane pane){
             pane.getChildren().remove(this);
         }        
-        if(plot != null) plotManager.removePlot(plot);
+        plotManager.removePlot(plot);
     }
 }

@@ -13,6 +13,13 @@ public class FunctionPlot extends Plot implements CartesianPlot{
     public String dependent = "y";
     public String independent = "x";
 
+    public FunctionPlot(){
+        this.name = "New Function Plot";
+        this.color = Color.RED;
+        this.expression = "x";
+        function = PlotGenerator.generateFunction(expression, dependent, independent);
+    }
+
     public FunctionPlot(String name, String expression, Color color){
         function = PlotGenerator.generateFunction(expression, dependent, independent);
         this.name = name;

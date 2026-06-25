@@ -12,6 +12,7 @@ public class PlotManager{
     public ArrayList<CurveData> curveCache;
     public ArrayList<Intersection> intersectionCache;
     public PlotInteractionController interactionController;
+    public ArrayList<PlotListener> listeners;
     boolean dirty;
 
     public PlotManager(PlotInteractionController plotInteractionController){
@@ -20,14 +21,21 @@ public class PlotManager{
         interactionController = plotInteractionController;
         intersectionCache = new ArrayList<>();
         plotInteractionController.setCaches(curveCache, intersectionCache);
+        this.listeners = new ArrayList<>();
         dirty = false;
     }
     public void addPlot(Plot plot){
         plots.add(plot);
+        for(PlotListener listener : listeners){
+            listener.plotsChanged();
+        }
         dirty = true;
     }
     public void removePlot(Plot plot){
         plots.remove(plot);
+        for(PlotListener listener : listeners){
+            listener.plotsChanged();
+        }
         dirty = true;
     }
     public void computeCurveData(Viewport viewport){
@@ -56,5 +64,14 @@ public class PlotManager{
     public void removeAll(){
         plots.clear();
         dirty = true;
+    }
+    public void addPlot(int index, Plot plot){
+        plots.add(index, plot);
+    }
+    public void addListener(PlotListener listener){
+        listeners.add(listener);
+    }
+    public void removeListener(PlotListener listener){
+        listeners.remove(listener);
     }
 }
