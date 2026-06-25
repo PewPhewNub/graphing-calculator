@@ -2,6 +2,7 @@ package engine.UI;
 
 import java.io.File;
 
+import engine.interaction.UndoManager;
 import engine.scene.GraphScene;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +18,7 @@ public class GraphTab extends Tab{
     private File projectFile;
     private String name;
     private boolean dirty;
+    private UndoManager undoManager;
 
     public GraphTab(String text, GraphScene scene){
         this.scene = scene;
@@ -83,5 +85,9 @@ public class GraphTab extends Tab{
     }
     public void isDirty(boolean dirty){
         this.dirty = dirty;
+    }
+    public void setUndoManager(UndoManager undoManager) {
+        this.undoManager = undoManager;
+        uiPanel.setUndoManager(undoManager);
     }
 }

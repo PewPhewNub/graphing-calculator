@@ -10,6 +10,7 @@ public class RemovePlotCommand implements Command{
     public RemovePlotCommand(Plot plot, PlotManager plotManager){
         this.plot = plot;
         this.plotManager = plotManager;
+        this.index = plotManager.plots.indexOf(plot);
     }
 
     @Override

@@ -7,7 +7,6 @@ import engine.UI.UIElements.LabelledInput;
 import engine.UI.UIElements.MoreOptionsButton;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
-import engine.plotting.plots.PlotGenerator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -37,13 +36,6 @@ public class FunctionPlotEditor extends PlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
-    private FunctionPlot plot;
-
-    public FunctionPlotEditor(PlotManager plotManager){
-        this.plotManager = plotManager;
-        initialize();
-        buildPlot();
-    }
     public FunctionPlotEditor(PlotManager plotManager, FunctionPlot plot){
         this.plotManager = plotManager;
         initialize();
@@ -57,11 +49,11 @@ public class FunctionPlotEditor extends PlotEditor{
 
         box1.setText(independent);
         box2.setText(dependent);
+
+        attachListeners();
     }
 
     private void initialize(){
-        this.plot = null;
-
         setBackground(new Background(
             new BackgroundFill(
                 Color.WHITE,
@@ -81,20 +73,8 @@ public class FunctionPlotEditor extends PlotEditor{
         
         colorChooser = new ColorChooser(Color.RED);
         colorChooser.setAlignment(Pos.CENTER_RIGHT);
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            try {
-                buildPlot();
-            } catch (Exception e1) {
-                System.out.println(e1.getMessage());
-            }
-        });
 
         box0 = new EquationInput(dependent + "(" + independent + ") = ", 14, independent);
-        box0.textProperty().addListener(
-            (obs, oldValue, newValue) -> {
-                buildPlot();
-            }
-        );
 
         advancedOptionsPanel = new VBox();
         advancedOptionsPanel.setVisible(false);
@@ -104,18 +84,6 @@ public class FunctionPlotEditor extends PlotEditor{
 
         box1 = new LabelledInput("Independent Variable:", 9, "x", 14);
         box2 = new LabelledInput("Dependent Variable:", 9, "y", 14);
-        
-        box1.textProperty().addListener((obs, oldValue, newValue) -> {
-            independent = box1.getText();
-            box0.setLabelText(dependent + "(" + independent + ") = ");
-            buildPlot();
-        });
-
-        box2.textProperty().addListener((obs, oldValue, newValue) -> {
-            dependent = box2.getText();
-            box0.setLabelText(dependent + "(" + independent + ") = ");
-            buildPlot();
-        });
 
         this.getChildren().add(box0);
         this.getChildren().add(advancedButton);
@@ -133,14 +101,43 @@ public class FunctionPlotEditor extends PlotEditor{
         });
 
         CloseButton button = new CloseButton();
-        button.setOnMouseClicked(e -> close());
+        button.setOnMouseClicked(e -> {
+            close();
+        });
         topPanel.setRight(button);
+    }
+
+    private void attachListeners(){
+        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
+            buildPlot();
+        });
+
+        box0.textProperty().addListener((obs, oldValue, newValue) -> {
+            buildPlot();
+        });
+
+        box1.textProperty().addListener((obs, oldValue, newValue) -> {
+            independent = box1.getText();
+            box0.setLabelText(dependent + "(" + independent + ") = ");
+            buildPlot();
+        });
+
+        box2.textProperty().addListener((obs, oldValue, newValue) -> {
+            dependent = box2.getText();
+            box0.setLabelText(dependent + "(" + independent + ") = ");
+            buildPlot();
+        });
     }
     @Override
     protected void buildPlot(){
-        String text = box0.getText();
-        if(plot!=null) plotManager.removePlot(plot);
-        plot = PlotGenerator.generateFunctionPlot("name", text, dependent, independent, colorChooser.getSelectedColor());
-        if(plot!= null) plotManager.addPlot(plot);
+        if(((FunctionPlot)plot).update(
+            box0.getText(),
+            dependent,
+            independent,
+            colorChooser.getSelectedColor()
+        )){
+            System.out.println("ues");
+            plotManager.plotChanged(plot);
+        }
     }
 }

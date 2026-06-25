@@ -1,29 +1,18 @@
 package engine.UI;
 
-import java.util.Optional;
-
 import app.GraphApplication;
 import app.WindowManager;
 import engine.interaction.UndoManager;
 import engine.interaction.commands.AddGraphCommand;
 import engine.interaction.commands.RemoveGraphCommand;
-import engine.rendering.graph.Graph;
 import engine.scene.FunctionGraphScene;
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -50,8 +39,9 @@ public class MainWindow {
         tabPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tabPane.setMinSize(0, 100);
 
-        Tab graphTab = new GraphTab("Graph 1", new FunctionGraphScene(1200, 850));
+        GraphTab graphTab = new GraphTab("Graph 1", new FunctionGraphScene(1200, 850));
         tabPane.getTabs().add(graphTab);
+        graphTab.setUndoManager(undoManager);
 
         tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
             if(tabPane.getTabs().isEmpty()){
@@ -102,6 +92,7 @@ public class MainWindow {
             if(!graphTab.isDirty()) return;
             fileActions.unsaved(graphTab);
         });
+        graphTab.setUndoManager(undoManager);
         undoManager.execute(new AddGraphCommand(
             tabPane.getSelectionModel().getSelectedIndex() + 1,
             graphTab, 

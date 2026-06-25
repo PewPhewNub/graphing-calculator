@@ -2,6 +2,7 @@ package engine.plotting.plots;
 
 import java.util.function.Function;
 
+import engine.interaction.state.FunctionPlotState;
 import engine.rendering.camera.Viewport;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -91,5 +92,37 @@ public class FunctionPlot extends Plot implements CartesianPlot{
 
     public double sample(double x, double y){
         return function.apply(x);
+    }
+    public void setExpression(String expression) {
+        this.expression = expression;
+        this.function = PlotGenerator.generateFunction(expression, dependent, independent);
+    }
+
+    public boolean update(
+            String expression,
+            String dependent,
+            String independent,
+            Color color) {
+
+        Function<Double, Double> newFunction =
+                PlotGenerator.generateFunction(
+                        expression,
+                        dependent,
+                        independent);
+
+        if(newFunction == null)
+            return false;
+
+        this.expression = expression;
+        this.dependent = dependent;
+        this.independent = independent;
+        this.color = color;
+        this.function = newFunction;
+
+        return true;
+    }
+
+    public FunctionPlotState getState(){
+        return new FunctionPlotState(name, expression, independent, dependent, color);
     }
 }

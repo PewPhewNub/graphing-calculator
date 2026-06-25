@@ -36,6 +36,7 @@ public class Renderer {
         if(scene.getSettings().showTickMarks)drawAxesTicks(scene.gridData());
         if(scene.getSettings().showTickMarks)drawLabels(scene.gridData());
         for(CurveData curve : (scene.getPlotManager()).curveCache){
+            if(curve == null) continue;
             drawCurveSegmented(
                 curve.visibleSegments(),
                 curve.plot().getColor()

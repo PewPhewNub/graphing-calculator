@@ -1,9 +1,13 @@
 package engine.UI;
+import java.util.HashMap;
+import java.util.Map;
+
 import engine.UI.controls.FunctionPlotEditor;
-import engine.UI.controls.ImplicitPlotEditor;
-import engine.UI.controls.ODEPlotEditor;
 import engine.UI.controls.ParametricPlotEditor;
+import engine.UI.controls.PlotEditor;
 import engine.UI.controls.PolarPlotEditor;
+import engine.interaction.UndoManager;
+import engine.interaction.commands.AddPlotCommand;
 import engine.plotting.PlotListener;
 import engine.plotting.PlotManager;
 import engine.plotting.plots.FunctionPlot;
@@ -32,6 +36,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 public class UIPanel extends BorderPane implements PlotListener{
     GraphScene graphScene;
+    PlotManager plotManager;
     Button showButton;
     VBox sidePane;
     BorderPane plotPane;
@@ -40,12 +45,16 @@ public class UIPanel extends BorderPane implements PlotListener{
     double maxWidth;
     double minWidth;
     public MenuButton addPlotButton;
+    private Map<Plot, PlotEditor> editors;
+    private UndoManager undoManager;
     public UIPanel(double width, double height, GraphScene graphScene){
         super();
         setHeight(height);
         setPrefWidth(width);
         this.graphScene = graphScene;
         maxWidth = width;
+        this.editors = new HashMap<>();
+        this.plotManager = graphScene.getPlotManager();
 
         sidePane = new VBox();
         minWidth = 56;
@@ -86,25 +95,21 @@ public class UIPanel extends BorderPane implements PlotListener{
 
         MenuItem functionItem = new MenuItem("Function");
         functionItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new FunctionPlotEditor(graphScene.getPlotManager()));
+            System.out.println("addPlot called");
+            this.undoManager.execute(
+                new AddPlotCommand(
+                    new FunctionPlot(),
+                    this.plotManager)
+            );
         });
         MenuItem odeItem = new MenuItem("ODE");
-        odeItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new ODEPlotEditor(graphScene.getPlotManager()));
-        });
+        
         MenuItem polarItem = new MenuItem("Parametric");
-        polarItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new ParametricPlotEditor(graphScene.getPlotManager()));
-        });
+        
         MenuItem parametricItem = new MenuItem("Polar");
-        parametricItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new PolarPlotEditor(graphScene.getPlotManager()));
-        });
 
         MenuItem implicitItem = new MenuItem("Implicit");
-        implicitItem.setOnAction(e ->{
-            plotEditorPane.getChildren().add(new ImplicitPlotEditor(graphScene.getPlotManager()));
-        });
+        
 
         addPlotButton.getItems().addAll(
             functionItem,
@@ -216,43 +221,82 @@ public class UIPanel extends BorderPane implements PlotListener{
         PlotManager plotManager = graphScene.getPlotManager();
         for(Plot plot : plotManager.plots){
             if(plot instanceof FunctionPlot p) {
-                plotEditorPane.getChildren().add(
-                    new FunctionPlotEditor(
+                PlotEditor editor = new FunctionPlotEditor(
                         plotManager,
                         p
-                    )
+                    );
+                plotEditorPane.getChildren().add(
+                    editor
                 );
+                editor.setUndoManager(undoManager);
+                editors.put(p, editor);
             }
             if(plot instanceof ParametricPlot p) {
-                plotEditorPane.getChildren().add(
-                    new ParametricPlotEditor(
+                PlotEditor editor = new ParametricPlotEditor(
                         plotManager,
                         p
-                    )
+                    );
+                plotEditorPane.getChildren().add(
+                    editor
                 );
+                editor.setUndoManager(undoManager);
+                editors.put(p, editor);
             }
             if(plot instanceof PolarPlot p) {
-                plotEditorPane.getChildren().add(
-                    new PolarPlotEditor(
+                PlotEditor editor = new PolarPlotEditor(
                         plotManager,
                         p
-                    )
+                    );
+                plotEditorPane.getChildren().add(
+                    editor
                 );
+                editor.setUndoManager(undoManager);
+                editors.put(p, editor);
             }
         }
     }
     @Override
     public void plotAdded(Plot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotAdded'");
+        System.out.println(System.identityHashCode(plot));
+        PlotManager plotManager = graphScene.getPlotManager();
+        if(plot instanceof FunctionPlot p) {
+            PlotEditor editor = new FunctionPlotEditor(
+                    plotManager,
+                    p
+                );
+            plotEditorPane.getChildren().add(
+                editor
+            );
+            editor.setUndoManager(undoManager);
+            editors.put(p, editor);
+        }
     }
     @Override
-    public void plotRemoved(Plot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotRemoved'");
+    public void plotRemoved(Plot plot) { 
+        System.out.println(System.identityHashCode(plot));
+        System.out.println(editors.containsKey(plot));
+        PlotEditor editor = editors.get(plot);
+        if(editor != null){
+            plotEditorPane.getChildren().remove(editor);
+            editors.remove(plot);
+        }
     }
     @Override
     public void plotsChanged() {
-        rebuildEditors();
+        
+    }
+    @Override
+    public void plotChanged(Plot plot) {
+
+    }
+
+    public void setUndoManager(UndoManager undoManager) {
+        this.undoManager = undoManager;
+        for(PlotEditor editor : editors.values()){
+            editor.setUndoManager(undoManager);
+        }
+    }
+    public void addPlot(Plot plot){
+        
     }
 }

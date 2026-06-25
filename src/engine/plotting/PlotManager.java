@@ -28,13 +28,17 @@ public class PlotManager{
         plots.add(plot);
         for(PlotListener listener : listeners){
             listener.plotsChanged();
+            listener.plotAdded(plot);
+            System.out.println("yes");
         }
         dirty = true;
     }
     public void removePlot(Plot plot){
+        System.out.println("removePlot called");
         plots.remove(plot);
         for(PlotListener listener : listeners){
             listener.plotsChanged();
+            listener.plotRemoved(plot);
         }
         dirty = true;
     }
@@ -67,11 +71,21 @@ public class PlotManager{
     }
     public void addPlot(int index, Plot plot){
         plots.add(index, plot);
+        for(PlotListener listener : listeners){
+            listener.plotsChanged();
+            listener.plotAdded(plot);
+            System.out.println("yes");
+        }
     }
     public void addListener(PlotListener listener){
         listeners.add(listener);
     }
     public void removeListener(PlotListener listener){
         listeners.remove(listener);
+    }
+    public void plotChanged(Plot plot){
+        for(PlotListener listener : listeners){
+            listener.plotChanged(plot);
+        }
     }
 }

@@ -25,6 +25,7 @@ public class CartesianInteractionController extends PlotInteractionController{
         InteractionResult result = null;
 
         for(CurveData curve : curves){
+            if(curve == null) continue;
             InteractionResult currentResult = curve.hitTest(mouseX, mouseY);
 
             if(currentResult.getNearestPoint() == null) continue;
