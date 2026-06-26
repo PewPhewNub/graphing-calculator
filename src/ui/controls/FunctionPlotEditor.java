@@ -1,30 +1,17 @@
 package ui.controls;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
+import java.util.function.Function;
+
+import interaction.commands.EditPlotCommand;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
-import ui.components.CloseButton;
-import ui.components.ColorChooser;
+import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
 import ui.components.LabelledInput;
 import ui.components.MoreOptionsButton;
 
-public class FunctionPlotEditor extends PlotEditor{
-
-    public ColorChooser colorChooser;
-    public BorderPane topPanel;
+public class FunctionPlotEditor extends AbstractPlotEditor{
 
     public String dependent = "y";
     public String independent = "x";
@@ -37,6 +24,7 @@ public class FunctionPlotEditor extends PlotEditor{
     private VBox advancedOptionsPanel;
 
     public FunctionPlotEditor(PlotManager plotManager, FunctionPlot plot){
+        updatingFields = true;
         this.plotManager = plotManager;
         initialize();
         this.plot = plot;
@@ -46,33 +34,17 @@ public class FunctionPlotEditor extends PlotEditor{
 
         box0.setLabelText(dependent + "(" + independent + ") = ");
         box0.setFieldText(plot.expression);
+        nameLabel.setText(plot.getName());
 
         box1.setText(independent);
         box2.setText(dependent);
 
         attachListeners();
+        updatingFields = false;
     }
 
-    private void initialize(){
-        setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(5),
-                new Insets(2)
-            )
-        ));
-
-        setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGREY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(15),
-                new BorderWidths(2)
-            )
-        ));
-        
-        colorChooser = new ColorChooser(Color.RED);
-        colorChooser.setAlignment(Pos.CENTER_RIGHT);
+    public void initialize(){
+        super.initialize();
 
         box0 = new EquationInput(dependent + "(" + independent + ") = ", 14, independent);
 
@@ -90,53 +62,75 @@ public class FunctionPlotEditor extends PlotEditor{
         this.getChildren().add(advancedOptionsPanel);
         advancedOptionsPanel.getChildren().add(box1);
         advancedOptionsPanel.getChildren().add(box2);
-
-        topPanel = new BorderPane();
-        getChildren().add(0, topPanel);
-        topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Function Plot"){
-            {
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        CloseButton button = new CloseButton();
-        button.setOnMouseClicked(e -> {
-            close();
-        });
-        topPanel.setRight(button);
     }
 
-    private void attachListeners(){
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            buildPlot();
-        });
+    protected void attachListeners(){
+        super.attachListeners();
 
         box0.textProperty().addListener((obs, oldValue, newValue) -> {
+            if(updatingFields)
+                return;
             buildPlot();
         });
 
         box1.textProperty().addListener((obs, oldValue, newValue) -> {
             independent = box1.getText();
             box0.setLabelText(dependent + "(" + independent + ") = ");
+            if(updatingFields)
+                return;
             buildPlot();
         });
 
         box2.textProperty().addListener((obs, oldValue, newValue) -> {
             dependent = box2.getText();
             box0.setLabelText(dependent + "(" + independent + ") = ");
+            if(updatingFields)
+                return;
             buildPlot();
         });
     }
     @Override
     protected void buildPlot(){
-        if(((FunctionPlot)plot).update(
-            box0.getText(),
-            dependent,
-            independent,
-            colorChooser.getSelectedColor()
-        )){
-            plotManager.plotChanged(plot);
+        String text = box0.getText();
+        FunctionPlot before = (FunctionPlot)plot.copy();
+
+        Function<Double, Double> f = 
+            PlotGenerator.generateFunction(
+                text,
+                dependent,
+                independent
+            );
+
+        if(f == null){
+            return;
         }
+
+        FunctionPlot after = new FunctionPlot(nameLabel.getText(), text, f, colorChooser.getSelectedColor());
+        if(before.equals(after)) return;
+        undoManager.execute(
+            new EditPlotCommand(
+                plot, 
+                before,
+                after,
+                plotManager
+            )
+        );
+    }
+
+    public void updateFields(){   
+        updatingFields = true;
+        FunctionPlot fPlot = (FunctionPlot)plot;    
+        dependent = fPlot.dependent;
+        independent = fPlot.independent;
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box0.setLabelText(dependent + "(" + independent + ") = ");
+        box0.setFieldText(fPlot.expression);
+
+        box1.setText(independent);
+        box2.setText(dependent);
+        
+        nameLabel.setText(plot.getName());
+        updatingFields = false;
     }
 }

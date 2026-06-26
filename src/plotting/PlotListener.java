@@ -1,10 +1,10 @@
 package plotting;
 
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 
 public interface PlotListener {
-    void plotAdded(Plot plot);
-    void plotRemoved(Plot plot);
+    void plotAdded(AbstractPlot plot);
+    void plotRemoved(AbstractPlot plot);
     void plotsChanged();
-    void plotChanged(Plot plot);
+    void plotChanged(AbstractPlot plot);
 }

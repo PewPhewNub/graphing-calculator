@@ -1,9 +1,12 @@
 package ui.components;
 
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -74,5 +77,14 @@ public class LabelledInput extends VBox{
     }
     public void setText(String text){
         textField.setText(text);
+    }
+    public void setTextFormatter(TextFormatter<String> formatter){
+        textField.setTextFormatter(formatter);  
+    }
+    public void setOnAction(Runnable action){
+        textField.setOnAction(e -> action.run());
+        textField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            if(!newValue) action.run();
+        });
     }
 }

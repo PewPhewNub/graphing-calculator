@@ -2,14 +2,14 @@ package interaction;
 
 import javafx.geometry.Point2D;
 import plotting.data.curve.CurveData;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 
 public class InteractionResult {
-    Plot plot;
+    AbstractPlot plot;
     Point2D nearestPoint;
     double distanceSquared;
     CurveData curveData;
-    public InteractionResult(Plot plot, CurveData curveData, Point2D nearestPoint, double distanceSquared) {
+    public InteractionResult(AbstractPlot plot, CurveData curveData, Point2D nearestPoint, double distanceSquared) {
         this.plot = plot;
         this.curveData = curveData;
         this.nearestPoint = nearestPoint;
@@ -22,7 +22,7 @@ public class InteractionResult {
     public Point2D getNearestPoint() {
         return nearestPoint;
     }
-    public Plot getPlot() {
+    public AbstractPlot getPlot() {
         return plot;
     }
     public CurveData getCurveData() {

@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import javafx.geometry.Point2D;
 import plotting.data.curve.CurveData;
 import plotting.data.curve.Intersection;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import rendering.camera.Viewport;
 
 public abstract class PlotInteractionController {
 
-    protected Plot hoveredPlot;
-    protected Plot selectedPlot;
+    protected AbstractPlot hoveredPlot;
+    protected AbstractPlot selectedPlot;
 
     protected CurveData hoveredCurve;
     protected CurveData selectedCurve;
@@ -40,7 +40,7 @@ public abstract class PlotInteractionController {
     public CurveData getHoveredCurve() {
         return hoveredCurve;
     }
-    public Plot getHoveredPlot() {
+    public AbstractPlot getHoveredPlot() {
         return hoveredPlot;
     }
     public Point2D getHoveredPoint() {
@@ -49,7 +49,7 @@ public abstract class PlotInteractionController {
     public CurveData getSelectedCurve() {
         return selectedCurve;
     }
-    public Plot getSelectedPlot() {
+    public AbstractPlot getSelectedPlot() {
         return selectedPlot;
     }
     public Point2D getSelectedPoint() {

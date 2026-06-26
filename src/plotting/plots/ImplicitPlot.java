@@ -12,7 +12,7 @@ import plotting.data.Segment2D;
 import rendering.camera.Viewport;
 import rendering.camera.ViewportState;
 
-public class ImplicitPlot extends Plot implements CartesianPlot{
+public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     public BiFunction<Double, Double, Double> function;
     public Color color;
     public String name;

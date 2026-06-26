@@ -8,7 +8,7 @@ import persistence.plotdata.PolarPlotData;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ParametricPlot;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
 import scene.GraphScene;
@@ -34,9 +34,9 @@ public final class Serializer {
     }
 
     public static void serializePlotData(ProjectData data, PlotManager plotManager){
-        ArrayList<Plot> plots = plotManager.plots;
+        ArrayList<AbstractPlot> plots = plotManager.plots;
 
-        for(Plot plot : plots){
+        for(AbstractPlot plot : plots){
             if(plot instanceof FunctionPlot p){
                 FunctionPlotData plotData = new FunctionPlotData();
                 plotData.expression = p.expression;

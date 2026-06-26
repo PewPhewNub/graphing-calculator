@@ -10,7 +10,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import plotting.data.ParametricCurveChunk;
 
-public class PolarPlot extends Plot implements CartesianPlot{
+public class PolarPlot extends AbstractPlot implements CartesianPlot{
     public Function<Double, Double> r;
     public Function<Double, Double> x;
     public Function<Double, Double> y;
@@ -101,11 +101,8 @@ public class PolarPlot extends Plot implements CartesianPlot{
         return new Point2D(x.apply(t), y.apply(t));
     }
 
-    public void update(){
-        initializeChunks();
-    }
-
     public boolean update(
+            String name,
             String expression,
             double minT,
             double maxT,
@@ -126,8 +123,50 @@ public class PolarPlot extends Plot implements CartesianPlot{
         this.y = t -> r.apply(t)*Math.sin(t);
         tMax = maxT;
         tMin = minT;
+        this.name = name;
         initializeChunks();
 
         return true;
+    }
+
+    @Override
+    public PolarPlot copy() {
+        PolarPlot p = new PolarPlot(); 
+        p.update(name, expression, tMin, tMax, color);
+        return p;
+    }
+    @Override
+    public boolean copyFrom(AbstractPlot plot){
+        if(plot == null) return false;
+        if(plot instanceof PolarPlot p){
+            if(p.x == null) return false;
+            if(p.y == null) return false;
+            name = p.name;
+            expression = p.expression;
+            color = p.color;
+            x = p.x;
+            y = p.y;
+            tMin = p.tMin;
+            tMax = p.tMax;
+            update();
+            return true;
+        }else{
+            return false;
+        }
+    }
+    @Override
+    public void update() {
+        initializeChunks();
+    }
+    @Override
+    public boolean equals(AbstractPlot plot) {
+        if(plot instanceof PolarPlot p){
+            return p.name.trim().equals(name.trim())&&
+                   p.expression.trim().equals(expression.trim())&&
+                   p.color.equals(color)&&
+                   p.tMin == tMin &&
+                   p.tMax == tMax;
+        }
+        return false;
     }
 }

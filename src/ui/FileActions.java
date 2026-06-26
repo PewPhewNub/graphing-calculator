@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
@@ -85,7 +86,7 @@ public class FileActions {
                 new ButtonType("Don't Save");
 
         ButtonType cancel =
-                new ButtonType("Cancel");
+                new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(
                 save,
@@ -107,6 +108,8 @@ public class FileActions {
             if(result.get() == cancel){
                 return false;
             }
+        }else if(result.isEmpty()){
+            return false;
         }
         return false;
     }

@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import plotting.data.ODECurveChunk;
 import rendering.camera.Viewport;
 
-public class ODEPlot extends Plot {
+public class ODEPlot extends AbstractPlot {
     public BiFunction<Double, Double, Double> equation;
     ODEStatus statusLeft;
     ODEStatus statusRight;

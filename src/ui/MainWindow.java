@@ -45,9 +45,7 @@ public class MainWindow implements SettingsListener{
         tabPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tabPane.setMinSize(0, 100);
 
-        GraphTab graphTab = new GraphTab("Graph 1", new FunctionGraphScene(1200, 850));
-        tabPane.getTabs().add(graphTab);
-        graphTab.setUndoManager(undoManager);
+        addGraphScene("New Graph");
 
         tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
             if(tabPane.getTabs().isEmpty()){
@@ -93,10 +91,12 @@ public class MainWindow implements SettingsListener{
     }
 
     public void addGraphScene(String text){
-        GraphTab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850));
+        GraphTab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850, settingsManager.getSettings()));
+
         graphTab.setOnCloseRequest(e -> {
-            if(!graphTab.isDirty()) return;
-            fileActions.unsaved(graphTab);
+            e.consume();
+            removeGraphScene();
+            return;
         });
         graphTab.setUndoManager(undoManager);
         undoManager.execute(new AddGraphCommand(
@@ -105,11 +105,15 @@ public class MainWindow implements SettingsListener{
             tabPane));
     }
     public void removeGraphScene(){
-        GraphTab GraphTab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+        GraphTab graphTab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+        if(graphTab.isDirty()){
+            if(!fileActions.unsaved(graphTab)) return;
+        }
         undoManager.execute(new RemoveGraphCommand(
             tabPane.getSelectionModel().getSelectedIndex(), 
-            GraphTab, 
+            graphTab, 
             tabPane));
+        System.out.println("yes");
         if(tabPane.getTabs().isEmpty()){
             close();
         }
@@ -118,6 +122,9 @@ public class MainWindow implements SettingsListener{
     @Override
     public void themeChanged(Theme theme) {
         
+    }
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
     }
 }
 enum GraphType{

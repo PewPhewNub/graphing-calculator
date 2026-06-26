@@ -1,15 +1,15 @@
 package interaction.commands;
 
 import plotting.PlotManager;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 
 public class ReplacePlotCommand implements Command{
     PlotManager plotManager;
-    Plot plot1;
-    Plot plot2;
+    AbstractPlot plot1;
+    AbstractPlot plot2;
     int index;
 
-    public ReplacePlotCommand(PlotManager plotManager, Plot plot1, Plot plot2, int index){
+    public ReplacePlotCommand(PlotManager plotManager, AbstractPlot plot1, AbstractPlot plot2, int index){
         this.plot1 = plot1;
         this.plot2 = plot2;
         this.plotManager = plotManager;

@@ -2,12 +2,11 @@ package plotting.plots;
 
 import java.util.function.Function;
 
-import interaction.state.FunctionPlotState;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import rendering.camera.Viewport;
 
-public class FunctionPlot extends Plot implements CartesianPlot{
+public class FunctionPlot extends AbstractPlot implements CartesianPlot{
 
     public Function<Double, Double> function;
     public String expression;
@@ -99,6 +98,7 @@ public class FunctionPlot extends Plot implements CartesianPlot{
     }
 
     public boolean update(
+            String name,
             String expression,
             String dependent,
             String independent,
@@ -118,11 +118,45 @@ public class FunctionPlot extends Plot implements CartesianPlot{
         this.independent = independent;
         this.color = color;
         this.function = newFunction;
+        this.name = name;
 
         return true;
     }
 
-    public FunctionPlotState getState(){
-        return new FunctionPlotState(name, expression, independent, dependent, color);
+    @Override
+    public FunctionPlot copy() {
+        FunctionPlot p = new FunctionPlot(); 
+        p.update(name, expression, dependent, independent, color);
+        return p;
+    }
+    @Override
+    public boolean copyFrom(AbstractPlot plot){
+        if(plot == null) return false;
+        if(plot instanceof FunctionPlot p){
+            if(p.getFunction() == null) return false;
+            name = p.name;
+            expression = p.expression;
+            dependent = p.dependent;
+            independent = p.independent;
+            color = p.color;
+            function = p.function;
+            update();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public void update(){
+        return;
+    }
+
+    public boolean equals(AbstractPlot plot) {
+        if(plot instanceof FunctionPlot p){
+            return p.name.trim().equals(name.trim())&&
+                   p.expression.trim().equals(expression.trim())&&
+                   p.color.equals(color); 
+        }
+        return false;
     }
 }

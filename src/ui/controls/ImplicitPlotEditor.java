@@ -25,7 +25,7 @@ import ui.components.CloseButton;
 import ui.components.ColorChooser;
 import ui.components.EquationInput;
 
-public class ImplicitPlotEditor extends PlotEditor{
+public class ImplicitPlotEditor extends AbstractPlotEditor{
 
     public ColorChooser colorChooser;
     public BorderPane topPanel;

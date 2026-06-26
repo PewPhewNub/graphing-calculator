@@ -38,7 +38,7 @@ import plotting.PlotManager;
 import plotting.plots.ODEPlot;
 import ui.components.ColorChooser;
 
-public class ODEPlotEditor extends PlotEditor{
+public class ODEPlotEditor extends AbstractPlotEditor{
 
     public ColorChooser colorChooser;
     public BorderPane topPanel;

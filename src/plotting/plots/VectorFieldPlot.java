@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import plotting.data.ODECurveChunk;
 import plotting.data.Segment2D;
 
-public class VectorFieldPlot extends Plot {
+public class VectorFieldPlot extends AbstractPlot {
     public BiFunction<Double, Double, Double> dx;
     public BiFunction<Double, Double, Double> dy;
     public double t0;

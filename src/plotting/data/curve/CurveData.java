@@ -5,26 +5,26 @@ import java.util.ArrayList;
 import interaction.InteractionResult;
 import javafx.geometry.Point2D;
 import plotting.data.Segment2D;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 
 public class CurveData{
 
-    Plot originalPlot;
+    AbstractPlot originalPlot;
     ArrayList<Segment2D> visibleSegments;
     ArrayList<Point2D> featurePoints;
 
-    public CurveData(Plot plot, ArrayList<Segment2D> segments, ArrayList<Point2D> points){
+    public CurveData(AbstractPlot plot, ArrayList<Segment2D> segments, ArrayList<Point2D> points){
         this.originalPlot = plot;
         this.visibleSegments = segments;
         this.featurePoints = points;
     }
 
-    public CurveData(Plot plot, ArrayList<Segment2D> segments){
+    public CurveData(AbstractPlot plot, ArrayList<Segment2D> segments){
         this.originalPlot = plot;
         this.visibleSegments = segments;
     }
 
-    public Plot plot(){
+    public AbstractPlot plot(){
         return originalPlot;
     }
 

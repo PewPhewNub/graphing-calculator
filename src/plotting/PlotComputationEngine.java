@@ -25,7 +25,7 @@ import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.ODEPlot;
 import plotting.plots.ParametricPlot;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
 import plotting.plots.VectorFieldPlot;
 import rendering.camera.Viewport;
@@ -740,7 +740,7 @@ public class PlotComputationEngine {
 
         return new CurveData(plot, segments);
     }
-    public static ArrayList<Point2D> computeIntercepts(Plot plot, ViewportState state) {
+    public static ArrayList<Point2D> computeIntercepts(AbstractPlot plot, ViewportState state) {
         if (plot instanceof FunctionPlot fp)
             return computeIntercepts(fp, state);
 
@@ -755,7 +755,7 @@ public class PlotComputationEngine {
 
         return new ArrayList<>();
     }
-    public static ArrayList<Intersection> computeIntersections(Plot plot1, Plot plot2, Viewport viewport){
+    public static ArrayList<Intersection> computeIntersections(AbstractPlot plot1, AbstractPlot plot2, Viewport viewport){
         if(plot1 instanceof ODEPlot) return new ArrayList<>();
         if(plot2 instanceof ODEPlot) return new ArrayList<>();
         ViewportState state = new ViewportState(viewport);
@@ -784,7 +784,7 @@ public class PlotComputationEngine {
         }
         return new ArrayList<>();
     }
-    private static ArrayList<Point2D> computeCriticalPoints(Plot plot, ViewportState state){
+    private static ArrayList<Point2D> computeCriticalPoints(AbstractPlot plot, ViewportState state){
          if (plot instanceof FunctionPlot fp)
             return computeCriticalPoints(fp, state);
 
@@ -797,7 +797,7 @@ public class PlotComputationEngine {
         return new ArrayList<>();
     }
 
-    private static ArrayList<Intersection> computeIntersectionsCurves(Plot plot1, Plot plot2, Viewport viewport){
+    private static ArrayList<Intersection> computeIntersectionsCurves(AbstractPlot plot1, AbstractPlot plot2, Viewport viewport){
         if(plot1 instanceof ODEPlot || plot1 instanceof FunctionPlot) return new ArrayList<>();
         if(plot2 instanceof ODEPlot || plot2 instanceof FunctionPlot) return new ArrayList<>();
         if(plot1 == plot2) return new ArrayList<>();
@@ -936,7 +936,7 @@ public class PlotComputationEngine {
         return new double[]{x1+t0*dx, y1+t0*dy, x1+t1*dx, y1+t1*dy};
     }
 
-    public static CurveData computeCurveData(Plot plot, Viewport viewport){
+    public static CurveData computeCurveData(AbstractPlot plot, Viewport viewport){
         if(plot == null) return null;
         if(plot instanceof FunctionPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
         if(plot instanceof ODEPlot p) return PlotComputationEngine.computeCurveData(p, viewport);

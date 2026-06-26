@@ -28,13 +28,13 @@ import plotting.PlotListener;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ParametricPlot;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
 import scene.GraphScene;
 import settings.ThemeColors;
 import ui.controls.FunctionPlotEditor;
 import ui.controls.ParametricPlotEditor;
-import ui.controls.PlotEditor;
+import ui.controls.AbstractPlotEditor;
 import ui.controls.PolarPlotEditor;
 public class UIPanel extends BorderPane implements PlotListener, Themeable{
     GraphScene graphScene;
@@ -47,7 +47,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     double maxWidth;
     double minWidth;
     public MenuButton addPlotButton;
-    private Map<Plot, PlotEditor> editors;
+    private Map<AbstractPlot, AbstractPlotEditor> editors;
     private UndoManager undoManager;
     public UIPanel(double width, double height, GraphScene graphScene){
         super();
@@ -233,9 +233,9 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     public void rebuildEditors(){
         plotEditorPane.getChildren().clear();
         PlotManager plotManager = graphScene.getPlotManager();
-        for(Plot plot : plotManager.plots){
+        for(AbstractPlot plot : plotManager.plots){
             if(plot instanceof FunctionPlot p) {
-                PlotEditor editor = new FunctionPlotEditor(
+                AbstractPlotEditor editor = new FunctionPlotEditor(
                         plotManager,
                         p
                     );
@@ -246,7 +246,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 editors.put(p, editor);
             }
             if(plot instanceof ParametricPlot p) {
-                PlotEditor editor = new ParametricPlotEditor(
+                AbstractPlotEditor editor = new ParametricPlotEditor(
                         plotManager,
                         p
                     );
@@ -257,7 +257,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 editors.put(p, editor);
             }
             if(plot instanceof PolarPlot p) {
-                PlotEditor editor = new PolarPlotEditor(
+                AbstractPlotEditor editor = new PolarPlotEditor(
                         plotManager,
                         p
                     );
@@ -270,11 +270,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         }
     }
     @Override
-    public void plotAdded(Plot plot) {
+    public void plotAdded(AbstractPlot plot) {
         System.out.println(System.identityHashCode(plot));
         PlotManager plotManager = graphScene.getPlotManager();
         if(plot instanceof FunctionPlot p) {
-            PlotEditor editor = new FunctionPlotEditor(
+            AbstractPlotEditor editor = new FunctionPlotEditor(
                     plotManager,
                     p
                 );
@@ -286,7 +286,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             return;
         }
         if(plot instanceof ParametricPlot p) {
-            PlotEditor editor = new ParametricPlotEditor(
+            AbstractPlotEditor editor = new ParametricPlotEditor(
                     plotManager,
                     p
                 );
@@ -298,7 +298,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             return;
         }
         if(plot instanceof PolarPlot p) {
-            PlotEditor editor = new PolarPlotEditor(
+            AbstractPlotEditor editor = new PolarPlotEditor(
                     plotManager,
                     p
                 );
@@ -311,10 +311,10 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         }
     }
     @Override
-    public void plotRemoved(Plot plot) { 
+    public void plotRemoved(AbstractPlot plot) { 
         System.out.println(System.identityHashCode(plot));
         System.out.println(editors.containsKey(plot));
-        PlotEditor editor = editors.get(plot);
+        AbstractPlotEditor editor = editors.get(plot);
         if(editor != null){
             plotEditorPane.getChildren().remove(editor);
             editors.remove(plot);
@@ -325,17 +325,21 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         
     }
     @Override
-    public void plotChanged(Plot plot) {
-
+    public void plotChanged(AbstractPlot plot) {
+        AbstractPlotEditor editor = editors.get(plot);
+        editor.updateFields();
+        
+    System.out.println(editor);
     }
 
     public void setUndoManager(UndoManager undoManager) {
         this.undoManager = undoManager;
-        for(PlotEditor editor : editors.values()){
+        for(AbstractPlotEditor editor : editors.values()){
             editor.setUndoManager(undoManager);
+            
         }
     }
-    public void addPlot(Plot plot){
+    public void addPlot(AbstractPlot plot){
         
     }
     @Override

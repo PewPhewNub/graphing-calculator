@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import plotting.PlotInteractionController;
 import plotting.PlotManager;
 import plotting.data.GridData;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import rendering.camera.CameraSystem;
 import rendering.core.RenderContext;
 import rendering.core.Renderer;
 import rendering.graph.Graph;
+import settings.ApplicationSettings;
 
 public abstract class GraphScene {
     protected Graph graph;
@@ -19,7 +20,7 @@ public abstract class GraphScene {
     protected Renderer renderer;
     protected PlotInteractionController interaction;
     protected RenderContext context;
-    protected SceneSettings settings;
+    protected ApplicationSettings settings;
 
     public abstract void render();
     public abstract void update();
@@ -27,7 +28,7 @@ public abstract class GraphScene {
     public GridData gridData(){
         return gridData;
     }
-    public ArrayList<Plot> plots(){
+    public ArrayList<AbstractPlot> plots(){
         return plotManager.plots;
     }
     public PlotManager getPlotManager(){
@@ -45,7 +46,7 @@ public abstract class GraphScene {
     public RenderContext getContext() {
         return context;
     }
-    public SceneSettings getSettings() {
+    public ApplicationSettings getSettings() {
         return settings;
     }
 }

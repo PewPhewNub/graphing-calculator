@@ -8,6 +8,7 @@ public class GridRenderer {
     public void drawGridlines(RenderContext context, GridData data, Color gridLinesColor){
         double gridStepX = data.stepX;
         double gridStepY = data.stepY;
+        context.getGc().setLineDashes(0);
         context.getGc().setStroke(gridLinesColor);
         context.getGc().setLineWidth(.2);
         for (double x = Math.floor(context.getState().left / gridStepX) * gridStepX; x < context.getState().right; x += gridStepX) {

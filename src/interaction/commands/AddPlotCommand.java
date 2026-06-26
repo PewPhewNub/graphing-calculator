@@ -1,14 +1,13 @@
 package interaction.commands;
 
 import plotting.PlotManager;
-import plotting.plots.Plot;
-import ui.controls.PlotEditor;
+import plotting.plots.AbstractPlot;
 
 public class AddPlotCommand implements Command{
-    Plot plot;
+    AbstractPlot plot;
     int index;
     PlotManager plotManager;
-    public AddPlotCommand(Plot plot, PlotManager plotManager){
+    public AddPlotCommand(AbstractPlot plot, PlotManager plotManager){
         this.plot = plot;
         this.plotManager = plotManager;
     }

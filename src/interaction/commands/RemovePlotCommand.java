@@ -1,13 +1,13 @@
 package interaction.commands;
 
 import plotting.PlotManager;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 
 public class RemovePlotCommand implements Command{
-    Plot plot;
+    AbstractPlot plot;
     int index;
     PlotManager plotManager;
-    public RemovePlotCommand(Plot plot, PlotManager plotManager){
+    public RemovePlotCommand(AbstractPlot plot, PlotManager plotManager){
         this.plot = plot;
         this.plotManager = plotManager;
         this.index = plotManager.plots.indexOf(plot);

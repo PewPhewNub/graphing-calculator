@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import scene.GraphScene;
+import settings.ApplicationSettings;
 
 public class GraphTab extends Tab{
     private GraphScene scene;
@@ -19,6 +20,7 @@ public class GraphTab extends Tab{
     private String name;
     private boolean dirty;
     private UndoManager undoManager;
+    private ApplicationSettings settings;
 
     public GraphTab(String text, GraphScene scene){
         this.scene = scene;
@@ -27,6 +29,7 @@ public class GraphTab extends Tab{
         setText(text);
         toolBar = new GraphToolBar(scene);
         uiPanel = new UIPanel(400, 900, scene);
+        this.settings = scene.getSettings();
         BorderPane mainPane = new BorderPane();
 
         StackPane graphHolder = new StackPane();
@@ -53,6 +56,9 @@ public class GraphTab extends Tab{
         mainPane.setCenter(graphPane);
 
         scene.getPlotManager().addListener(uiPanel);
+        scene.getPlotManager().setDirtyCallback(
+            () -> setDirty(true)
+        );
         
         VBox.setVgrow(graphHolder, Priority.ALWAYS);
 
@@ -83,11 +89,23 @@ public class GraphTab extends Tab{
     public boolean isDirty(){
         return dirty;
     }
-    public void isDirty(boolean dirty){
+    public void setDirty(boolean dirty){
         this.dirty = dirty;
+        updateTitle();
     }
     public void setUndoManager(UndoManager undoManager) {
         this.undoManager = undoManager;
         uiPanel.setUndoManager(undoManager);
+    }
+
+    public void updateTitle(){
+        if(dirty){
+            setText(name + "*");
+        }else{
+            setText(name);
+        }
+    }
+    public ApplicationSettings getSettings() {
+        return this.settings;
     }
 }

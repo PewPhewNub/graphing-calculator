@@ -109,10 +109,12 @@ public class CameraSystem {
         viewport.cameraY +=
             (targetCameraY - viewport.cameraY) * .87;
 
-        viewport.setZoom(
-            viewport.getZoom() +
-            (targetZoom - viewport.getZoom()) * 0.3
-        );
+        double currentLog = Math.log(viewport.getZoom());
+        double targetLog = Math.log(targetZoom);
+
+        currentLog += (targetLog - currentLog) * .3;
+
+        viewport.setZoom(Math.exp(currentLog));
 
         viewport.setScaleX(
             viewport.scaleX +

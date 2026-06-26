@@ -13,28 +13,31 @@ import rendering.layers.CurveRenderer;
 import rendering.layers.GridRenderer;
 import rendering.layers.OverlayRenderer;
 import scene.GraphScene;
+import settings.RendererSettings;
 
 public class Renderer {
     private RenderContext context;
+    private RendererSettings rendererSettings;
     private final CurveRenderer curveRenderer = new CurveRenderer();
     private final AxisRenderer axesRenderer = new AxisRenderer();
     private final GridRenderer gridRenderer = new GridRenderer();
     private final OverlayRenderer overlayRenderer = new OverlayRenderer();
     Color axesColor; Color gridLinesColor; Color labelColor;
-    public Renderer(RenderContext context){
+    public Renderer(RenderContext context, RendererSettings rendererSettings){
         this.axesColor = Color.BLACK;
         this.gridLinesColor = Color.BLACK;
         this.labelColor =  Color.GREY;
         this.context = context;
         context.getGc().setImageSmoothing(true);
+        this.rendererSettings = rendererSettings;
     }
 
     public void render(GraphScene scene){
         clearCanvas();
-        if(scene.getSettings().showGrid)drawGridlines(scene.gridData());
-        if(scene.getSettings().showAxes)drawAxes();
-        if(scene.getSettings().showTickMarks)drawAxesTicks(scene.gridData());
-        if(scene.getSettings().showTickMarks)drawLabels(scene.gridData());
+        if(rendererSettings.showGrid)drawGridlines(scene.gridData());
+        if(rendererSettings.showAxes)drawAxes();
+        if(rendererSettings.showAxesTicks)drawAxesTicks(scene.gridData());
+        if(rendererSettings.showLabels)drawLabels(scene.gridData(), rendererSettings.showLabelsOutOfView);
         for(CurveData curve : (scene.getPlotManager()).curveCache){
             if(curve == null) continue;
             drawCurveSegmented(
@@ -71,8 +74,8 @@ public class Renderer {
     public void drawGridlines(GridData data){
         gridRenderer.drawGridlines(context, data, gridLinesColor);
     }
-    public void drawLabels(GridData data){
-        axesRenderer.drawLabels(context, data, labelColor);
+    public void drawLabels(GridData data, boolean drawOffScreen){
+        axesRenderer.drawLabels(context, data, labelColor, drawOffScreen);
     }
     public void drawCurve(ArrayList<Point2D> points, Color color){
         curveRenderer.drawCurve(context, points, color);

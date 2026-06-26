@@ -10,7 +10,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import plotting.data.ParametricCurveChunk;
 
-public class ParametricPlot extends Plot implements CartesianPlot{
+public class ParametricPlot extends AbstractPlot implements CartesianPlot{
     public Function<Double, Double> x;
     public Function<Double, Double> y;
     public double tMin;
@@ -60,6 +60,7 @@ public class ParametricPlot extends Plot implements CartesianPlot{
     }
 
     public void initializeChunks(){
+        chunks.clear();
         double chunkSize = 5; // radians
 
         for(double t = tMin; t < tMax; t += chunkSize){
@@ -102,6 +103,7 @@ public class ParametricPlot extends Plot implements CartesianPlot{
     }
 
     public boolean update(
+            String name,
             String expression1,
             String expression2,
             double minT,
@@ -119,7 +121,7 @@ public class ParametricPlot extends Plot implements CartesianPlot{
                         "y",
                         "t");
 
-        if(newFunction1 == null && newFunction2 == null)
+        if(newFunction1 == null || newFunction2 == null)
             return false;
 
         this.expression1 = expression1;
@@ -127,10 +129,55 @@ public class ParametricPlot extends Plot implements CartesianPlot{
         this.color = color;
         this.x = newFunction1;
         this.y = newFunction2;
-        tMax = maxT;
-        tMin = minT;
+        this.tMax = maxT;
+        this.tMin = minT;
+        this.name = name;
         initializeChunks();
 
         return true;
+    }
+
+    @Override
+    public ParametricPlot copy() {
+        ParametricPlot p = new ParametricPlot(); 
+        p.update(name, expression1, expression2, tMin, tMax, color);
+        return p;
+    }
+    @Override
+    public boolean copyFrom(AbstractPlot plot){
+        if(plot == null) return false;
+        if(plot instanceof ParametricPlot p){
+            if(p.x == null) return false;
+            if(p.y == null) return false;
+            name = p.name;
+            expression1 = p.expression1;
+            expression2 = p.expression2;
+            color = p.color;
+            x = p.x;
+            y = p.y;
+            tMin = p.tMin;
+            tMax = p.tMax;
+            update();
+            return true;
+        }else{
+            return false;
+        }
+    }
+    @Override
+    public void update() {
+        initializeChunks();
+    }
+
+    @Override
+    public boolean equals(AbstractPlot plot) {
+        if(plot instanceof ParametricPlot p){
+            return p.name.trim().equals(name.trim())&&
+                   p.expression1.trim().equals(expression1.trim())&&
+                   p.expression2.trim().equals(expression2.trim())&&
+                   p.color.equals(color)&&
+                   p.tMin == tMin &&
+                   p.tMax == tMax; 
+        }
+        return false;
     }
 }

@@ -1,39 +1,19 @@
 package ui.controls;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
+import interaction.commands.EditPlotCommand;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import parser.Lexer;
-import parser.Parser;
-import parser.node.DefinitionNode;
 import plotting.PlotManager;
-import plotting.plots.FunctionPlot;
+import plotting.plots.ParametricPlot;
 import plotting.plots.PlotGenerator;
 import plotting.plots.PolarPlot;
-import ui.components.CloseButton;
-import ui.components.ColorChooser;
 import ui.components.EquationInput;
 import ui.components.LabelledInput;
 import ui.components.MoreOptionsButton;
 
-public class PolarPlotEditor extends PlotEditor{
-    public ColorChooser colorChooser;
-    public BorderPane topPanel;
-
+public class PolarPlotEditor extends AbstractPlotEditor{
     public String dependent = "r";
     public String independent = "\u03B8";
 
@@ -46,7 +26,6 @@ public class PolarPlotEditor extends PlotEditor{
 
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
-    private PolarPlot plot;
 
     public PolarPlotEditor(PlotManager plotManager, PolarPlot plot){
         this.plotManager = plotManager;
@@ -65,45 +44,61 @@ public class PolarPlotEditor extends PlotEditor{
     }
 
     private void addHandlers(){
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            buildPlot();
-        });
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
                 buildPlot();
             }
         );
-        box1.textProperty().addListener((obs, oldValue, newValue) -> {
-            minT = Double.parseDouble(newValue);
-            if(Double.isNaN(minT)) minT = 0;
-            buildPlot();
-        });
-        box2.textProperty().addListener((obs, oldValue, newValue) -> {
-            maxT = Double.parseDouble(newValue);
-            if(Double.isNaN(maxT)) maxT = 0;
-            buildPlot();
-        });
-    }
-    private void initialize(){  
-        setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(5),
-                new Insets(2)
-            )
-        ));
+        TextFormatter<String> formatter1 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
 
-        setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGREY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(15),
-                new BorderWidths(2)
-            )
-        ));
-        
-        colorChooser = new ColorChooser(Color.RED);
-        colorChooser.setAlignment(Pos.CENTER_RIGHT);
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
+        });
+        TextFormatter<String> formatter2 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
+        });
+
+        box1.setTextFormatter(formatter1);
+        box2.setTextFormatter(formatter2);
+
+        Runnable action = () -> {
+            minT = (Double.parseDouble(box1.getText().trim()));
+            maxT = (Double.parseDouble(box2.getText().trim()));
+            buildPlot();
+        };
+        box1.setOnAction(action);
+        box2.setOnAction(action);
+    }
+    protected void initialize(){  
+        super.initialize();
 
         box0 = new EquationInput("r(\u03B8) = ", 14, "\u03B8");
 
@@ -121,30 +116,49 @@ public class PolarPlotEditor extends PlotEditor{
         this.getChildren().add(advancedOptionsPanel);
         advancedOptionsPanel.getChildren().add(box1);
         advancedOptionsPanel.getChildren().add(box2);
-
-        topPanel = new BorderPane();
-        getChildren().add(0, topPanel);
-        topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Polar Plot"){
-            {
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        CloseButton button = new CloseButton();
-        button.setOnMouseClicked(e -> close());
-        topPanel.setRight(button);
     }
     
     @Override
     protected void buildPlot(){
-        if(((PolarPlot)plot).update(
-            box0.getText(),
-            minT,
-            maxT,
-            colorChooser.getSelectedColor()
-        )){
-            plotManager.plotChanged(plot);
+        String text1 = box0.getText();
+        PolarPlot before = (PolarPlot)plot.copy();
+
+        Function<Double, Double> r = 
+            PlotGenerator.generateFunction(
+                text1,
+                "r",
+                "\u03B8"
+            );
+
+        if(r == null){
+            return;
         }
+
+        PolarPlot after = new PolarPlot(nameLabel.getText(), text1, r, minT, maxT, colorChooser.getSelectedColor());
+        if(before.equals(after)) return;
+        undoManager.execute(
+            new EditPlotCommand(
+                plot, 
+                before,
+                after,
+                plotManager
+            )
+        );
+    }
+
+    @Override
+    public void updateFields(){   
+        updatingFields = true;
+        PolarPlot fPlot = (PolarPlot)plot;    
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box0.setFieldText(fPlot.expression);
+
+        box1.setText(Double.toString(fPlot.tMin));
+        box2.setText(Double.toString(fPlot.tMax));
+        minT = fPlot.tMin;
+        maxT = fPlot.tMax;
+        nameLabel.setText(plot.getName());
+        updatingFields = false;
     }
 }

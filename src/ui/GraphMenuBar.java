@@ -15,6 +15,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import rendering.camera.CameraIntent;
+import settings.ApplicationSettings;
 
 public class GraphMenuBar extends MenuBar{
 
@@ -92,28 +93,51 @@ public class GraphMenuBar extends MenuBar{
         view.getItems().add(showGrid);
         showGrid.setOnAction(e -> {
             GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
-            tab.getGraphScene().getSettings().showGrid = showGrid.isSelected();
+            tab.getSettings().rendererSettings.showGrid = showGrid.isSelected();
         });
         CheckMenuItem showAxes = new CheckMenuItem("Show Axes");
         view.getItems().add(showAxes);
         showAxes.setSelected(true);
-        CheckMenuItem showTickMarks = new CheckMenuItem("Show Grid");
+        CheckMenuItem showTickMarks = new CheckMenuItem("Show Ticks");
         showTickMarks.setSelected(true);
         view.getItems().add(showTickMarks);
         showTickMarks.setOnAction(e -> {
             GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
-            tab.getGraphScene().getSettings().showTickMarks = showTickMarks.isSelected();
+            tab.getSettings().rendererSettings.showAxesTicks = showTickMarks.isSelected();
         });
         showAxes.setOnAction(e -> {
             GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
-            tab.getGraphScene().getSettings().showAxes = showAxes.isSelected();
+            tab.getSettings().rendererSettings.showAxes = showAxes.isSelected();
 
             if(!showAxes.isSelected()){
                 showTickMarks.setDisable(true);
-                tab.getGraphScene().getSettings().showTickMarks = false;
+                tab.getSettings().rendererSettings.showAxesTicks = false;
             }else{
                 showTickMarks.setDisable(false);
-                tab.getGraphScene().getSettings().showTickMarks = showTickMarks.isSelected();
+                tab.getSettings().rendererSettings.showAxesTicks = showTickMarks.isSelected();
+            }
+        });
+
+        CheckMenuItem showLabels = new CheckMenuItem("Show Labels");
+        view.getItems().add(showLabels);
+        showLabels.setSelected(true);
+        CheckMenuItem boundLabels = new CheckMenuItem("Bound labels to edge");
+        boundLabels.setSelected(true);
+        view.getItems().add(boundLabels);
+        boundLabels.setOnAction(e -> {
+            GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+            tab.getSettings().rendererSettings.showLabelsOutOfView = boundLabels.isSelected();
+        });
+        showLabels.setOnAction(e -> {
+            GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+            tab.getSettings().rendererSettings.showLabels = showLabels.isSelected();
+
+            if(!showLabels.isSelected()){
+                boundLabels.setDisable(true);
+                tab.getSettings().rendererSettings.showLabelsOutOfView = false;
+            }else{
+                boundLabels.setDisable(false);
+                tab.getSettings().rendererSettings.showLabelsOutOfView = boundLabels.isSelected();
             }
         });
 
@@ -128,7 +152,7 @@ public class GraphMenuBar extends MenuBar{
             );
         });
         zoomIn.setAccelerator(KeyCombination.keyCombination("CTRL + EQUALS"));
-        MenuItem zoomOut = new MenuItem("Zoom in");
+        MenuItem zoomOut = new MenuItem("Zoom out");
         view.getItems().add(zoomOut);
         zoomOut.setOnAction(e -> {
             GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();

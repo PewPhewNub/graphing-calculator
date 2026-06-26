@@ -1,32 +1,18 @@
 package ui.controls;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
+import java.util.function.Function;
+
+import interaction.commands.EditPlotCommand;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import plotting.PlotManager;
-import plotting.plots.FunctionPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PlotGenerator;
-import ui.components.CloseButton;
-import ui.components.ColorChooser;
 import ui.components.EquationInput;
 import ui.components.LabelledInput;
 import ui.components.MoreOptionsButton;
 
-public class ParametricPlotEditor extends PlotEditor{
-
-    public ColorChooser colorChooser;
-    public BorderPane topPanel;
+public class ParametricPlotEditor extends AbstractPlotEditor{
 
     private EquationInput box0;
     private EquationInput box1;
@@ -42,8 +28,11 @@ public class ParametricPlotEditor extends PlotEditor{
 
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
+    
+    private boolean updatingFields = false;
 
     public ParametricPlotEditor(PlotManager plotManager, ParametricPlot plot){
+        updatingFields = true;
         this.plotManager = plotManager;
         initialize();
         this.plot = plot;
@@ -57,34 +46,15 @@ public class ParametricPlotEditor extends PlotEditor{
 
         box2.setText(Double.toString(plot.tMin));
         box3.setText(Double.toString(plot.tMax));
-
+        nameLabel.setText(plot.getName());
         attachListeners();
+        updatingFields = false;
     }
 
-    private void initialize(){
-        setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(5),
-                new Insets(2)
-            )
-        ));
-
-        setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGREY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(15),
-                new BorderWidths(2)
-            )
-        ));
-        
-        colorChooser = new ColorChooser(Color.RED);
-        colorChooser.setAlignment(Pos.CENTER_RIGHT);
-
+    protected void initialize(){
+        super.initialize();
         box0 = new EquationInput("x(t) = ", 14, "2t");
         box1 = new EquationInput("y(t) = ", 14, "t*t");
-
         
         advancedOptionsPanel = new VBox();
         advancedOptionsPanel.setVisible(false);
@@ -101,61 +71,120 @@ public class ParametricPlotEditor extends PlotEditor{
         this.getChildren().add(advancedOptionsPanel);
         advancedOptionsPanel.getChildren().add(box2);
         advancedOptionsPanel.getChildren().add(box3);
-
-        topPanel = new BorderPane();
-        getChildren().add(0, topPanel);
-        topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Function Plot"){
-            {
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        CloseButton button = new CloseButton();
-        button.setOnMouseClicked(e -> close());
-        topPanel.setRight(button);
     }
 
-    public void attachListeners(){
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            try {
-                buildPlot();
-            } catch (Exception e1) {
-                System.out.println(e1.getMessage());
-            }
-        });
+    protected void attachListeners(){
+        super.attachListeners();
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
+                if(updatingFields)
+                return;
                 buildPlot();
             }
         );
         box1.textProperty().addListener(
             (obs, oldValue, newValue) -> {
+                if(updatingFields)
+                return;
                 buildPlot();
             }
         );
-        box2.textProperty().addListener((obs, oldValue, newValue) -> {
-            minT = Double.parseDouble(newValue);
-            if(Double.isNaN(minT)) minT = 0;
-            buildPlot();
+        TextFormatter<String> formatter1 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
         });
-        box3.textProperty().addListener((obs, oldValue, newValue) -> {
-            maxT = Double.parseDouble(newValue);
-            if(Double.isNaN(maxT)) maxT = 0;
-            buildPlot();
+        TextFormatter<String> formatter2 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
         });
+
+        box2.setTextFormatter(formatter1);
+        box3.setTextFormatter(formatter2);
+
+        Runnable action = () -> {
+            minT = (Double.parseDouble(box2.getText().trim()));
+            maxT = (Double.parseDouble(box3.getText().trim()));
+            buildPlot();
+        };
+        box2.setOnAction(action);
+        box3.setOnAction(action);
     }
 
     @Override
     protected void buildPlot(){
-        if(((ParametricPlot)plot).update(
-            box0.getText(),
-            box1.getText(),
-            minT,
-            maxT,
-            colorChooser.getSelectedColor()
-        )){
-            plotManager.plotChanged(plot);
+        String text1 = box0.getText();
+        String text2 = box1.getText();
+        ParametricPlot before = (ParametricPlot)plot.copy();
+
+        Function<Double, Double> x = 
+            PlotGenerator.generateFunction(
+                text1,
+                "x",
+                "t"
+            );
+        Function<Double, Double> y = 
+            PlotGenerator.generateFunction(
+                text2,
+                "y",
+                "t"
+            );
+
+        if(x == null || y == null){
+            return;
         }
+
+        ParametricPlot after = new ParametricPlot(nameLabel.getText(), text1, text2, x, y, minT, maxT, colorChooser.getSelectedColor());
+        if(before.equals(after)) return;
+        undoManager.execute(
+            new EditPlotCommand(
+                plot, 
+                before,
+                after,
+                plotManager
+            )
+        );
+    }
+    public void updateFields(){   
+        updatingFields = true;
+        ParametricPlot fPlot = (ParametricPlot)plot;  
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box0.setFieldText(fPlot.expression1);
+        box1.setFieldText(fPlot.expression2);
+
+        box2.setText(Double.toString(fPlot.tMin));
+        box3.setText(Double.toString(fPlot.tMax));
+        minT = fPlot.tMin;
+        maxT = fPlot.tMax;
+        nameLabel.setText(plot.getName());
+        updatingFields = false;
     }
 }

@@ -48,21 +48,20 @@ public class EquationInput extends HBox{
             change.setText(text);
             return change;
         }));
-        functionInputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.contains("theta")) {
-                // Use Platform.runLater to avoid conflicts with the ongoing text update
-                Platform.runLater(() -> {
-                    int caretPosition = functionInputField.getCaretPosition();
-                    
-                    // Replace the text
-                    String replaced = newValue.replace("theta", "\u03B8");
-                    functionInputField.setText(replaced);
-                    
-                    // Adjust caret position so it doesn't jump to the beginning
-                    functionInputField.positionCaret(caretPosition - 4); 
-                });
-            }
-        });
+        functionInputField.setTextFormatter(
+            new TextFormatter<>(change -> {
+
+                String text = change.getText();
+
+                if(text.contains("theta")) {
+                    change.setText(
+                        text.replace("theta", "\u03B8")
+                    );
+                }
+
+                return change;
+            })
+        );
 
         functionInputField.setBackground(new Background(new BackgroundFill(
             Color.WHITE,

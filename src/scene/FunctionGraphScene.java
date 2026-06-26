@@ -7,32 +7,33 @@ import plotting.CartesianInteractionController;
 import plotting.PlotManager;
 import plotting.data.GridData;
 import plotting.plots.CartesianPlot;
-import plotting.plots.Plot;
+import plotting.plots.AbstractPlot;
 import rendering.camera.CameraIntent;
 import rendering.camera.CameraSystem;
 import rendering.camera.Viewport;
 import rendering.core.RenderContext;
 import rendering.core.Renderer;
 import rendering.graph.Graph;
+import settings.ApplicationSettings;
 import ui.InputController;
 
 public class FunctionGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
     private CartesianInteractionController interaction;
-    private boolean dirty;
+    private boolean unsaved;
     
-    public FunctionGraphScene(double width, double height){
+    public FunctionGraphScene(double width, double height, ApplicationSettings settings){
         graph = new Graph(width, height);
+        this.settings = settings;
         interaction = new CartesianInteractionController();
         plotManager = new PlotManager(interaction);
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
-        renderer = new Renderer(context);
+        renderer = new Renderer(context, this.settings.rendererSettings);
         cameraSystem = new CameraSystem(graph.viewport);
         currentMode = CurrentMode.NONE;
         gridData = new GridData();
-        dirty = false;
-        this.settings = new SceneSettings();
+        unsaved = false;
     }
 
     @Override
@@ -206,19 +207,16 @@ public class FunctionGraphScene extends GraphScene{
         }
     }
 
-    public boolean canAdd(Plot plot){
+    public boolean canAdd(AbstractPlot plot){
         if(plot instanceof CartesianPlot) return true;
         return false;
     }
 
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
+    public void setUnsaved(boolean dirty) {
+        this.unsaved = dirty;
     }
-    public boolean isDirty() {
-        return dirty;
-    }
-    public SceneSettings getSettings(){
-        return settings;
+    public boolean isUnsaved() {
+        return unsaved;
     }
 }
     
