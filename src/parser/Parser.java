@@ -32,37 +32,59 @@ public class Parser{
         advance();
         return true;
     }
-    private boolean consume(TokenType type) throws Exception{
-        if(peek().type != type) throw new Exception("SYNTAX ERROR"); 
+    private void consume(TokenType type) throws ParseException{
+        if(peek().type != type){
+            String character = 
+                switch(type){
+                    case ASSIGN -> "=";
+                    case LPAREN -> "(";
+                    case RPAREN -> ")";
+                    case PLUS -> "+";
+                    case MINUS -> "-";
+                    case STAR -> "*";
+                    case SLASH -> "/";
+                    case POW -> "^";
+                    case IDENTIFIER -> "identifier";
+                    case OPERATOR -> "operator";
+                    case NUMBER -> "number";
+                    case POINT -> ".";
+                    case COMMA -> ",";
+                    default -> throw new ParseException("Syntax Error");
+                };
+                throw new ParseException("Expected " + character);
+        } 
         advance();
-        return true;
     }
 
     private boolean startExpression(Token token){
         return token.type == TokenType.LPAREN || token.type == TokenType.NUMBER || token.type == TokenType.IDENTIFIER || token.type == TokenType.STAR || token.type == TokenType.SLASH;
     }
 
-    private ExpressionNode parsePrimary() throws Exception{
-        if(peek().type == TokenType.NUMBER) return new NumberNode(Double.parseDouble(advance().value));
+    private ExpressionNode parsePrimary() throws ParseException{
+        if(peek().type == TokenType.NUMBER){
+            String text = advance().value;
+            if(text.trim().equals(".") || text.trim().equals("0.")) throw new ParseException("Expected number after .");
+            return new NumberNode(Double.parseDouble(text));
+        }
         else if(peek().type == TokenType.IDENTIFIER){
             Token current = advance();
             if(match(TokenType.LPAREN)){
                 ExpressionNode node = new FunctionNode(current.value, parseExpression());
-                if(!consume(TokenType.RPAREN)) throw new Exception("SYNTAX ERROR");
+                consume(TokenType.RPAREN);
                 return node;
             }
             return new VariableNode(current.value);
         }else if(peek().type == TokenType.LPAREN){
             advance();
             ExpressionNode node = parseExpression();
-            if(!consume(TokenType.RPAREN)) throw new Exception("SYNTAX ERROR");
+            consume(TokenType.RPAREN);
             return node;
         }
         
-        throw new Exception("ILLEGAL ARGUMENT");
+        throw new ParseException("Expected Expression");
     }
 
-    private ExpressionNode parseUnary() throws Exception{
+    private ExpressionNode parseUnary() throws ParseException{
         if(peek().type == TokenType.PLUS){
             advance();
             return new UnaryNode(TokenType.PLUS, parsePrimary());
@@ -73,7 +95,7 @@ public class Parser{
             return parsePrimary();
     }
 
-    private ExpressionNode parsePower() throws Exception{
+    private ExpressionNode parsePower() throws ParseException{
         ExpressionNode left = parseUnary();
         if(match(TokenType.POW)){
             ExpressionNode right = parsePower();
@@ -82,7 +104,7 @@ public class Parser{
         return left;
     }
 
-    private ExpressionNode parseTerm() throws Exception{
+    private ExpressionNode parseTerm() throws ParseException{
         ExpressionNode left = parsePower();
         while(startExpression(peek())){
             TokenType type = peek().type;
@@ -102,7 +124,7 @@ public class Parser{
         return left;
     }
 
-    public ExpressionNode parseExpression() throws Exception{
+    public ExpressionNode parseExpression() throws ParseException{
         ExpressionNode left = parseTerm();
         while(peek().type == TokenType.PLUS || peek().type == TokenType.MINUS){
             TokenType type = advance().type;
@@ -112,7 +134,7 @@ public class Parser{
         return left;
     }
 
-    public DefinitionNode parseDefinition(String dependentVariable, Set<String> knownVariables) throws Exception {
+    public DefinitionNode parseDefinition(String dependentVariable, Set<String> knownVariables) throws ParseException {
         ExpressionNode expr = parseExpression();
         if(peek().type == TokenType.ASSIGN){
             advance();

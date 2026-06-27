@@ -143,24 +143,32 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
         String text1 = box0.getText();
         String text2 = box1.getText();
         ParametricPlot before = (ParametricPlot)plot.copy();
-
-        Function<Double, Double> x = 
-            PlotGenerator.generateFunction(
+        box0.highlightError(null);
+        box1.highlightError(null);
+        Function<Double, Double> x = null;
+        Function<Double, Double> y = null;
+        boolean failed = false;
+        try{
+            x = PlotGenerator.generateFunction(
                 text1,
                 "x",
                 "t"
             );
-        Function<Double, Double> y = 
-            PlotGenerator.generateFunction(
+        }catch(Exception e){
+            box0.highlightError(e.getMessage());
+            failed = true;
+        }
+        try{
+            y = PlotGenerator.generateFunction(
                 text2,
                 "y",
                 "t"
             );
-
-        if(x == null || y == null){
-            return;
+        }catch(Exception e){
+            box1.highlightError(e.getMessage());
+            failed = true;
         }
-
+        if(failed) return;
         ParametricPlot after = new ParametricPlot(nameLabel.getText(), text1, text2, x, y, minT, maxT, colorChooser.getSelectedColor());
         if(before.equals(after)) return;
         undoManager.execute(

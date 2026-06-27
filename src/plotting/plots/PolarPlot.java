@@ -8,6 +8,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import math.Interval;
+import parser.ParseException;
 import plotting.data.ParametricCurveChunk;
 
 public class PolarPlot extends AbstractPlot implements CartesianPlot{
@@ -34,7 +35,11 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
         initializeChunks();
     }
     public PolarPlot(String name, String expression, double tMin, double tMax, Color color){
-        this.r = PlotGenerator.generateFunction(expression, "r", "\u03B8");
+        try {
+            this.r = PlotGenerator.generateFunction(expression, "r", "\u03B8");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         x = t-> r.apply(t)*Math.cos(t);
         y = t-> r.apply(t)*Math.sin(t);
         this.name = name;
@@ -108,13 +113,16 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
             double maxT,
             Color color) {
 
-        Function<Double, Double> newFunction1 =
-                PlotGenerator.generateFunction(
-                        expression,
-                        "r",
-                        "\u03B8");
-        if(newFunction1 == null)
+        Function<Double, Double> newFunction1;
+        try {
+            newFunction1 = PlotGenerator.generateFunction(
+                    expression,
+                    "r",
+                    "\u03B8");
+        } catch (ParseException e) {
+            e.printStackTrace();
             return false;
+        }
 
         this.expression = expression;
         this.color = color;

@@ -1,6 +1,5 @@
 package ui.components;
 
-import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,15 +16,20 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-public class EquationInput extends HBox{
+public class EquationInput extends VBox{
 
     Label functionInputLabel;
     TextField functionInputField;
+    HBox input;
+    Label errorLabel;
     public EquationInput(String text1, double size, String text2){
+        HBox input = new HBox();
+
         functionInputLabel = new Label(text1);
         functionInputLabel.setBorder(new Border(new BorderStroke(
             Color.rgb(220, 220, 220),       // A soft, light gray color
@@ -77,16 +81,29 @@ public class EquationInput extends HBox{
         )));
         functionInputField.setPadding(new Insets(5,0,5,0));
         
-        getChildren().add(functionInputLabel);
-        getChildren().add(functionInputField);
-        setPadding(new Insets(5, 25, 5, 25));
+        input.getChildren().add(functionInputLabel);
+        input.getChildren().add(functionInputField);
+        input.setPadding(new Insets(0, 25, 0, 25));
+
+        getChildren().add(input);
 
         HBox.setHgrow(functionInputField, Priority.ALWAYS);
         functionInputField.setMaxWidth(Double.MAX_VALUE);
 
         functionInputLabel.maxWidthProperty().bind(
-            widthProperty().multiply(1/3f)
+            input.widthProperty().multiply(1/3f)
         );
+
+        errorLabel = new Label();
+        errorLabel.setFont(new Font(9));
+        errorLabel.setTextFill(Color.RED);
+
+        getChildren().add(errorLabel);
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+        errorLabel.setPadding(new Insets(0, 30, 0, 30));
+
+        setPadding(new Insets(5, 0, 5, 0));
     }
 
     public StringProperty textProperty(){
@@ -107,4 +124,41 @@ public class EquationInput extends HBox{
     public void setFieldText(String text){
         functionInputField.setText(text);   
     }
+    public void highlightError(String text){
+        if(text != null){
+            functionInputField.setBorder(new Border(new BorderStroke(
+                Color.RED,       // A soft, light gray color
+                BorderStrokeStyle.SOLID,        // Solid line style
+                new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+                new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+            )));
+            functionInputLabel.setBorder(new Border(new BorderStroke(
+                Color.RED,       // A soft, light gray color
+                BorderStrokeStyle.SOLID,        // Solid line style
+                new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+            )));
+
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+            errorLabel.setText(text);
+        }else{ 
+            functionInputField.setBorder(new Border(new BorderStroke(
+                Color.rgb(220, 220, 220),       // A soft, light gray color
+                BorderStrokeStyle.SOLID,        // Solid line style
+                new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
+                new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
+            )));
+            functionInputLabel.setBorder(new Border(new BorderStroke(
+                Color.rgb(220, 220, 220),       // A soft, light gray color
+                BorderStrokeStyle.SOLID,        // Solid line style
+                new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+                new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
+            )));
+            
+            errorLabel.setVisible(false);
+            errorLabel.setManaged(false);
+        }
+    }
+
 }

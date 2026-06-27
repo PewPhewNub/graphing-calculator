@@ -5,6 +5,7 @@ import java.util.function.Function;
 import interaction.commands.EditPlotCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
+import parser.ParseException;
 import plotting.PlotManager;
 import plotting.plots.PlotGenerator;
 import plotting.plots.PolarPlot;
@@ -125,14 +126,15 @@ public class PolarPlotEditor extends AbstractPlotEditor{
         String text1 = box0.getText();
         PolarPlot before = (PolarPlot)plot.copy();
 
-        Function<Double, Double> r = 
-            PlotGenerator.generateFunction(
+        Function<Double, Double> r;
+        try {
+            r = PlotGenerator.generateFunction(
                 text1,
                 "r",
                 "\u03B8"
             );
-
-        if(r == null){
+        } catch (ParseException e) {
+            box0.highlightError(e.getMessage());
             return;
         }
 

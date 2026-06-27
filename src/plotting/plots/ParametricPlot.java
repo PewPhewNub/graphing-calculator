@@ -8,6 +8,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import math.Interval;
+import parser.ParseException;
 import plotting.data.ParametricCurveChunk;
 
 public class ParametricPlot extends AbstractPlot implements CartesianPlot{
@@ -33,8 +34,16 @@ public class ParametricPlot extends AbstractPlot implements CartesianPlot{
         initializeChunks();
     }
     public ParametricPlot(String name, String expression1, String expression2, double tMin, double tMax, Color color){
-        this.x = PlotGenerator.generateFunction(expression1, "x", "t");
-        this.y = PlotGenerator.generateFunction(expression2, "y", "t");
+        try {
+            this.x = PlotGenerator.generateFunction(expression1, "x", "t");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            this.y = PlotGenerator.generateFunction(expression2, "y", "t");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         this.name = name;
         this.color = color;
         this.tMin = tMin;
@@ -110,20 +119,21 @@ public class ParametricPlot extends AbstractPlot implements CartesianPlot{
             double maxT,
             Color color) {
 
-        Function<Double, Double> newFunction1 =
-                PlotGenerator.generateFunction(
+        Function<Double, Double> newFunction1;
+        Function<Double, Double> newFunction2;
+        try{
+            newFunction1 = PlotGenerator.generateFunction(
                         expression1,
                         "x",
                         "t");
-        Function<Double, Double> newFunction2 =
-                PlotGenerator.generateFunction(
+            newFunction2 = PlotGenerator.generateFunction(
                         expression2,
                         "y",
                         "t");
-
-        if(newFunction1 == null || newFunction2 == null)
+        }catch(Exception e){
+            e.printStackTrace();
             return false;
-
+        }
         this.expression1 = expression1;
         this.expression2 = expression2;
         this.color = color;

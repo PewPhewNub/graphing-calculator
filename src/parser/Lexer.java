@@ -13,26 +13,26 @@ public class Lexer {
         this.tokenList = new ArrayList<>();
     }
 
-    public void tokenize() throws Exception{
+    public void tokenize() throws ParseException{
         while(!isAtEnd()){
             skipWhitespace();
             if (isAtEnd()) break;
             if(isDigit(peek()) || peek() == '.'){
                 Token token = readNumber();
                 if(token.type == TokenType.ERROR){
-                    throw new Exception("ERROR");
+                    throw new ParseException("ERROR");
                 }
                 tokenList.add(token);
             }else if(isLetter(peek())){
                 Token token = readIdentifier();
                 if(token.type == TokenType.ERROR){
-                    throw new Exception("ERROR");
+                    throw new ParseException("ERROR");
                 }
                 tokenList.add(token);
             }else{
                 Token token = readOperator();
                 if(token.type == TokenType.ERROR){
-                    throw new Exception("ERROR");
+                    throw new ParseException("ERROR");
                 }
                 tokenList.add(token);
             }

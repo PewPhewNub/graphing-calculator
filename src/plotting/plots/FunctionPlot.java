@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import parser.ParseException;
 import rendering.camera.Viewport;
 
 public class FunctionPlot extends AbstractPlot implements CartesianPlot{
@@ -14,17 +15,25 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
     public String independent = "x";
 
     public FunctionPlot(){
-        this.name = "New Function Plot";
+        this.name = "New Explicit Plot";
         this.color = Color.RED;
         this.expression = "x";
-        function = PlotGenerator.generateFunction(expression, dependent, independent);
+        try {
+            function = PlotGenerator.generateFunction(expression, dependent, independent);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public FunctionPlot(String name, String expression, Color color){
-        function = PlotGenerator.generateFunction(expression, dependent, independent);
         this.name = name;
         this.color = color;
         this.expression = expression;
+        try {
+            function = PlotGenerator.generateFunction(expression, dependent, independent);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
     
     public FunctionPlot(String name, String expression, Function<Double, Double> f, Color color){
@@ -41,9 +50,11 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
         return color;
     }
     public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
+        if(function == null) return new Point2D(Double.NaN, Double.NaN);
         return new Point2D(worldX, function.apply(worldX));
     }
     public double distanceSquaredFrom(double x0, double y0, Viewport viewport) {
+        if(function == null) return Double.POSITIVE_INFINITY;
         double minDist2 = Double.POSITIVE_INFINITY;
         double worldMinX = viewport.screenToWorldX(0);
         double worldMaxX = viewport.screenToWorldX(viewport.width);
@@ -94,7 +105,11 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
     }
     public void setExpression(String expression) {
         this.expression = expression;
-        this.function = PlotGenerator.generateFunction(expression, dependent, independent);
+        try {
+            function = PlotGenerator.generateFunction(expression, dependent, independent);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean update(
@@ -104,23 +119,22 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
             String independent,
             Color color) {
 
-        Function<Double, Double> newFunction =
-                PlotGenerator.generateFunction(
-                        expression,
-                        dependent,
-                        independent);
+        try {
+            Function<Double, Double> newFunction = PlotGenerator.generateFunction(expression, dependent, independent);            
+            if(newFunction == null)
+                return false;
 
-        if(newFunction == null)
-            return false;
-
-        this.expression = expression;
-        this.dependent = dependent;
-        this.independent = independent;
-        this.color = color;
-        this.function = newFunction;
-        this.name = name;
-
-        return true;
+            this.expression = expression;
+            this.dependent = dependent;
+            this.independent = independent;
+            this.color = color;
+            this.function = newFunction;
+            this.name = name;
+            return true;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

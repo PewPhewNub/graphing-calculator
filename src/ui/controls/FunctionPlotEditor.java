@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import interaction.commands.EditPlotCommand;
 import javafx.scene.layout.VBox;
+import parser.ParseException;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
 import plotting.plots.PlotGenerator;
@@ -94,17 +95,18 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
         String text = box0.getText();
         FunctionPlot before = (FunctionPlot)plot.copy();
 
-        Function<Double, Double> f = 
-            PlotGenerator.generateFunction(
+        box0.highlightError(null);
+        Function<Double, Double> f;
+        try {
+            f = PlotGenerator.generateFunction(
                 text,
                 dependent,
                 independent
             );
-
-        if(f == null){
+        } catch (ParseException e) {
+            box0.highlightError(e.getMessage());
             return;
         }
-
         FunctionPlot after = new FunctionPlot(nameLabel.getText(), text, f, colorChooser.getSelectedColor());
         if(before.equals(after)) return;
         undoManager.execute(

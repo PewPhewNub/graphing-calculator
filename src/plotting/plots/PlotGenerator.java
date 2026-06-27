@@ -9,32 +9,28 @@ import java.util.function.Function;
 import javafx.scene.paint.Color;
 import parser.Lexer;
 import parser.Parser;
+import parser.ParseException;
 import parser.node.DefinitionNode;
 
 public class PlotGenerator {
-    public static FunctionPlot generateFunctionPlot(String name, String expression, String dependent, String independent, Color color){
+    public static FunctionPlot generateFunctionPlot(String name, String expression, String dependent, String independent, Color color) throws ParseException{
         Function<Double, Double> function = generateFunction(expression, dependent, independent);
         if(function == null) return null;
         return new FunctionPlot(name, expression, function, color);
     }
-    public static Function<Double, Double> generateFunction(String expression, String dependent, String independent){
+    public static Function<Double, Double> generateFunction(String expression, String dependent, String independent) throws ParseException{
         Lexer lexer = new Lexer(expression);
         Map<String, Double> map = new HashMap<>();
-        try {
-            lexer.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent,
-                        Set.of(independent)
-                    );
-            return x -> {
-                    map.put(independent, x);
-                    return node.evaluate(map);
+        lexer.tokenize();
+        Parser parser = new Parser(lexer.tokenList);
+        DefinitionNode node = parser.parseDefinition(
+                    dependent,
+                    Set.of(independent)
+                );
+        return x -> {
+                map.put(independent, x);
+                return node.evaluate(map);
             };
-        }catch(Exception e1){
-            System.out.println("bruh");
-        }
-        return null;
     }
 
     public static ParametricPlot generateParametricPlot(String name, String expression1, String expression2, double tMin, double tMax, Color color){

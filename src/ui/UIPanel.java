@@ -97,7 +97,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
 
         addPlotButton = new MenuButton(" Add Plot");
 
-        MenuItem functionItem = new MenuItem("Function");
+        MenuItem functionItem = new MenuItem("Explicit");
         functionItem.setOnAction(e ->{
             this.undoManager.execute(
                 new AddPlotCommand(
