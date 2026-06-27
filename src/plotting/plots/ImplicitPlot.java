@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 
+import com.fasterxml.jackson.databind.cfg.ContextAttributes.Impl;
+
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -14,19 +16,56 @@ import rendering.camera.ViewportState;
 
 public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     public BiFunction<Double, Double, Double> function;
-    public Color color;
-    public String name;
     public HashMap<Point2D, ImplicitChunk> chunks;
     public String expression1;
     public String expression2;
+    public String equivExpression;
     public final double CHUNK_SIZE = 16;
     private final double BASE_SIZE = 16;
     private final int maxCellsPerSide = 128;
     
-    public ImplicitPlot(String name, BiFunction<Double, Double, Double> function, Color color){
+    public ImplicitPlot(String name, String expression1, String expression2, BiFunction<Double, Double, Double> function, Color color){
         this.name = name;
         this.function = function;
         this.color = color;
+        this.expression1 = expression1;
+        this.expression2 = expression2;
+        this.equivExpression = "(" +  expression2 + ") - (" + expression1 + ")";
+        chunks = new HashMap<>();
+    }
+    
+    public ImplicitPlot(String name, String expression1, String expression2, Color color){
+        this.name = name;
+        this.expression1 = expression1;
+        this.expression2 = expression2;
+        this.equivExpression = "(" +  expression2 + ") - (" + expression1 + ")";
+        this.function = PlotGenerator.generateBiFunction(equivExpression);
+        this.color = color;
+
+        chunks = new HashMap<>();
+    }
+
+    
+    public ImplicitPlot(String name, String expression, Color color){
+        this.name = name;
+        this.equivExpression = expression.trim();
+        this.function = PlotGenerator.generateBiFunction(equivExpression);
+        this.color = color;
+
+        int index = equivExpression.indexOf((int)('='));
+        if(index == -1) return;
+        expression1 = equivExpression.substring(0, index).trim();
+        expression2 = equivExpression.substring(index + 1).trim();
+
+        chunks = new HashMap<>();
+    }
+    public ImplicitPlot(){
+        this.name = "New Implicit Plot";
+        this.expression1 = "y";
+        this.expression2 = "x";
+        this.equivExpression = "(y) - (x)";
+        this.function = PlotGenerator.generateBiFunction(equivExpression);
+        this.color = Color.RED;
 
         chunks = new HashMap<>();
     }
@@ -199,5 +238,46 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     }
     public String getName() {
         return name;
+    }
+
+    @Override
+    public ImplicitPlot copy() {
+        ImplicitPlot plot = new ImplicitPlot();
+        plot.name = name;
+        plot.expression1 = expression1;
+        plot.expression2 = expression2;
+        plot.equivExpression = equivExpression;
+        plot.color = color;
+        return plot;
+    }
+
+    @Override
+    public boolean copyFrom(AbstractPlot other) {
+        if(other instanceof ImplicitPlot p){
+            name = p.name;
+            expression1 = p.expression1;
+            expression2 = p.expression2;
+            equivExpression = p.equivExpression;
+            color = p.color;
+            function = p.function;
+            chunks.clear();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public boolean equals(AbstractPlot plot) {
+        if(plot instanceof ImplicitPlot p){
+            return expression1.trim().equals(p.expression1.trim())&&
+                   expression2.trim().equals(p.expression2.trim())&&
+                   color.equals(p.color)&&
+                   name.equals(p.name);
+        }else return false;
     }
 }

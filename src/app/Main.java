@@ -2,7 +2,6 @@ package app;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import ui.MainWindow;
 
 public class Main extends Application {
 

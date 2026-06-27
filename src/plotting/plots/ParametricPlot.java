@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
-import core.math.Core.Interval;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import math.Interval;
 import plotting.data.ParametricCurveChunk;
 
 public class ParametricPlot extends AbstractPlot implements CartesianPlot{

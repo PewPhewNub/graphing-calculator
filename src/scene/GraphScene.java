@@ -49,4 +49,7 @@ public abstract class GraphScene {
     public ApplicationSettings getSettings() {
         return settings;
     }
+    public void setPlotManager(PlotManager plotManager) {
+        this.plotManager = plotManager;
+    }
 }

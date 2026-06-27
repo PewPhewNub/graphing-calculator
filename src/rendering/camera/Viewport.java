@@ -97,4 +97,14 @@ public class Viewport {
         ViewportState state = new ViewportState(this);
         return state;
     }
+
+    public Viewport copy(){
+        Viewport viewport = new Viewport(width, height);
+        viewport.cameraX = cameraX;
+        viewport.cameraY = cameraY;
+        viewport.zoom = zoom;
+        viewport.scaleX = scaleX;
+        viewport.scaleY = scaleY;
+        return viewport;
+    }
 }

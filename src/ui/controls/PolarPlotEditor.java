@@ -6,7 +6,6 @@ import interaction.commands.EditPlotCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import plotting.PlotManager;
-import plotting.plots.ParametricPlot;
 import plotting.plots.PlotGenerator;
 import plotting.plots.PolarPlot;
 import ui.components.EquationInput;
@@ -44,8 +43,11 @@ public class PolarPlotEditor extends AbstractPlotEditor{
     }
 
     private void addHandlers(){
+        super.attachListeners();
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
+                newValue.replace("theta", "\u03b8");
+                box0.setFieldText(newValue);
                 buildPlot();
             }
         );

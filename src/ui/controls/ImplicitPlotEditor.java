@@ -1,118 +1,90 @@
 package ui.controls;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.function.BiFunction;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
+import interaction.commands.EditPlotCommand;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
-import parser.Lexer;
-import parser.Parser;
-import parser.node.DefinitionNode;
 import plotting.PlotManager;
 import plotting.plots.ImplicitPlot;
-import ui.components.CloseButton;
+import plotting.plots.PlotGenerator;
 import ui.components.ColorChooser;
 import ui.components.EquationInput;
 
 public class ImplicitPlotEditor extends AbstractPlotEditor{
 
-    public ColorChooser colorChooser;
-    public BorderPane topPanel;
-
-   private EquationInput box0;
+    private EquationInput box0;
 
     public String dependent = "y";
     public String independent = "x";
 
-    public ImplicitPlotEditor(PlotManager plotManager){
+    public ImplicitPlotEditor(PlotManager plotManager, ImplicitPlot plot){
+        updatingFields = true;
         this.plotManager = plotManager;
+        initialize();
+        this.plot = plot;
+        colorChooser.setSelectedColor(plot.getColor());
 
-        setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(5),
-                new Insets(2)
-            )
-        ));
+        box0.setLabelText("");
+        box0.setFieldText(plot.expression1.trim() + " = " + plot.expression2.trim());
+        nameLabel.setText(plot.getName());
 
-        setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGREY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(15),
-                new BorderWidths(2)
-            )
-        ));
-        
-        colorChooser = new ColorChooser(Color.RED);
-        colorChooser.setAlignment(Pos.CENTER_RIGHT);
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            try {
-                buildPlot();
-            } catch (Exception e1) {
-                System.out.println(e1.getMessage());
-            }
-        });
+        attachListeners();
+        updatingFields = false;
+    }
 
+    @Override
+    protected void initialize() {
+        super.initialize();
         box0 = new EquationInput("", 14, "y = x");
+        this.getChildren().add(box0);
+    }
+
+    @Override
+    protected void attachListeners() {
+        super.attachListeners();
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
                 buildPlot();
             }
         );
-   
-        this.getChildren().add(box0);
-
-        topPanel = new BorderPane();
-        getChildren().add(0, topPanel);
-        topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("Implicit Plot"){
-            {
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        CloseButton button = new CloseButton();
-        button.setOnMouseClicked(e -> close());
-        topPanel.setRight(button);
-
-        buildPlot();
     }
 
+
     @Override
-    public void buildPlot() {
+    protected void buildPlot(){
         String text = box0.getText();
-        
-        Lexer lexer = new Lexer(text);
-        Map<String, Double> map = new HashMap<>();
-        try {
-            lexer.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent,
-                        Set.of(independent)
-                    );
-            plotManager.removePlot(plot);
-            plot = new ImplicitPlot(dependent, 
-                (x, y) -> {
-                    map.put(independent, x);
-                    map.put(dependent, y);
-                    return node.evaluate(map);
-                }, colorChooser.getSelectedColor());       
-            plotManager.addPlot(plot);
-        }catch(Exception e1){
-            System.out.println(e1.getMessage());
+        ImplicitPlot before = (ImplicitPlot)plot.copy();
+        BiFunction<Double, Double, Double> f = 
+            PlotGenerator.generateBiFunction(text);
+        if(f == null){
+            return;
         }
+        int index = text.indexOf((int)('='));
+        System.out.println(index);
+        if(index == -1) return;
+        String exp1 = text.substring(0, index).trim();
+        String exp2 = text.substring(index + 1).trim();
+
+        ImplicitPlot after = new ImplicitPlot(nameLabel.getText(), exp1, exp2, f, colorChooser.getSelectedColor());
+        if(before.equals(after)) return;
+        undoManager.execute(
+            new EditPlotCommand(
+                plot, 
+                before,
+                after,
+                plotManager
+            )
+        );
+    }
+
+    public void updateFields(){   
+        updatingFields = true;
+        ImplicitPlot fPlot = (ImplicitPlot)plot;
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box0.setFieldText(fPlot.expression1 + " = " + fPlot.expression2);
+        
+        nameLabel.setText(plot.getName());
+        updatingFields = false;
     }
 }

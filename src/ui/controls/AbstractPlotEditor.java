@@ -35,7 +35,7 @@ public abstract class AbstractPlotEditor extends VBox {
     }
 
     public void close(){    
-        undoManager.execute(new RemovePlotCommand(plot, plotManager));
+        this.undoManager.execute(new RemovePlotCommand(plot, plotManager));
     }
 
     public void setUndoManager(final UndoManager undoManager) {

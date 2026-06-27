@@ -1,9 +1,8 @@
 package plotting.data;
 
-import core.math.Core.Interval;
-import core.math.Core.Point;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
+import math.Interval;
 
 public class ParametricCurveChunk {
     public BoundingBox bounds;

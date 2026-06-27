@@ -37,7 +37,7 @@ public class MainWindow implements SettingsListener{
         this.windowManager = windowManager;
         this.settingsManager = settingsManager;
         settingsManager.addListener(this);
-        this.fileActions = new FileActions(stage, tabPane);
+        this.fileActions = new FileActions(stage, tabPane,this);
         this.stage = stage;
         
         initializeMenus();
@@ -46,6 +46,7 @@ public class MainWindow implements SettingsListener{
         tabPane.setMinSize(0, 100);
 
         addGraphScene("New Graph");
+        undoManager.clearStacks();
 
         tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
             if(tabPane.getTabs().isEmpty()){
@@ -113,10 +114,21 @@ public class MainWindow implements SettingsListener{
             tabPane.getSelectionModel().getSelectedIndex(), 
             graphTab, 
             tabPane));
-        System.out.println("yes");
         if(tabPane.getTabs().isEmpty()){
             close();
         }
+    }
+    public void addGraphScene(GraphTab graphTab){
+        graphTab.setOnCloseRequest(e -> {
+            e.consume();
+            removeGraphScene();
+            return;
+        });
+        graphTab.setUndoManager(undoManager);
+        undoManager.execute(new AddGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex() + 1,
+            graphTab, 
+            tabPane));
     }
 
     @Override

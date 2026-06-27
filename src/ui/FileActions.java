@@ -11,14 +11,40 @@ import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import persistence.ProjectIO;
+import rendering.exporting.ImageExporter;
 
 public class FileActions {
     private final Stage stage;
     private final TabPane tabPane;
+    private final MainWindow mainWindow;
 
-    public FileActions(Stage stage, TabPane tabPane){
+    public FileActions(Stage stage, TabPane tabPane, MainWindow mainWindow){
         this.stage = stage;
         this.tabPane = tabPane;
+        this.mainWindow = mainWindow;
+    }
+
+    public void exportFile(GraphTab tab, double width, double height){
+        FileChooser chooser = new FileChooser();
+
+        FileChooser.ExtensionFilter png = 
+            new FileChooser.ExtensionFilter(
+                "PNG Image (*.png)",
+                 "*.png"
+                );
+                chooser.getExtensionFilters().add(png);
+        File file = chooser.showSaveDialog(stage);
+        FileChooser.ExtensionFilter selected = chooser.getSelectedExtensionFilter();
+        if (selected == png && !file.getName().endsWith(".png")) {
+            file = new File(file.getAbsolutePath() + ".png");
+        }
+        if(file == null) return;
+        
+        try {
+            ImageExporter.exportPNG(tab, file, height, width);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void saveAs(GraphTab tab){
@@ -32,6 +58,7 @@ public class FileActions {
         File file = chooser.showSaveDialog(stage);
         if(file == null) return;
         tab.setProjectFile(file);
+        tab.setDirty(false);
         save(tab);
     }
 
@@ -42,6 +69,7 @@ public class FileActions {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            tab.setDirty(false);
         }else{
             saveAs(tab);
         }
@@ -61,8 +89,9 @@ public class FileActions {
         try {
             GraphTab tab = ProjectIO.load(file);
             if(tab != null){
-                tabPane.getTabs().add(tab);
+                mainWindow.addGraphScene(tab);
                 tabPane.getSelectionModel().select(tab);
+                tab.setDirty(false);
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -3,10 +3,12 @@ package persistence;
 import java.util.ArrayList;
 
 import persistence.plotdata.FunctionPlotData;
+import persistence.plotdata.ImplicitPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PolarPlotData;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
+import plotting.plots.ImplicitPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
@@ -65,6 +67,15 @@ public final class Serializer {
                 plotData.color = p.getColor().toString();
                 plotData.minParameter = p.tMin;
                 plotData.maxParameter = p.tMax;
+
+                data.plots.add(plotData);
+            }
+            if(plot instanceof ImplicitPlot p){
+                ImplicitPlotData plotData = new ImplicitPlotData();
+                plotData.expression1 = p.expression1;
+                plotData.expression2 = p.expression2;
+                plotData.name = p.getName();
+                plotData.color = p.getColor().toString();
 
                 data.plots.add(plotData);
             }

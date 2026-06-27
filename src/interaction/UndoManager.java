@@ -2,7 +2,6 @@ package interaction;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.DelayQueue;
 
 import interaction.commands.Command;
 
@@ -44,5 +43,9 @@ public class UndoManager {
     
     public boolean canRedo(){
         return !redoStack.isEmpty();
+    }
+    public void clearStacks(){
+        redoStack.clear();
+        undoStack.clear();
     }
 }

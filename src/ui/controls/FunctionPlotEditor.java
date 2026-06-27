@@ -116,7 +116,7 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
             )
         );
     }
-
+    @Override
     public void updateFields(){   
         updatingFields = true;
         FunctionPlot fPlot = (FunctionPlot)plot;    

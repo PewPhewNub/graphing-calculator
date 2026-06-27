@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import core.math.Core.ODESolution;
-import core.math.Core.ODEStatus;
-import core.math.Core.Point;
-import core.math.ODESolvers.SystemSolvers;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import math.ODESolution;
+import math.ODESolving;
+import math.ODEStatus;
+import math.Point;
 import plotting.data.ODECurveChunk;
 import plotting.data.Segment2D;
 
@@ -116,9 +116,8 @@ public class VectorFieldPlot extends AbstractPlot {
 
     private void extendRight(double targetT) {
         Point last = rightPoints.get(rightPoints.size() - 1);
-        int prevEnd = rightPoints.size() - 1;
 
-        ODESolution sol = SystemSolvers.RK4(
+        ODESolution sol = ODESolving.RK4(
             dx, dy, t0, new Point(last.x, last.y), 0.01, targetT);
         if (sol.list() == null) return;
         List<Point> pts = sol.list();
@@ -130,9 +129,8 @@ public class VectorFieldPlot extends AbstractPlot {
 
     private void extendLeft(double targetT) {
         Point last = leftPoints.get(leftPoints.size() - 1);
-        int prevEnd = leftPoints.size() - 1;
 
-        ODESolution sol = SystemSolvers.RK4(
+        ODESolution sol = ODESolving.RK4(
             dx, dy, t0, new Point(last.x, last.y), -0.01, targetT);
         if (sol.list() == null) return;
         List<Point> pts = sol.list();
@@ -174,5 +172,29 @@ public class VectorFieldPlot extends AbstractPlot {
 
     public void setShowSlopeField(boolean showSlopeField) {
         this.showSlopeField = showSlopeField;
+    }
+
+    @Override
+    public AbstractPlot copy() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'copy'");
+    }
+
+    @Override
+    public boolean copyFrom(AbstractPlot other) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'copyFrom'");
+    }
+
+    @Override
+    public void update() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public boolean equals(AbstractPlot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'equals'");
     }
 }

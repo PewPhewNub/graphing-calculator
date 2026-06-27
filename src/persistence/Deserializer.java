@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import javafx.scene.paint.Color;
 import persistence.plotdata.FunctionPlotData;
+import persistence.plotdata.ImplicitPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PlotData;
 import persistence.plotdata.PolarPlotData;
 import plotting.PlotManager;
 import plotting.plots.FunctionPlot;
+import plotting.plots.ImplicitPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
@@ -45,6 +47,10 @@ public final class Deserializer {
             }
             if(data instanceof PolarPlotData d){
                 PolarPlot plot = new PolarPlot(d.name, d.expression, d.minParameter, d.maxParameter, Color.web(d.color));
+                plotManager.addPlot(plot);
+            }
+            if(data instanceof ImplicitPlotData d){
+                ImplicitPlot plot = new ImplicitPlot(d.name, d.expression1, d.expression2, Color.web(d.color));
                 plotManager.addPlot(plot);
             }
         }

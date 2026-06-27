@@ -26,15 +26,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import plotting.PlotListener;
 import plotting.PlotManager;
-import plotting.plots.FunctionPlot;
-import plotting.plots.ParametricPlot;
 import plotting.plots.AbstractPlot;
+import plotting.plots.FunctionPlot;
+import plotting.plots.ImplicitPlot;
+import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import scene.GraphScene;
 import settings.ThemeColors;
-import ui.controls.FunctionPlotEditor;
-import ui.controls.ParametricPlotEditor;
 import ui.controls.AbstractPlotEditor;
+import ui.controls.FunctionPlotEditor;
+import ui.controls.ImplicitPlotEditor;
+import ui.controls.ParametricPlotEditor;
 import ui.controls.PolarPlotEditor;
 public class UIPanel extends BorderPane implements PlotListener, Themeable{
     GraphScene graphScene;
@@ -122,14 +124,20 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             );
         });
 
-        MenuItem implicitItem = new MenuItem("Implicit");
+        MenuItem implicitItem = new MenuItem("Implicit (EXPERIMENTAL)");
+        implicitItem.setOnAction(e ->{
+            this.undoManager.execute(
+                new AddPlotCommand(
+                    new ImplicitPlot(),
+                    this.plotManager)
+            );
+        });
         
 
         addPlotButton.getItems().addAll(
             functionItem,
             parametricItem,
             polarItem,
-            odeItem,
             implicitItem
         );
         addPlotButton.setBorder(new Border(
@@ -271,7 +279,6 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     }
     @Override
     public void plotAdded(AbstractPlot plot) {
-        System.out.println(System.identityHashCode(plot));
         PlotManager plotManager = graphScene.getPlotManager();
         if(plot instanceof FunctionPlot p) {
             AbstractPlotEditor editor = new FunctionPlotEditor(
@@ -309,11 +316,21 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             editors.put(p, editor);
             return;
         }
+        if(plot instanceof ImplicitPlot p) {
+            AbstractPlotEditor editor = new ImplicitPlotEditor(
+                    plotManager,
+                    p
+                );
+            plotEditorPane.getChildren().add(
+                editor
+            );
+            editor.setUndoManager(undoManager);
+            editors.put(p, editor);
+            return;
+        }
     }
     @Override
     public void plotRemoved(AbstractPlot plot) { 
-        System.out.println(System.identityHashCode(plot));
-        System.out.println(editors.containsKey(plot));
         AbstractPlotEditor editor = editors.get(plot);
         if(editor != null){
             plotEditorPane.getChildren().remove(editor);
@@ -328,8 +345,6 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     public void plotChanged(AbstractPlot plot) {
         AbstractPlotEditor editor = editors.get(plot);
         editor.updateFields();
-        
-    System.out.println(editor);
     }
 
     public void setUndoManager(UndoManager undoManager) {
@@ -338,9 +353,6 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             editor.setUndoManager(undoManager);
             
         }
-    }
-    public void addPlot(AbstractPlot plot){
-        
     }
     @Override
     public void applyTheme(Node node, ThemeColors colors) {

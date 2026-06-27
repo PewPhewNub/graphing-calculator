@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import core.math.Core.Point;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import math.Point;
 import parser.Lexer;
 import parser.Parser;
 import parser.node.DefinitionNode;
@@ -39,9 +39,6 @@ import plotting.plots.ODEPlot;
 import ui.components.ColorChooser;
 
 public class ODEPlotEditor extends AbstractPlotEditor{
-
-    public ColorChooser colorChooser;
-    public BorderPane topPanel;
 
     public String inputFunction;
     public HBox functionInputPanel;

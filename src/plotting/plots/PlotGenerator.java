@@ -3,6 +3,7 @@ package plotting.plots;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javafx.scene.paint.Color;
@@ -99,4 +100,37 @@ public class PlotGenerator {
         }
         return null;
     }
+
+    public static ImplicitPlot generateImplicitPlot(String name, String expression1, String expression2, Color color){
+        String equivExpression = "(" +  expression2 + ") - (" + expression1 + ")";
+        
+        ImplicitPlot plot = new ImplicitPlot(name,
+            expression1,
+            expression2,
+            generateBiFunction(equivExpression),
+            color);
+        return plot;
+    }
+
+    public static BiFunction<Double, Double, Double> generateBiFunction(String expression){
+        Lexer lexer = new Lexer(expression);
+        Map<String, Double> map = new HashMap<>();
+        try {
+            lexer.tokenize();
+            Parser parser = new Parser(lexer.tokenList);
+            DefinitionNode node = parser.parseDefinition(
+                        "y",
+                        Set.of("x")
+                    );
+            return (x, y) -> {
+                    map.put("x", x);
+                    map.put("y", y);
+                    return node.evaluate(map);
+            };
+        }catch(Exception e1){
+            
+        }
+        return null;
+    }
+
 }

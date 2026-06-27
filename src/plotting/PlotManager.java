@@ -28,12 +28,10 @@ public class PlotManager{
         for(PlotListener listener : listeners){
             listener.plotsChanged();
             listener.plotAdded(plot);
-            System.out.println("yes");
         }
         markUnsaved();
     }
     public void removePlot(AbstractPlot plot){
-        System.out.println("removePlot called");
         plots.remove(plot);
         for(PlotListener listener : listeners){
             listener.plotsChanged();
@@ -67,7 +65,6 @@ public class PlotManager{
         for(PlotListener listener : listeners){
             listener.plotsChanged();
             listener.plotAdded(plot);
-            System.out.println("yes");
         }
         markUnsaved();
     }

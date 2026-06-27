@@ -15,6 +15,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import rendering.camera.CameraIntent;
+import rendering.exporting.ImageExporter;
 import settings.ApplicationSettings;
 
 public class GraphMenuBar extends MenuBar{
@@ -68,6 +69,18 @@ public class GraphMenuBar extends MenuBar{
             fileActions.saveAs((GraphTab)(tabPane.getSelectionModel().getSelectedItem()));
         });
         saveAsGraph.setAccelerator(KeyCombination.keyCombination("CTRL + A"));
+        file.getItems().add(new SeparatorMenuItem());
+        MenuItem exportGraph = new MenuItem("Export PNG");
+        file.getItems().add(exportGraph);
+        exportGraph.setOnAction(e -> {
+            fileActions.exportFile(
+                (GraphTab)(tabPane.getSelectionModel().getSelectedItem()), 
+                1200, 
+                900
+            );
+        });
+        exportGraph.setAccelerator(KeyCombination.keyCombination("CTRL + P"));
+        
         file.getItems().add(new SeparatorMenuItem());
         MenuItem closeGraph = new MenuItem("Close Graph");
         file.getItems().add(closeGraph);

@@ -3,14 +3,14 @@ package plotting;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import core.math.Core.Calculus;
-import core.math.Core.Interval;
-import core.math.Core.Point;
-import core.math.Core.RootSolution;
-import core.math.Core.SolverStatus;
-import core.math.RootFindingAlgorithms.HybridSolvers;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
+import math.Calculus;
+import math.Interval;
+import math.Point;
+import math.RootFinding;
+import math.RootSolution;
+import math.SolverStatus;
 import plotting.data.ImplicitChunk;
 import plotting.data.ODECurveChunk;
 import plotting.data.ParametricCurveChunk;
@@ -43,7 +43,7 @@ public class PlotComputationEngine {
             double i2 = i * stepSize + state.left;
             double current = function.apply(i2);
             if(prev * current <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(function, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(function, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(solution.root(), 0));
                 } 
@@ -65,13 +65,13 @@ public class PlotComputationEngine {
             double currentX = x.apply(t);
             double currentY = y.apply(t);
             if(prevX * currentX <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
             if(prevY * currentY <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
@@ -93,13 +93,13 @@ public class PlotComputationEngine {
             double currentX = x.apply(t);
             double currentY = y.apply(t);
             if(prevX * currentX <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(x, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
             if(prevY * currentY <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(y, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
@@ -120,7 +120,7 @@ public class PlotComputationEngine {
             double i2 = i * stepSize + state.left;
             double current = function.apply(i2);
             if(prev * current < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(function, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(function, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(
                         new Intersection(
@@ -149,13 +149,16 @@ public class PlotComputationEngine {
         for (double t = plot2.tMin + stepSize; t <= plot2.tMax; t += stepSize) {
             double current = function.apply(t);
             if(prev * current < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(function, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(function, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
+                    double tRoot = solution.root();
+                    double xRoot = x.apply(tRoot);
+                    double yRoot = y.apply(tRoot);
                     list.add(
                         new Intersection(
                             new Point2D(
-                                solution.root(), 
-                                plot1.getFunction().apply(solution.root())
+                                xRoot, 
+                                yRoot
                             ),
                         plot1,
                         plot2)
@@ -178,13 +181,16 @@ public class PlotComputationEngine {
         for (double t = plot2.tMin + stepSize; t <= plot2.tMax; t += stepSize) {
             double current = function.apply(t);
             if(prev * current < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(function, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(function, new Interval(t - stepSize, t), t - stepSize/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
+                    double tRoot = solution.root();
+                    double xRoot = x.apply(tRoot);
+                    double yRoot = y.apply(tRoot);
                     list.add(
                         new Intersection(
                             new Point2D(
-                                solution.root(), 
-                                plot1.getFunction().apply(solution.root())
+                                xRoot, 
+                                yRoot
                             ),
                         plot1,
                         plot2)
@@ -207,7 +213,7 @@ public class PlotComputationEngine {
             double i2 = i * stepSize + state.left;
             double current = derivative.apply(i2);
             if(prev * current < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(derivative, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(derivative, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(solution.root(), function.apply(solution.root())));
                 } 
@@ -234,13 +240,13 @@ public class PlotComputationEngine {
             double currentX = dx.apply(i2);
             double currentY = dy.apply(i2);
             if(prevX * currentX < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(dx, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(dx, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
             if(prevY * currentY < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(dy, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(dy, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
@@ -268,13 +274,13 @@ public class PlotComputationEngine {
             double currentX = dx.apply(i2);
             double currentY = dy.apply(i2);
             if(prevX * currentX < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(dx, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(dx, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
             }
             if(prevY * currentY < 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(dy, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(dy, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(x.apply(solution.root()), y.apply(solution.root())));
                 } 
@@ -367,7 +373,7 @@ public class PlotComputationEngine {
                     : new Interval(midX, x2);
 
                 RootSolution solution =
-                    HybridSolvers.findRootHybrid2(
+                    RootFinding.findRootHybrid2(
                         boundary,
                         interval,
                         midX,
@@ -395,7 +401,7 @@ public class PlotComputationEngine {
                     : new Interval(midX, x2);
 
                 RootSolution solution =
-                    HybridSolvers.findRootHybrid2(
+                    RootFinding.findRootHybrid2(
                         boundary,
                         interval,
                         midX,
@@ -957,7 +963,7 @@ public class PlotComputationEngine {
             double i2 = i * stepSizeX + state.left;
             double current = yConst.apply(i2);
             if(prevX * current <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(yConst, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(yConst, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(0 , solution.root()));
                 } 
@@ -973,7 +979,7 @@ public class PlotComputationEngine {
             double i2 = i * stepSizeY + state.bottom;
             double current = yConst.apply(i2);
             if(prevY * current <= 0){
-                RootSolution solution = HybridSolvers.findRootHybrid2(xConst, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
+                RootSolution solution = RootFinding.findRootHybrid2(xConst, new Interval(i1, i2), i1 + (i2 - i1)/2, 1e-10, 1000);
                 if(solution.status() == SolverStatus.SUCCESS){
                     list.add(new Point2D(solution.root(), 0));
                 } 
