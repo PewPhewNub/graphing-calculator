@@ -21,7 +21,7 @@ public class Viewport {
         this.width = width; this.height = height;
         cameraX = 0;
         cameraY = 0;
-        zoom = 90;
+        zoom = 100;
         scaleX = 1; scaleY = 1;
     }
 

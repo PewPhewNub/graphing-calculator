@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import scene.FunctionGraphScene;
 import scene.GraphScene;
 import settings.ApplicationSettings;
-import ui.GraphTab;
+import ui.shell.GraphTab;
 
 public final class ProjectIO {
     private static final ObjectMapper MAPPER = new ObjectMapper();

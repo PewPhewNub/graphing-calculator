@@ -1,4 +1,4 @@
-package ui;
+package ui.shell;
 
 import app.WindowManager;
 import interaction.UndoManager;

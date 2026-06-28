@@ -12,13 +12,15 @@ public class AddPlotCommand implements Command{
         this.plotManager = plotManager;
     }
 
-    @Override
+     @Override
     public void execute() {
-        plotManager.addPlot(index, plot);
+        plotManager.addPlot(plot);
     }
 
     @Override
     public void undo() {
+        index = plotManager.plots.indexOf(plot);
         plotManager.removePlot(plot);
     }
 }
+

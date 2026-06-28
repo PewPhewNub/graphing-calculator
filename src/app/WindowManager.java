@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javafx.stage.Stage;
 import settings.SettingsManager;
-import ui.MainWindow;
+import ui.shell.MainWindow;
 
 public class WindowManager {
     ArrayList<MainWindow> windows;

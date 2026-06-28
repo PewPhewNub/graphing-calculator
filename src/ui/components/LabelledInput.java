@@ -27,7 +27,7 @@ public class LabelledInput extends VBox{
         label.setPadding(new Insets(2, 5, 0, 5));
         
         label.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
+            Color.TRANSPARENT,
             new CornerRadii(2),
             new Insets(2)
         )));
@@ -53,7 +53,7 @@ public class LabelledInput extends VBox{
         setMargin(textField, new Insets(5));
 
         setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
+            Color.TRANSPARENT,
             new CornerRadii(5),
             new Insets(2)
         )));

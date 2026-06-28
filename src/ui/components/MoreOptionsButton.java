@@ -30,7 +30,7 @@ public class MoreOptionsButton extends Button{
         setBackground(
                 new Background(
                     new BackgroundFill(
-                        Color.WHITE,
+                        Color.TRANSPARENT,
                         new CornerRadii(0, 0, 0, 15, false),
                         new Insets(0)
                     )

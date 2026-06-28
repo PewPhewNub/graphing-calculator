@@ -1,4 +1,4 @@
-package ui;
+package interaction;
 
 import java.util.HashSet;
 
@@ -7,7 +7,9 @@ import rendering.camera.CameraSystem;
 
 public class InputController {
     public double mouseX = 0; 
-    public double mouseY = 0;;
+    public double mouseY = 0;
+    public double worldX = 0;
+    public double worldY = 0;
     public double pressedX = 0; 
     public double pressedY = 0;
     public double pressedWorldX;

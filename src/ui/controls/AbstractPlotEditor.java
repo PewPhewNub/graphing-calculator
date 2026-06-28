@@ -44,7 +44,7 @@ public abstract class AbstractPlotEditor extends VBox {
     protected void initialize(){
         setBackground(new Background(
             new BackgroundFill(
-                Color.WHITE,
+                Color.rgb(250, 250, 250),
                 new CornerRadii(5),
                 new Insets(2)
             )
@@ -92,5 +92,48 @@ public abstract class AbstractPlotEditor extends VBox {
                 return;
             buildPlot();
         });
+
+        setOnMouseClicked(e -> {
+            System.out.println("Clicked " + plot.getClass().getSimpleName());
+            plotManager.setSelectedPlot(plot);
+        });
+    }
+
+    public void setSelected(boolean selected){
+        if(selected){
+            setBackground(new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(5),
+                    new Insets(2)
+                )
+            ));
+
+            setBorder(new Border(
+                new BorderStroke(
+                    Color.CYAN,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(15),
+                    new BorderWidths(2)
+                )
+            ));
+        }else{
+            setBackground(new Background(
+                new BackgroundFill(
+                    Color.rgb(250, 250, 250),
+                    new CornerRadii(5),
+                    new Insets(2)
+                )
+            ));
+
+            setBorder(new Border(
+                new BorderStroke(
+                    Color.LIGHTGREY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(15),
+                    new BorderWidths(2)
+                )
+            ));
+        }
     }
 }

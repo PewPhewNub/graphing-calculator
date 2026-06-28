@@ -1,5 +1,6 @@
-package ui;
+package ui.shell;
 
+import java.util.ArrayList;
 import java.util.Timer;
 
 import app.GraphApplication;
@@ -33,9 +34,7 @@ public class MainWindow implements SettingsListener{
     Scene scene;
     MenuBar menuBar;
 
-    private static final long FIXED_STEP = 16_666_667L; // 60 Hz
-    private long previous = 0;
-    private long accumulator = 0;
+    private AnimationTimer timer;
 
     public MainWindow(Stage stage, GraphApplication app, WindowManager windowManager, SettingsManager settingsManager){
         this.app = app;
@@ -46,6 +45,11 @@ public class MainWindow implements SettingsListener{
         settingsManager.addListener(this);
         this.fileActions = new FileActions(stage, tabPane,this);
         this.stage = stage;
+        stage.setOnCloseRequest(e -> {
+            e.consume();
+            removeAll();
+            stage.close();
+        });
         
         initializeMenus();
         
@@ -77,13 +81,15 @@ public class MainWindow implements SettingsListener{
         stage.setMinHeight(300);
         stage.show();
 
-        new AnimationTimer() {
+        timer = new AnimationTimer() {
             private static final long FIXED_STEP = 16_666_667L; // 60 Hz
             private long previous = 0;
             private long accumulator = 0;
             @Override
             public void handle(long now) {
-                GraphScene current = ((GraphTab)(tabPane.getSelectionModel().getSelectedItem())).getGraphScene();
+                GraphTab tab = (GraphTab)(tabPane.getSelectionModel().getSelectedItem());
+                if(tab == null) return;
+                GraphScene current = (tab).getGraphScene();
                 if (previous == 0)
                     previous = now;
                 long delta = now - previous;
@@ -96,8 +102,11 @@ public class MainWindow implements SettingsListener{
                 }
                 current.lateUpdate();
                 current.render();
+
+                tab.updateStatusBar();
             }
-        }.start();
+        };
+        timer.start();
     }
 
     public void initializeMenus(){
@@ -131,6 +140,21 @@ public class MainWindow implements SettingsListener{
         if(graphTab.isDirty()){
             if(!fileActions.unsaved(graphTab)) return;
         }
+        graphTab.getGraphScene()
+            .getPlotManager()
+            .close();
+        undoManager.execute(new RemoveGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex(), 
+            graphTab, 
+            tabPane));
+        if(tabPane.getTabs().isEmpty()){
+            close();
+        }
+    }
+    public void removeGraphScene(GraphTab graphTab){
+        if(graphTab.isDirty()){
+            if(!fileActions.unsaved(graphTab)) return;
+        }
         undoManager.execute(new RemoveGraphCommand(
             tabPane.getSelectionModel().getSelectedIndex(), 
             graphTab, 
@@ -150,6 +174,17 @@ public class MainWindow implements SettingsListener{
             tabPane.getSelectionModel().getSelectedIndex() + 1,
             graphTab, 
             tabPane));
+    }
+
+    public void removeAll(){
+        ArrayList<Tab> tabs = new ArrayList<>(tabPane.getTabs());
+
+        for(Tab tab : tabs){
+            ((GraphTab)tab).getGraphScene().getPlotManager().close();
+        }
+        tabPane.getTabs().clear();
+        timer.stop();
+        stage.close();
     }
 
     @Override

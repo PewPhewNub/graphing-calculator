@@ -1,4 +1,4 @@
-package ui;
+package ui.shell;
 
 import javafx.scene.Node;
 import settings.ThemeColors;

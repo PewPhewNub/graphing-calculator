@@ -1,7 +1,7 @@
 package interaction.commands;
 
 import javafx.scene.control.TabPane;
-import ui.GraphTab;
+import ui.shell.GraphTab;
 
 public class AddGraphCommand implements Command{
     GraphTab graph;

@@ -1,11 +1,11 @@
 package rendering.graph;
 
+import interaction.InputController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import rendering.camera.Viewport;
-import ui.InputController;
 
 public class Graph extends Canvas{
     public Viewport viewport;
@@ -31,6 +31,8 @@ public class Graph extends Canvas{
         addEventHandler(MouseEvent.MOUSE_MOVED, e -> {
             input.mouseX = e.getX();
             input.mouseY = e.getY();
+            input.worldX = viewport.screenToWorldX(e.getX());
+            input.worldY = viewport.screenToWorldY(e.getY());
             input.mouseMoved = true;
         });
 
@@ -38,6 +40,8 @@ public class Graph extends Canvas{
         addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
             input.mouseX = e.getX();
             input.mouseY = e.getY();
+            input.worldX = viewport.screenToWorldX(e.getX());
+            input.worldY = viewport.screenToWorldY(e.getY());
             input.mouseDown = true;
         });
 
@@ -51,6 +55,9 @@ public class Graph extends Canvas{
 
             input.mouseX = e.getX();
             input.mouseY = e.getY();
+
+            input.worldX = viewport.screenToWorldX(e.getX());
+            input.worldY = viewport.screenToWorldY(e.getY());
 
             input.mousePressed = true;
             input.mouseDown = true;

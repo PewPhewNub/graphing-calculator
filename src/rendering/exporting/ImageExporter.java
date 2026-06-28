@@ -11,7 +11,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
 import scene.FunctionGraphScene;
 import scene.GraphScene;
-import ui.GraphTab;
+import ui.shell.GraphTab;
 
 public final class ImageExporter {
     private ImageExporter(){}

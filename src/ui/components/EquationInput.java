@@ -37,6 +37,11 @@ public class EquationInput extends VBox{
             new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
             new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
         )));
+        functionInputLabel.setBackground(new Background(new BackgroundFill(
+            Color.WHITE,
+            new CornerRadii(2, 0, 0, 2, false),
+            new Insets(2, 0, 2, 2)
+        )));
         functionInputLabel.setFont(new Font(size));
         functionInputLabel.setTextAlignment(TextAlignment.LEFT);
         functionInputLabel.setPadding(new Insets(5,0,5,15));

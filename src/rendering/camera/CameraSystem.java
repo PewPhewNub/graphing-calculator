@@ -75,7 +75,7 @@ public class CameraSystem {
         targetCameraY = 0;
         targetScaleX = 1;
         targetScaleY = 1;
-        targetZoom = 90;
+        targetZoom = 100;
     }
 
     public void resetAspectRatio(){

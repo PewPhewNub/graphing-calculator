@@ -1,7 +1,8 @@
-package ui;
+package ui.shell;
 
 import java.io.File;
 
+import interaction.InputController;
 import interaction.UndoManager;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -9,12 +10,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import plotting.PlotManager;
+import rendering.camera.Viewport;
 import scene.GraphScene;
 import settings.ApplicationSettings;
 
 public class GraphTab extends Tab{
     private GraphScene scene;
     private GraphToolBar toolBar;
+    private StatusBar statusBar;
     private UIPanel uiPanel;
     private File projectFile;
     private String name;
@@ -44,9 +48,12 @@ public class GraphTab extends Tab{
         scene.getGraph().widthProperty().addListener((obs,o,n) -> scene.render());
         scene.getGraph().heightProperty().addListener((obs,o,n) -> scene.render());
 
+        statusBar = new StatusBar();
+
         VBox graphPane = new VBox();
         graphPane.getChildren().add(toolBar);
         graphPane.getChildren().add(graphHolder);
+        graphPane.getChildren().add(statusBar);
         graphPane.setMinSize(0, 0);
         graphPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
@@ -107,5 +114,17 @@ public class GraphTab extends Tab{
     }
     public ApplicationSettings getSettings() {
         return this.settings;
+    }
+
+    public void updateStatusBar(){
+        InputController input = scene.getGraph().getInput();
+        Viewport viewport = scene.getGraph().viewport;
+        PlotManager plotManager = scene.getPlotManager();
+        statusBar.update(
+            input.worldX, 
+            input.worldY, 
+            viewport.getZoom(),
+            plotManager.getCount()
+        );
     }
 }

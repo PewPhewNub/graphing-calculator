@@ -1,5 +1,6 @@
 package scene;
 
+import interaction.InputController;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -15,7 +16,6 @@ import rendering.core.RenderContext;
 import rendering.core.Renderer;
 import rendering.graph.Graph;
 import settings.ApplicationSettings;
-import ui.InputController;
 
 public class FunctionGraphScene extends GraphScene{
     
@@ -164,7 +164,7 @@ public class FunctionGraphScene extends GraphScene{
             plotManager.computeCurveData(graph.viewport);
         }
         
-        generateGridData(75);
+        generateGridData(80);
         
         updateCursor();
 
@@ -259,6 +259,21 @@ public class FunctionGraphScene extends GraphScene{
     @Override
     public void viewportMoved() {
         viewportMoved = true;
+    }
+
+    @Override
+    public void selectedPlotChanged(AbstractPlot plot) {
+        return;
+    }
+
+    @Override
+    public void plotReordered(AbstractPlot plot1, AbstractPlot plot2) {
+        return;
+    }
+    @Override
+    public void plotReordered(int index1, int index2) {
+        // TODO Auto-generated method stub
+        
     }
 }
     
