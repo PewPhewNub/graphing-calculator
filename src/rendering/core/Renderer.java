@@ -69,7 +69,7 @@ public class Renderer {
     }
     public void clearCanvas(){
         context.getGc().setFill(Color.WHITE);
-        context.getGc().fillRect(0, 0, context.getViewport().width, context.getViewport().height);
+        context.getGc().fillRect(0, 0, context.getViewport().getWidth(), context.getViewport().getHeight());
     }
     public void drawGridlines(GridData data){
         gridRenderer.drawGridlines(context, data, gridLinesColor);

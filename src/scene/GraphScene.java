@@ -3,16 +3,18 @@ package scene;
 import java.util.ArrayList;
 
 import plotting.PlotInteractionController;
+import plotting.PlotListener;
 import plotting.PlotManager;
 import plotting.data.GridData;
 import plotting.plots.AbstractPlot;
 import rendering.camera.CameraSystem;
+import rendering.camera.ViewportListener;
 import rendering.core.RenderContext;
 import rendering.core.Renderer;
 import rendering.graph.Graph;
 import settings.ApplicationSettings;
 
-public abstract class GraphScene {
+public abstract class GraphScene implements PlotListener, ViewportListener{
     protected Graph graph;
     protected PlotManager plotManager;
     protected CameraSystem cameraSystem;
@@ -22,8 +24,13 @@ public abstract class GraphScene {
     protected RenderContext context;
     protected ApplicationSettings settings;
 
+    protected boolean viewportMoved = true;
+    protected boolean plotsChanged = true;
+
     public abstract void render();
     public abstract void update();
+    public abstract void fixedUpdate();
+    public abstract void lateUpdate();
     public abstract void generateGridData(double roughPixels);
     public GridData gridData(){
         return gridData;

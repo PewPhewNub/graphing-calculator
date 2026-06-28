@@ -25,8 +25,8 @@ public final class Deserializer {
     }
 
     public static void setViewport(ViewportData viewportData, Viewport viewport){
-        viewport.cameraX = viewportData.centerX;
-        viewport.cameraY = viewportData.centerY;
+        viewport.setCameraX(viewportData.centerX);
+        viewport.setCameraY(viewportData.centerY);
         viewport.setScaleX(viewportData.scaleX);
         viewport.setScaleY(viewportData.scaleY);
         viewport.setZoom(viewportData.zoom);

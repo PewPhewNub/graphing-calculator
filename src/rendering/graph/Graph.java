@@ -83,11 +83,11 @@ public class Graph extends Canvas{
         });
 
         widthProperty().addListener((obs, oldV, newV) -> {
-            viewport.width = newV.doubleValue();
+            viewport.setWidth(newV.doubleValue());
         });
 
         heightProperty().addListener((obs, oldV, newV) -> {
-            viewport.height = newV.doubleValue();
+            viewport.setHeight(newV.doubleValue());
         });
     }
 

@@ -10,8 +10,8 @@ public class AxisRenderer {
         context.getGc().setStroke(axesColor);
         context.getGc().setLineWidth(2);
         context.getGc().setLineDashes(0);
-        context.getGc().strokeLine(0, context.getViewport().worldToScreenY(0), context.getViewport().width, context.getViewport().worldToScreenY(0));
-        context.getGc().strokeLine(context.getViewport().worldToScreenX(0), 0, context.getViewport().worldToScreenX(0), context.getViewport().height);
+        context.getGc().strokeLine(0, context.getViewport().worldToScreenY(0), context.getViewport().getWidth(), context.getViewport().worldToScreenY(0));
+        context.getGc().strokeLine(context.getViewport().worldToScreenX(0), 0, context.getViewport().worldToScreenX(0), context.getViewport().getHeight());
     }
 
     public void drawAxesTicks(RenderContext context, GridData data, Color axesColor){
@@ -46,7 +46,7 @@ public class AxisRenderer {
             if(Math.abs(x) < 1e-7) continue;
             if(exponent >= 0) value = Integer.toString((int)x); 
             else value = String.format(formatter, x);
-            if(context.getState().xAxisOnTop && drawOffScreen) context.getGc().fillText(value, context.getViewport().worldToScreenX(x), context.getViewport().height - 10);
+            if(context.getState().xAxisOnTop && drawOffScreen) context.getGc().fillText(value, context.getViewport().worldToScreenX(x), context.getViewport().getHeight() - 10);
             else if(context.getState().xAxisOnBottom && drawOffScreen) context.getGc().fillText(value, context.getViewport().worldToScreenX(x), 20);
             else context.getGc().fillText(value, context.getViewport().worldToScreenX(x), context.getViewport().worldToScreenY(0) + 20);
         }
@@ -62,7 +62,7 @@ public class AxisRenderer {
             if(Math.abs(y) < 1e-7) continue;
             if(exponent >= 0) value = Integer.toString((int)y); 
             else value = String.format(formatter, y);
-            if(context.getState().yAxisOnLeft && drawOffScreen)context.getGc().fillText(value, context.getViewport().width - 10, context.getViewport().worldToScreenY(y) + 5);
+            if(context.getState().yAxisOnLeft && drawOffScreen)context.getGc().fillText(value, context.getViewport().getWidth() - 10, context.getViewport().worldToScreenY(y) + 5);
             else if(context.getState().yAxisOnRight && drawOffScreen) context.getGc().fillText(value, 10, context.getViewport().worldToScreenY(y) + 5);
             else context.getGc().fillText(value, context.getViewport().worldToScreenX(0) - 17, context.getViewport().worldToScreenY(y) + 5);
         }

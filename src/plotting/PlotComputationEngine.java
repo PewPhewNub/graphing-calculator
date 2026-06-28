@@ -426,7 +426,7 @@ public class PlotComputationEngine {
 
     private static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
-        double samples = (int)(viewport.width);
+        double samples = (int)(viewport.getWidth());
         double stepX = (state.right - state.left)/samples;
         double toleranceY = Math.abs(
                 viewport.screenToWorldY(1)

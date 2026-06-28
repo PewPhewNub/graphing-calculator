@@ -57,11 +57,11 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
         if(function == null) return Double.POSITIVE_INFINITY;
         double minDist2 = Double.POSITIVE_INFINITY;
         double worldMinX = viewport.screenToWorldX(0);
-        double worldMaxX = viewport.screenToWorldX(viewport.width);
+        double worldMaxX = viewport.screenToWorldX(viewport.getWidth());
         double mouseX = viewport.worldToScreenX(x0);
         double mouseY = viewport.worldToScreenY(y0);
 
-        int samples = (int)viewport.width; // 1 sample per pixel (good UX baseline)
+        int samples = (int)viewport.getWidth(); // 1 sample per pixel (good UX baseline)
         
         for (int i = 0; i < samples; i++) {
 

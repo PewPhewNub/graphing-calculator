@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Timer;
+
 import app.GraphApplication;
 import app.WindowManager;
 import interaction.UndoManager;
@@ -15,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import scene.FunctionGraphScene;
+import scene.GraphScene;
 import settings.SettingsListener;
 import settings.SettingsManager;
 import settings.Theme;
@@ -29,6 +32,10 @@ public class MainWindow implements SettingsListener{
     private UndoManager undoManager;
     Scene scene;
     MenuBar menuBar;
+
+    private static final long FIXED_STEP = 16_666_667L; // 60 Hz
+    private long previous = 0;
+    private long accumulator = 0;
 
     public MainWindow(Stage stage, GraphApplication app, WindowManager windowManager, SettingsManager settingsManager){
         this.app = app;
@@ -71,11 +78,24 @@ public class MainWindow implements SettingsListener{
         stage.show();
 
         new AnimationTimer() {
-            public void handle(long arg0){
-                if(tabPane.getTabs().isEmpty()) return;
-                GraphTab tab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
-                tab.getGraphScene().update();
-                tab.getGraphScene().render();
+            private static final long FIXED_STEP = 16_666_667L; // 60 Hz
+            private long previous = 0;
+            private long accumulator = 0;
+            @Override
+            public void handle(long now) {
+                GraphScene current = ((GraphTab)(tabPane.getSelectionModel().getSelectedItem())).getGraphScene();
+                if (previous == 0)
+                    previous = now;
+                long delta = now - previous;
+                previous = now;
+                accumulator += delta;
+                current.update();
+                while (accumulator >= FIXED_STEP) {
+                    current.fixedUpdate();
+                    accumulator -= FIXED_STEP;
+                }
+                current.lateUpdate();
+                current.render();
             }
         }.start();
     }
@@ -96,6 +116,7 @@ public class MainWindow implements SettingsListener{
 
         graphTab.setOnCloseRequest(e -> {
             e.consume();
+            graphTab.getGraphScene().getPlotManager().close();
             removeGraphScene();
             return;
         });

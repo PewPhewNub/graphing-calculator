@@ -1,16 +1,21 @@
 package rendering.camera;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.geometry.Point2D;
 
 public class Viewport {
-    public double cameraX;
-    public double cameraY;
+    private double cameraX;
+    private double cameraY;
     private double zoom = 90;
 
-    public double width;
-    public double height;
+    private double width;
+    private double height;
 
-    public double scaleX; public double scaleY;
+    private double scaleX; private double scaleY;
+
+    private final List<ViewportListener> listeners = new ArrayList<>();
 
     public Viewport(double width, double height){
         this.width = width; this.height = height;
@@ -38,9 +43,12 @@ public class Viewport {
         return zoom;
     }
     public void setZoom(double zoom) {
+        if (Math.abs(zoom - this.zoom) < 1e-6)
+            return;
         this.zoom = zoom;
         if(zoom > 1e8) this.zoom = 0.99999e8;
         if(zoom < 1e-6) this.zoom = 1.00001e-6;
+        notifyListeners();
     }
     
     public double getViewportCenterX(){
@@ -72,9 +80,14 @@ public class Viewport {
 
     }
     public void setScaleX(double scaleX) {
+        if (Math.abs(scaleX - this.scaleX) < 1e-6)
+            return;
         this.scaleX = scaleX;
+        notifyListeners();
     }
     public void setScaleY(double scaleY) {
+        if (Math.abs(scaleY - this.scaleY) < 1e-6)
+            return;
         this.scaleY = scaleY;
     }
 
@@ -106,5 +119,65 @@ public class Viewport {
         viewport.scaleX = scaleX;
         viewport.scaleY = scaleY;
         return viewport;
+    }
+
+    public void addListener(ViewportListener listener){
+        listeners.add(listener);
+    }
+
+    public void removeListener(ViewportListener listener){
+        listeners.add(listener);
+    }
+
+    public void notifyListeners(){
+        for(ViewportListener listener : listeners){
+            listener.viewportMoved();   
+        }
+    }
+
+    public void setCameraX(double cameraX) {
+        if (Math.abs(cameraX - this.cameraX) < 1e-6)
+            return;
+        this.cameraX = cameraX;
+        notifyListeners();
+    }
+    public void setCameraY(double cameraY) {
+        if (Math.abs(cameraY - this.cameraY) < 1e-6)
+            return;
+        this.cameraY = cameraY;
+        notifyListeners();
+    }
+    public void setHeight(double height) {
+        if (Math.abs(height - this.height) < 1e-6)
+            return;
+        this.height = height;
+        notifyListeners();
+    }
+    public void setWidth(double width) {
+        if (Math.abs(width - this.width) < 1e-6)
+            return;
+        this.width = width;
+        notifyListeners();
+    }
+    public double getCameraX() {
+        return cameraX;
+    }
+    public double getCameraY() {
+        return cameraY;
+    }
+    public double getHeight() {
+        return height;
+    }
+    public List<ViewportListener> getListeners() {
+        return listeners;
+    }
+    public double getScaleX() {
+        return scaleX;
+    }
+    public double getScaleY() {
+        return scaleY;
+    }
+    public double getWidth() {
+        return width;
     }
 }

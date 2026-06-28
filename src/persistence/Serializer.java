@@ -26,13 +26,13 @@ public final class Serializer {
         return data;
     }
     public static void serializeViewportData(ProjectData data, Viewport viewport){
-        data.viewport.centerX = viewport.cameraX;
-        data.viewport.centerY = viewport.cameraY;
+        data.viewport.centerX = viewport.getCameraX();
+        data.viewport.centerY = viewport.getCameraY();
         data.viewport.zoom = viewport.getZoom();
-        data.viewport.scaleX = viewport.scaleX;
-        data.viewport.scaleY = viewport.scaleY;
-        data.viewport.height = viewport.height;
-        data.viewport.width = viewport.width;
+        data.viewport.scaleX = viewport.getScaleX();
+        data.viewport.scaleY = viewport.getScaleY();
+        data.viewport.height = viewport.getHeight();
+        data.viewport.width = viewport.getWidth();
     }
 
     public static void serializePlotData(ProjectData data, PlotManager plotManager){

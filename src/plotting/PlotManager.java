@@ -1,6 +1,10 @@
 package plotting;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import plotting.data.curve.CurveData;
 import plotting.data.curve.Intersection;
@@ -14,6 +18,8 @@ public class PlotManager{
     public PlotInteractionController interactionController;
     public ArrayList<PlotListener> listeners;
     private Runnable dirtyCallback;
+
+    private ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public PlotManager(PlotInteractionController plotInteractionController){
         plots = new ArrayList<>();
@@ -40,13 +46,6 @@ public class PlotManager{
         markUnsaved();
     }
     public void computeCurveData(Viewport viewport){
-        curveCache.clear();
-        for(AbstractPlot plot : plots){
-            curveCache.add(
-                PlotComputationEngine.computeCurveData(plot, viewport)
-            );
-        }
-        
         intersectionCache.clear();
         for(int i = 0; i < plots.size(); i++){
             AbstractPlot plot1 = plots.get(i);
@@ -54,6 +53,24 @@ public class PlotManager{
                 intersectionCache.addAll(PlotComputationEngine.computeIntersections(plot1, plots.get(j), viewport));
             }
         }
+
+        ArrayList<CurveData> newCurveCache = new ArrayList<>();
+
+        ArrayList<Future<CurveData>> futures = new ArrayList<>();
+        for(AbstractPlot plot : plots){
+            futures.add(pool.submit(
+                () -> PlotComputationEngine.computeCurveData(plot, viewport)
+            ));
+        }
+        for(Future<CurveData> future : futures){
+            try {
+                newCurveCache.add(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        curveCache = newCurveCache;
     }
 
     public void removeAll(){
@@ -77,6 +94,7 @@ public class PlotManager{
     public void plotChanged(AbstractPlot plot){
         for(PlotListener listener : listeners){
             listener.plotChanged(plot);
+            listener.plotsChanged();
         }
         markUnsaved();
     }
@@ -88,5 +106,9 @@ public class PlotManager{
         if(dirtyCallback!= null){
             dirtyCallback.run();
         }
+    }
+
+    public void close(){
+        pool.shutdown();
     }
 }

@@ -34,6 +34,9 @@ public class FunctionGraphScene extends GraphScene{
         currentMode = CurrentMode.NONE;
         gridData = new GridData();
         unsaved = false;
+
+        graph.viewport.addListener(this);
+        plotManager.addListener(this);
     }
 
     @Override
@@ -66,8 +69,8 @@ public class FunctionGraphScene extends GraphScene{
         gridData.stepX = gridlinesSpacing[0];
         gridData.stepY = gridlinesSpacing[1];
         double floorLeft = viewport.screenToWorldX(0); 
-        double floorRight = viewport.screenToWorldX(viewport.width);
-        double floorBottom = viewport.screenToWorldY(viewport.height);
+        double floorRight = viewport.screenToWorldX(viewport.getWidth());
+        double floorBottom = viewport.screenToWorldY(viewport.getHeight());
         double floorTop = viewport.screenToWorldY(0);
         for (double x = Math.floor(floorLeft / gridData.stepX) * gridData.stepX; x < floorRight; x += gridData.stepX) {
             for (double y = Math.floor(floorBottom / gridData.stepY)* gridData.stepY; y < floorTop; y += gridData.stepY) {
@@ -140,21 +143,35 @@ public class FunctionGraphScene extends GraphScene{
     }
 
     public void update(){
-        graph.viewport.width = graph.getWidth();
-        graph.viewport.height = graph.getHeight();
+        graph.viewport.setWidth(graph.getWidth());
+        graph.viewport.setHeight(graph.getHeight());
         context.reload();
         InputController input = graph.getInput();
         input.update();
 
         handleCamera();     // apply camera changes
-        plotManager.computeCurveData(graph.viewport);
         updateMode();       // decide what user is doing
         handleInteraction();// apply plot interaction
-        generateGridData(75);
-        updateCursor();
         input.clearFrameEvents();
     }
 
+    public void fixedUpdate(){
+        return;
+    }
+
+    public void lateUpdate(){
+        if(plotsChanged || viewportMoved){
+            plotManager.computeCurveData(graph.viewport);
+        }
+        
+        generateGridData(75);
+        
+        updateCursor();
+
+        plotsChanged = false;
+        viewportMoved = false;
+    }
+    
     private void handleInteraction(){
         InputController input = graph.getInput();
         double worldX = graph.viewport.screenToWorldX(input.mouseX);
@@ -217,6 +234,31 @@ public class FunctionGraphScene extends GraphScene{
     }
     public boolean isUnsaved() {
         return unsaved;
+    }
+
+    @Override
+    public void plotAdded(AbstractPlot plot) {
+        return;
+    }
+
+    @Override
+    public void plotRemoved(AbstractPlot plot) {
+        return;
+    }
+
+    @Override
+    public void plotChanged(AbstractPlot plot) {
+        return;
+    }
+    
+    @Override
+    public void plotsChanged() {
+        plotsChanged = true;
+    }
+
+    @Override
+    public void viewportMoved() {
+        viewportMoved = true;
     }
 }
     

@@ -60,7 +60,6 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
             return;
         }
         int index = text.indexOf((int)('='));
-        System.out.println(index);
         if(index == -1) return;
         String exp1 = text.substring(0, index).trim();
         String exp2 = text.substring(index + 1).trim();

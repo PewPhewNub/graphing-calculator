@@ -15,13 +15,13 @@ public class CameraSystem {
         this.viewport = viewport;
         smoothMovements = true;
 
-        targetCameraX = viewport.cameraX;
-        targetCameraY = viewport.cameraY;
+        targetCameraX = viewport.getCameraX();
+        targetCameraY = viewport.getCameraY();
 
         targetZoom = viewport.getZoom();
 
-        targetScaleX = viewport.scaleX;
-        targetScaleY = viewport.scaleY;
+        targetScaleX = viewport.getScaleX();
+        targetScaleY = viewport.getScaleY();
         lastTime = System.nanoTime();
     }
 
@@ -65,8 +65,8 @@ public class CameraSystem {
         smoothMovements = enabled;
 
         if(!enabled){
-            targetCameraX = viewport.cameraX;
-            targetCameraY = viewport.cameraY;
+            targetCameraX = viewport.getCameraX();
+            targetCameraY = viewport.getCameraY();
             targetZoom = viewport.getZoom();
         }
     }
@@ -95,19 +95,17 @@ public class CameraSystem {
 
         double factor = 1 - Math.exp(-60 * dt);
         if(!smoothMovements){
-            viewport.cameraX = targetCameraX;
-            viewport.cameraY = targetCameraY;
+            viewport.setCameraX(targetCameraX);
+            viewport.setCameraY(targetCameraY);
             viewport.setZoom(targetZoom);
 
             viewport.setScaleX(targetScaleX);
             viewport.setScaleY(targetScaleY);
             return;
         }
-        viewport.cameraX +=
-            (targetCameraX - viewport.cameraX) * .87;
+        viewport.setCameraX(viewport.getCameraX() + (targetCameraX - viewport.getCameraX()) * .87);
 
-        viewport.cameraY +=
-            (targetCameraY - viewport.cameraY) * .87;
+        viewport.setCameraY(viewport.getCameraY() + (targetCameraY - viewport.getCameraY()) * .87);
 
         double currentLog = Math.log(viewport.getZoom());
         double targetLog = Math.log(targetZoom);
@@ -117,20 +115,20 @@ public class CameraSystem {
         viewport.setZoom(Math.exp(currentLog));
 
         viewport.setScaleX(
-            viewport.scaleX +
-            (targetScaleX - viewport.scaleX) * 0.15
+            viewport.getScaleX() +
+            (targetScaleX - viewport.getScaleX()) * 0.15
         );
 
         viewport.setScaleY(
-            viewport.scaleY +
-            (targetScaleY - viewport.scaleY) * 0.15
+            viewport.getScaleY() +
+            (targetScaleY - viewport.getScaleY()) * 0.15
         );
 
-        if(Math.abs(targetCameraX - viewport.cameraX) < 0.001 &&
-        Math.abs(targetCameraY - viewport.cameraY) < 0.001){
+        if(Math.abs(targetCameraX - viewport.getCameraX()) < 0.001 &&
+        Math.abs(targetCameraY - viewport.getCameraY()) < 0.001){
             
-            viewport.cameraX = targetCameraX;
-            viewport.cameraY = targetCameraY;
+            viewport.setCameraX(targetCameraX);
+            viewport.setCameraY(targetCameraY);
         }
 
     }

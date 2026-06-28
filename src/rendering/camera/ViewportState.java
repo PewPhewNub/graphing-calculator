@@ -15,18 +15,18 @@ public class ViewportState {
     public double marginX, marginY;
 
     public ViewportState(Viewport viewport){
-        viewportHeight = viewport.height;
-        viewportWidth = viewport.width;
+        viewportHeight = viewport.getHeight();
+        viewportWidth = viewport.getWidth();
         left = viewport.screenToWorldX(0); 
-        right = viewport.screenToWorldX(viewport.width);
-        bottom = viewport.screenToWorldY(viewport.height);
+        right = viewport.screenToWorldX(viewportWidth);
+        bottom = viewport.screenToWorldY(viewportHeight);
         top = viewport.screenToWorldY(0);
         axisX = viewport.worldToScreenX(0); 
         axisY  = viewport.worldToScreenY(0);
         xAxisOnBottom = viewport.worldToScreenY(0) < 0; 
-        xAxisOnTop = viewport.worldToScreenY(0) > viewport.height - 30;
+        xAxisOnTop = viewport.worldToScreenY(0) > viewportHeight - 30;
         yAxisOnRight = viewport.worldToScreenX(0) < 45;
-        yAxisOnLeft = viewport.worldToScreenX(0) > viewport.width + 7;
+        yAxisOnLeft = viewport.worldToScreenX(0) > viewportWidth + 7;
         
         worldHeight = top - bottom;
         worldWidth = right - left;
