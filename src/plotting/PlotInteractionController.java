@@ -8,7 +8,7 @@ import plotting.data.curve.Intersection;
 import plotting.plots.AbstractPlot;
 import rendering.camera.Viewport;
 
-public abstract class PlotInteractionController {
+public abstract class PlotInteractionController implements PlotListener{
 
     protected AbstractPlot hoveredPlot;
     protected AbstractPlot selectedPlot;
@@ -25,10 +25,12 @@ public abstract class PlotInteractionController {
 
     protected ArrayList<CurveData> curveData;
     protected ArrayList<Intersection> intersections;
+    protected PlotManager plotManager;
 
-    public void setCaches(ArrayList<CurveData> curveData, ArrayList<Intersection> intersections){
-        this.curveData = curveData;
-        this.intersections = intersections;
+    public void setCaches(PlotManager plotManager){
+        this.plotManager = plotManager;
+        this.curveData = plotManager.curveCache;
+        this.intersections = plotManager.intersectionCache;
     }
 
     public abstract void update(

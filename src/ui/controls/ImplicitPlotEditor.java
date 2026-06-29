@@ -3,11 +3,9 @@ package ui.controls;
 import java.util.function.BiFunction;
 
 import interaction.commands.EditPlotCommand;
-import javafx.scene.layout.BorderPane;
 import plotting.PlotManager;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.PlotGenerator;
-import ui.components.ColorChooser;
 import ui.components.EquationInput;
 
 public class ImplicitPlotEditor extends AbstractPlotEditor{

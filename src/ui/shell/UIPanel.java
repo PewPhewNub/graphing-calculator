@@ -18,8 +18,9 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -29,7 +30,6 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -42,6 +42,7 @@ import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import scene.GraphScene;
 import settings.ThemeColors;
+import ui.components.ToolTip;
 import ui.controls.AbstractPlotEditor;
 import ui.controls.FunctionPlotEditor;
 import ui.controls.ImplicitPlotEditor;
@@ -99,6 +100,8 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 )
             )
         );
+        ToolTip showTip = new ToolTip("Show Sidebar");
+        ToolTip hideTip = new ToolTip("Hide Sidebar");
         
         showButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -106,6 +109,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 isVisible = !isVisible;
                 if(isVisible) expand(); else collapse();
             }
+        });
+        showButton.setTooltip(hideTip);
+        showButton.setOnMouseEntered(e -> {
+            if(isVisible) showButton.setTooltip(hideTip);
+            else showButton.setTooltip(showTip);
         });
         showButton.setPrefSize(50, 50);
         showButton.setMaxSize(50, 50);
@@ -115,7 +123,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         initializePlotButtons();
         initializeControlButtons();
 
-        plotPane.setPadding(new Insets(5, 0, 5, 0));
+        plotPane.setPadding(new Insets(5, 5, 5, 5));
 
         controlPane.setPadding(new Insets(0));
         controlPane.setMinHeight(45);
@@ -133,8 +141,21 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         plotPane.setTop(controlPane);
 
         plotEditorPane = new VBox();
-        plotEditorPane.setPadding(new Insets(5, 0, 0, 0));
-        plotPane.setCenter(plotEditorPane);
+        plotEditorPane.setFocusTraversable(false);
+        ScrollPane yes = new ScrollPane(plotEditorPane);
+        yes.setFocusTraversable(false);
+        yes.setHbarPolicy(ScrollBarPolicy.NEVER);
+        yes.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        yes.setFitToWidth(true);
+        yes.setFitToHeight(false);
+        yes.setStyle("""
+            -fx-focus-color: transparent;
+            -fx-faint-focus-color: transparent;
+            -fx-background-color: transparent;
+            -fx-border-color: transparent;
+            -fx-background-color : #FEFEFE;
+        """);
+        plotPane.setCenter(yes);
         
         plotPane.setBorder(
             new Border(
@@ -328,7 +349,15 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         for(AbstractPlotEditor editor : editors.values()){
             editor.setSelected(false);
         }
-        if(plot == null) return;
+        if(plot == null){
+            for(Node i : controlPane.getChildren()){
+                ((Button)i).setDisable(true);
+            }
+            return;
+        }
+        for(Node i : controlPane.getChildren()){
+            ((Button)i).setDisable(false);
+        }
         AbstractPlotEditor editor = editors.get(plot);
         if(editor == null) return;
         editor.setSelected(true);
@@ -348,6 +377,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
 
     public void initializePlotButtons(){
         addPlotButton = new Button("\u2795");
+        addPlotButton.setTooltip(new ToolTip("Add plot"));
 
         MenuItem functionItem = new MenuItem("Explicit");
         functionItem.setOnAction(e ->{
@@ -425,6 +455,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
 
     void initializeControlButtons(){
         Button moveUpButton = new Button("\u2191");
+        moveUpButton.setTooltip(new ToolTip("Move selected up"));
         moveUpButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index <= 0) return;
@@ -462,6 +493,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         );
 
         Button moveDownButton = new Button("\u2193");
+        moveDownButton.setTooltip(new ToolTip("Move selected down"));
         moveDownButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index >= plotManager.getCount() - 1) return;
@@ -499,6 +531,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         );
 
         Button moveTopButton = new Button("\u21A5");
+        moveTopButton.setTooltip(new ToolTip("Send selected to top"));
         moveTopButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index <= 0) return;
@@ -535,6 +568,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         );
 
         Button moveBottomButton = new Button("\u21A7");
+        moveBottomButton.setTooltip(new ToolTip("Send selected to bottom"));
         moveBottomButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index >= plotManager.getCount() - 1) return;
@@ -571,6 +605,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         );
 
         Button duplicateButton = new Button("\u2398");
+        duplicateButton.setTooltip(new ToolTip("Duplicate selected"));
         duplicateButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index < 0) return;
@@ -614,6 +649,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         uhSpaceTaker.setManaged(true);
 
         Button closeButton = new Button("\u274c");
+        closeButton.setTooltip(new ToolTip("Close selected"));
         closeButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index < 0) return;

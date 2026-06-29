@@ -15,8 +15,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import rendering.camera.CameraIntent;
-import rendering.exporting.ImageExporter;
-import settings.ApplicationSettings;
 
 public class GraphMenuBar extends MenuBar{
 
@@ -24,6 +22,7 @@ public class GraphMenuBar extends MenuBar{
     Menu view;
     Menu edit;
     Menu plot;
+    Menu help;
 
     public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions, UndoManager undoManager){
         setBackground(new Background(
@@ -37,6 +36,7 @@ public class GraphMenuBar extends MenuBar{
         getMenus().add(new Menu("Plot"));
         populateViewMenu(tabPane);
         populateEditMenu(undoManager);
+        populateHelpMenu();
     }
     public void populateFileMenu(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions){
         file = new Menu("File");
@@ -69,15 +69,13 @@ public class GraphMenuBar extends MenuBar{
         saveAsGraph.setOnAction(e -> {
             fileActions.saveAs((GraphTab)(tabPane.getSelectionModel().getSelectedItem()));
         });
-        saveAsGraph.setAccelerator(KeyCombination.keyCombination("CTRL + A"));
+        saveAsGraph.setAccelerator(KeyCombination.keyCombination("CTRL + SHIFT + S"));
         file.getItems().add(new SeparatorMenuItem());
         MenuItem exportGraph = new MenuItem("Export PNG");
         file.getItems().add(exportGraph);
         exportGraph.setOnAction(e -> {
-            fileActions.exportFile(
-                (GraphTab)(tabPane.getSelectionModel().getSelectedItem()), 
-                1200, 
-                900
+            fileActions.exportImage(
+                (GraphTab)(tabPane.getSelectionModel().getSelectedItem())
             );
         });
         exportGraph.setAccelerator(KeyCombination.keyCombination("CTRL + P"));
@@ -203,5 +201,20 @@ public class GraphMenuBar extends MenuBar{
         redo.setAccelerator(KeyCombination.keyCombination("CTRL + Y"));
 
         getMenus().add(edit);
+    }
+
+    public void populateHelpMenu(){
+        help = new Menu("Help");
+
+        MenuItem about = new MenuItem("About");
+        About aboutAlert = new About();
+
+        about.setOnAction(e -> {
+            aboutAlert.showAndWait();
+        });
+
+        help.getItems().add(about);
+
+        getMenus().add(help);
     }
 }

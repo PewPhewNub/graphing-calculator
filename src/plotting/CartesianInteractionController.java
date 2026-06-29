@@ -10,12 +10,14 @@ import plotting.data.curve.ImplicitCurveData;
 import plotting.data.curve.Intersection;
 import plotting.data.curve.ParametricCurveData;
 import plotting.data.curve.PolarCurveData;
+import plotting.plots.AbstractPlot;
 import rendering.camera.Viewport;
 
 public class CartesianInteractionController extends PlotInteractionController{
 
     @Override
     public void update(Viewport viewport, double mouseX, double mouseY) {
+        if(Double.isNaN(mouseY) || Double.isNaN(mouseX)) return;
         updateHover(curveData, mouseX, mouseY, viewport);
 
         updateSelection(mouseX, mouseY, intersections, viewport);
@@ -63,6 +65,8 @@ public class CartesianInteractionController extends PlotInteractionController{
     }
 
     public void selectHovered(ArrayList<Intersection> intersections, Viewport viewport){
+        plotManager.setSelectedPlot(hoveredPlot);
+        
         if(hoveredPlot == null) return;
 
         selectedPlot = hoveredPlot;
@@ -85,13 +89,13 @@ public class CartesianInteractionController extends PlotInteractionController{
 
         selectedCurve = curve;
         if(selectedCurve instanceof FunctionCurveData f){
-                selectedPoint = applySnapping(
-                    f.targettedPoint(mouseX, mouseY),
-                    selectedCurve,
-                    intersections,
-                    viewport
-                );
-            }
+            selectedPoint = applySnapping(
+                f.targettedPoint(mouseX, mouseY),
+                selectedCurve,
+                intersections,
+                viewport
+            );
+        }
         if(selectedCurve instanceof ParametricCurveData f){
             selectedPoint = applySnapping(
                 f.targettedPoint(mouseX, mouseY),
@@ -165,6 +169,7 @@ public class CartesianInteractionController extends PlotInteractionController{
 
     public void clearSelection(){
         selectedPlot = null;
+        plotManager.setSelectedPlot(null);
         selectedCurve = null;
         selectedPoint = null;
     }
@@ -175,4 +180,52 @@ public class CartesianInteractionController extends PlotInteractionController{
         hoveredCurve = null;
         hoveredPoint = null;
     }
+
+    @Override
+    public void plotAdded(AbstractPlot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotAdded'");
+    }
+
+    @Override
+    public void plotRemoved(AbstractPlot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotRemoved'");
+    }
+
+    @Override
+    public void plotsChanged() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotsChanged'");
+    }
+
+    @Override
+    public void plotChanged(AbstractPlot plot) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotChanged'");
+    }
+
+    @Override
+    public void selectedPlotChanged(AbstractPlot plot) {
+        selectedPlot = plot;
+    }
+
+    @Override
+    public void plotReordered(AbstractPlot plot1, AbstractPlot plot2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotReordered'");
+    }
+
+    @Override
+    public void plotReordered(int index1, int index2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotReordered'");
+    }
+
+    @Override
+    public void plotMovedTo(AbstractPlot plot, int index) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plotMovedTo'");
+    }
+    
 }

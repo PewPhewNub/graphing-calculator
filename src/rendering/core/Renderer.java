@@ -23,6 +23,7 @@ public class Renderer {
     private final GridRenderer gridRenderer = new GridRenderer();
     private final OverlayRenderer overlayRenderer = new OverlayRenderer();
     Color axesColor; Color gridLinesColor; Color labelColor;
+    Color backgroundColor = Color.WHITE;
     public Renderer(RenderContext context, RendererSettings rendererSettings){
         this.axesColor = Color.BLACK;
         this.gridLinesColor = Color.BLACK;
@@ -77,8 +78,11 @@ public class Renderer {
         axesRenderer.drawAxesTicks(context, gridData, axesColor);
     }
     public void clearCanvas(){
-        context.getGc().setFill(Color.WHITE);
-        context.getGc().fillRect(0, 0, context.getViewport().getWidth(), context.getViewport().getHeight());
+        context.getGc().clearRect(0, 0, context.getViewport().getWidth(), context.getViewport().getHeight());
+        if(!backgroundColor.equals(Color.TRANSPARENT)){
+            context.getGc().setFill(backgroundColor);
+            context.getGc().fillRect(0, 0, context.getViewport().getWidth(), context.getViewport().getHeight());
+        }
     }
     public void drawGridlines(GridData data){
         gridRenderer.drawGridlines(context, data, gridLinesColor);
@@ -100,5 +104,9 @@ public class Renderer {
     }
     public void drawArrowScreen(Point2D worldStart, double angle, Color color, double lengthPx) {
         overlayRenderer.drawArrowScreen(context, worldStart, angle, color, lengthPx);
+    }
+    public void setBackgroundColor(Color clearColor) {
+        this.backgroundColor = clearColor;
+        clearCanvas();
     }
 }

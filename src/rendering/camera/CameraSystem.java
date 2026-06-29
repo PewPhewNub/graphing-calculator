@@ -89,11 +89,6 @@ public class CameraSystem {
     }
 
     public void update(){
-        long now = System.nanoTime();
-        double dt = (now - lastTime) / 1e9;
-        lastTime = now;
-
-        double factor = 1 - Math.exp(-60 * dt);
         if(!smoothMovements){
             viewport.setCameraX(targetCameraX);
             viewport.setCameraY(targetCameraY);

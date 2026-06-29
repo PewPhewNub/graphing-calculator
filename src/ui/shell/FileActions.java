@@ -11,6 +11,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import persistence.ProjectIO;
+import rendering.exporting.ExportOptions;
 import rendering.exporting.ImageExporter;
 
 public class FileActions {
@@ -24,28 +25,40 @@ public class FileActions {
         this.mainWindow = mainWindow;
     }
 
-    public void exportFile(GraphTab tab, double width, double height){
-        FileChooser chooser = new FileChooser();
+    public void exportImage(GraphTab tab){
+        ExportDialog dialog = new ExportDialog();
+        ExportOptions options = dialog.showAndWait().orElse(null);
+        if(options == null) return;
 
-        FileChooser.ExtensionFilter png = 
+        export(tab, options);
+    }
+
+    public void export(GraphTab tab, ExportOptions options){
+        if(!options.clipboard()){
+            FileChooser chooser = new FileChooser();
+            FileChooser.ExtensionFilter png = 
             new FileChooser.ExtensionFilter(
                 "PNG Image (*.png)",
                  "*.png"
                 );
-                chooser.getExtensionFilters().add(png);
-        File file = chooser.showSaveDialog(stage);
-        FileChooser.ExtensionFilter selected = chooser.getSelectedExtensionFilter();
-        if (selected == png && !file.getName().endsWith(".png")) {
-            file = new File(file.getAbsolutePath() + ".png");
-        }
-        if(file == null) return;
-        
-        try {
-            ImageExporter.exportPNG(tab, file, height, width);
-        } catch (IOException e) {
-            e.printStackTrace();
+            chooser.getExtensionFilters().add(png);
+            File file = chooser.showSaveDialog(stage);
+            FileChooser.ExtensionFilter selected = chooser.getSelectedExtensionFilter();
+            if (selected == png && !file.getName().endsWith(".png")) {
+                file = new File(file.getAbsolutePath() + ".png");
+            }
+            if(file == null) return;
+            
+            try {
+                ImageExporter.exportPNG(tab, file, options.width(), options.height(), options.transparent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            ImageExporter.copyImage(tab, options);
         }
     }
+
 
     public void saveAs(GraphTab tab){
         FileChooser chooser = new FileChooser();

@@ -1,6 +1,7 @@
 package ui.components;
 
 import javafx.geometry.Insets;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -18,6 +19,7 @@ public class CloseButton extends Pane{
         getChildren().addAll(l1, l2);
 
         setPadding(new Insets(5, 5, 0, 0));
-        
+
+        Tooltip.install(this, new ToolTip("Close Editor"));
     }
 }

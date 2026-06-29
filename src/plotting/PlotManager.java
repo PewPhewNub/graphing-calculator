@@ -34,7 +34,7 @@ public class PlotManager{
         curveCache = new ArrayList<>();
         interactionController = plotInteractionController;
         intersectionCache = new ArrayList<>();
-        plotInteractionController.setCaches(curveCache, intersectionCache);
+        plotInteractionController.setCaches(this);
         this.listeners = new ArrayList<>();
     }
     public void addPlot(AbstractPlot plot){
@@ -179,7 +179,7 @@ public class PlotManager{
             System.out.println(i + ": " + plots.get(i));
         }
 
-        for(PlotListener listener : listeners){    System.out.println("PLOT MOVED LISTENER CALLED");
+        for(PlotListener listener : listeners){
             listener.plotMovedTo(plot, index);
         }
 

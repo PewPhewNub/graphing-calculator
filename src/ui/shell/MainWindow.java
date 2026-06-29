@@ -1,7 +1,6 @@
 package ui.shell;
 
 import java.util.ArrayList;
-import java.util.Timer;
 
 import app.GraphApplication;
 import app.WindowManager;
@@ -15,8 +14,10 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import plotting.plots.FunctionPlot;
 import scene.FunctionGraphScene;
 import scene.GraphScene;
 import settings.SettingsListener;
@@ -58,6 +59,9 @@ public class MainWindow implements SettingsListener{
         tabPane.setFocusTraversable(false);
 
         addGraphScene("New Graph");
+        GraphTab tab = (GraphTab)(tabPane.getSelectionModel().getSelectedItem());
+        tab.getGraphScene().getPlotManager().addPlot(new FunctionPlot("New Explicit Plot", "x", Color.RED));
+
         undoManager.clearStacks();
 
         tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {

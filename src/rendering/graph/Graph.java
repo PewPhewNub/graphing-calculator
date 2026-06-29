@@ -1,7 +1,6 @@
 package rendering.graph;
 
 import interaction.InputController;
-import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -108,15 +107,7 @@ public class Graph extends Canvas{
             input.worldX = Double.NaN;
             input.worldY = Double.NaN;
         });
-
-        focusedProperty().addListener((obs, oldVal, newVal) -> {
-    if (!newVal) {
-        Platform.runLater(() -> {
-            System.out.println("Focus owner = " + getScene().getFocusOwner());
-        });
     }
-});
-        }
 
     @Override
     public boolean isResizable() {

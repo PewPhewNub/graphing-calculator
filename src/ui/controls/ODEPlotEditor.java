@@ -339,7 +339,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
     }
 
     @Override
-    public void buildPlot() throws Exception {
+    public void buildPlot(){
         String text = functionInputField.getText();
         
         Lexer lexer = new Lexer(text);
@@ -363,5 +363,11 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         }catch(Exception e1){
             System.out.println(e1.getMessage());
         }
+    }
+
+    @Override
+    public void updateFields() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateFields'");
     }
 }

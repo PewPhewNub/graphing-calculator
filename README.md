@@ -1,7 +1,27 @@
-## Graphing Calculator
+# Graphing Calculator
 
-Welcome to this Graphing Calculator thingy I'm making!
+A desktop graphing calculator built with Java and JavaFX.
 
-## Cool graphs
+## Features
 
-There are cool graphs.
+- Function plots
+- Parametric plots
+- Polar plots
+- Implicit plots
+
+- Expression parsing
+- Zoom and pan
+- Curve inspection
+- Undo / redo
+- Save and open projects
+- Image export
+
+## Implementation
+
+Built from scratch:
+- Lexer and parser
+- Plot model system
+- Adaptive curve rendering
+- Camera/viewport system
+- Custom renderer
+- Command-based undo system

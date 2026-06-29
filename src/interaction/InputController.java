@@ -3,7 +3,6 @@ package interaction;
 import java.util.HashSet;
 
 import javafx.scene.input.KeyCode;
-import rendering.camera.CameraSystem;
 
 public class InputController {
     public double mouseX = 0; 

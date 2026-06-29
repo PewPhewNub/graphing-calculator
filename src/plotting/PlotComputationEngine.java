@@ -21,11 +21,11 @@ import plotting.data.curve.ImplicitCurveData;
 import plotting.data.curve.Intersection;
 import plotting.data.curve.ParametricCurveData;
 import plotting.data.curve.PolarCurveData;
+import plotting.plots.AbstractPlot;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.ODEPlot;
 import plotting.plots.ParametricPlot;
-import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
 import plotting.plots.VectorFieldPlot;
 import rendering.camera.Viewport;
@@ -229,7 +229,6 @@ public class PlotComputationEngine {
         Function<Double, Double> dx = Calculus.derivative(x, 1e-7);
         Function<Double, Double> dy = Calculus.derivative(y, 1e-7);
         double tMin = plot1.tMin;
-        double tMax = plot1.tMax;
         double prevX = dx.apply(tMin);
         double prevY = dy.apply(tMin);
         double stepSize = (plot1.tMax - plot1.tMin) / 2000;
@@ -263,7 +262,6 @@ public class PlotComputationEngine {
         Function<Double, Double> dx = Calculus.derivative(x, 1e-7);
         Function<Double, Double> dy = Calculus.derivative(y, 1e-7);
         double tMin = plot1.tMin;
-        double tMax = plot1.tMax;
         double prevX = dx.apply(tMin);
         double prevY = dy.apply(tMin);
         double stepSize = (plot1.tMax - plot1.tMin) / 2000;

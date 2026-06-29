@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 
-import com.fasterxml.jackson.databind.cfg.ContextAttributes.Impl;
-
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;

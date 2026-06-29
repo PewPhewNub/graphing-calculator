@@ -13,6 +13,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -83,7 +84,9 @@ public class ColorChooser extends StackPane{
         setVisible(true);
         setSelectedColor(color);
 
+
         colorDisplay = new StackPane();
+        Tooltip.install(colorDisplay, new ToolTip("Change color"));
         colorDisplay.setBorder(new Border(
             new BorderStroke(
                 Color.LIGHTGRAY, 
@@ -306,7 +309,7 @@ public class ColorChooser extends StackPane{
 
         advancedPane.getChildren().add(new BorderPane(){
             {
-                redLabel = new Label();
+                redLabel = new Label("255");
                 redLabel.setLabelFor(redSlider);
                 redLabel.setTextFill(Color.RED);
                 redLabel.setMaxWidth(75);
@@ -321,7 +324,7 @@ public class ColorChooser extends StackPane{
         
         advancedPane.getChildren().add(new BorderPane(){
             {
-                greenLabel = new Label();
+                greenLabel = new Label("0");
                 greenLabel.setLabelFor(greenSlider);
                 greenLabel.setTextFill(Color.GREEN);
                 greenLabel.setMaxWidth(75);
@@ -336,7 +339,7 @@ public class ColorChooser extends StackPane{
         
         advancedPane.getChildren().add(new BorderPane(){
             {
-                blueLabel = new Label();
+                blueLabel = new Label("0");
                 blueLabel.setLabelFor(blueSlider);
                 blueLabel.setTextFill(Color.BLUE);
                 blueLabel.setMaxWidth(75);

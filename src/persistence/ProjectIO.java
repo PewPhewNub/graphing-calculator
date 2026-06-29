@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import scene.FunctionGraphScene;
-import scene.GraphScene;
 import settings.ApplicationSettings;
 import ui.shell.GraphTab;
 

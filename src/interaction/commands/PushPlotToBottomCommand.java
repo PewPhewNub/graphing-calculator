@@ -1,7 +1,5 @@
 package interaction.commands;
 
-import java.util.ArrayList;
-
 import plotting.PlotManager;
 import plotting.plots.AbstractPlot;
 

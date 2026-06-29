@@ -97,6 +97,10 @@ public abstract class AbstractPlotEditor extends VBox {
             System.out.println("Clicked " + plot.getClass().getSimpleName());
             plotManager.setSelectedPlot(plot);
         });
+
+        focusedProperty().addListener((obs, oldValue, newValue) -> {
+            if(!newValue) plotManager.setSelectedPlot(null);
+        });
     }
 
     public void setSelected(boolean selected){

@@ -32,6 +32,9 @@ public abstract class GraphScene implements PlotListener, ViewportListener{
     public abstract void fixedUpdate();
     public abstract void lateUpdate();
     public abstract void generateGridData(double roughPixels);
+    public Renderer getRenderer() {
+        return renderer;
+    }
     public GridData gridData(){
         return gridData;
     }

@@ -9,7 +9,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -26,8 +26,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import rendering.camera.CameraIntent;
-import rendering.graph.Graph;
 import scene.GraphScene;
+import ui.components.ToolTip;
 
 public class GraphToolBar extends HBox{
     HBox modeControls;
@@ -48,10 +48,11 @@ public class GraphToolBar extends HBox{
         initializeRenderControls();
         initializeViewControls();
 
-        graphControls.setRight(renderControls);
+        //graphControls.setRight(renderControls);
         graphControls.setCenter(viewControls);
-        graphControls.setLeft(modeControls);
+        //graphControls.setLeft(modeControls);
 
+        graphControls.setPrefHeight(42);
         HBox.setHgrow(graphControls, Priority.ALWAYS);
 
         Border thinBorder = new Border(new BorderStroke(
@@ -70,7 +71,6 @@ public class GraphToolBar extends HBox{
         modeControls = new HBox();
         modeControls.setPadding(new Insets(5, 0, 5, 5));
         modeControls.setPrefHeight(40);
-        graphControls.setLeft(modeControls);
         modeType = new ComboBox<>(); 
         modeType.getItems().addAll(new String[]{"yes", "no"});
         modeType.setBorder(new Border(
@@ -99,7 +99,6 @@ public class GraphToolBar extends HBox{
         renderControls.setPrefWidth(155);
         renderControls.setPadding(new Insets(0, 5, 0, 5));
         renderControls.setAlignment(Pos.CENTER_RIGHT);
-        graphControls.setRight(renderControls);
         Button button = new Button("⚙");
         button.setFont(new Font(15));
         button.setBorder(new Border(
@@ -189,12 +188,81 @@ public class GraphToolBar extends HBox{
         viewControls.setAlignment(Pos.CENTER);
         viewControls.setSpacing(10);
         BorderPane.setAlignment(viewControls, Pos.CENTER);
-        graphControls.setCenter(viewControls);
+        //Go to
+        viewControls.getChildren().add(new HBox(){
+            {
+                setAlignment(Pos.CENTER);
+                Tooltip.install(this, new ToolTip("Go to"));
+                TextField xField = new TextField("0");
+                getChildren().add(xField);
+                
+                getChildren().add(new Label(","){
+                    {
+                        setFont(new Font(16));
+                        setBorder(Border.EMPTY);
+                        setPadding(new Insets(3, 0, 3, 5));
+                    }
+                });
+                TextField yField = new TextField("0");
+                getChildren().add(yField);
+
+                xField.setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                xField.setBorder(Border.EMPTY);
+                xField.setAlignment(Pos.CENTER_RIGHT);
+                xField.setPadding(new Insets(3,0,3,0));
+                xField.setFont(new Font(14));
+                xField.setPrefWidth(30);
+
+                yField.setBackground(new Background(new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(0, 2, 2, 0, false),
+                    new Insets(2, 2, 2, 0)
+                )));
+                yField.setBorder(Border.EMPTY);
+                yField.setAlignment(Pos.CENTER_LEFT);
+                yField.setPadding(new Insets(3,0,3,0));
+                yField.setFont(new Font(14));
+                yField.setPrefWidth(30);
+                
+                setPadding(new Insets(0, 0, 0, 0));
+                setPrefSize(81, 35);
+                setMaxHeight(35);
+                setMinHeight(35);
+                setBorder(new Border(
+                    new BorderStroke(
+                        Color.LIGHTGRAY,
+                        BorderStrokeStyle.SOLID,
+                        new CornerRadii(3),
+                        new BorderWidths(2)
+                    )
+                ));
+                setBackground(new Background(
+                    new BackgroundFill(
+                        Color.WHITE,
+                        new CornerRadii(3),
+                        new Insets(2)
+                    )
+                ));
+
+                setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent e){
+                        scene.getCameraSystem().goTo(Double.parseDouble(xField.getText()), Double.parseDouble(yField.getText()));
+                    }
+                });
+            }
+        });
+        //Zoom in
         viewControls.getChildren().add(new Button(){
             {
                 setText(" \u2795 ");
                 setFont(new Font(15));
                 setPadding(new Insets(0, 0, 0, 0));
+                setTooltip(new ToolTip("Zoom in"));
                 setPrefSize(35, 35);
                 setBorder(new Border(
                     new BorderStroke(
@@ -229,12 +297,14 @@ public class GraphToolBar extends HBox{
                 });
             }
         });
+        //Zoom out
         viewControls.getChildren().add(new Button(){
             {
                 setText(" \u2796 ");
                 setFont(new Font(15));
                 setPadding(new Insets(0, 0, 0, 0));
                 setPrefSize(35, 35);
+                setTooltip(new ToolTip("Zoom out"));
                 setBorder(new Border(
                     new BorderStroke(
                         Color.LIGHTGRAY,
@@ -266,13 +336,14 @@ public class GraphToolBar extends HBox{
                 });
             }
         });
-
+        //Reset viewport
         viewControls.getChildren().add(new Button(){
             {
                 setText(" \u2302 ");
                 setFont(new Font(15));
                 setPadding(new Insets(0, 0, 0, 0));
                 setPrefSize(35, 35);
+                setTooltip(new ToolTip("Reset viewport"));
                 setBorder(new Border(
                     new BorderStroke(
                         Color.LIGHTGRAY,
@@ -299,13 +370,14 @@ public class GraphToolBar extends HBox{
                 });
             }
         });
-
+        //Reset Aspect ratio
         viewControls.getChildren().add(new Button(){
             {
                 setText(" \u21F2 ");
                 setFont(new Font(15));
                 setPadding(new Insets(0, 0, 0, 0));
                 setPrefSize(35, 35);
+                setTooltip(new ToolTip("Reset aspect ratio"));
                 setBorder(new Border(
                     new BorderStroke(
                         Color.LIGHTGRAY,
@@ -328,103 +400,6 @@ public class GraphToolBar extends HBox{
                     @Override
                     public void handle(ActionEvent e){
                         scene.getCameraSystem().resetAspectRatio();
-                    }
-                });
-            }
-        });
-
-        viewControls.getChildren().add(new HBox(){
-            {
-                setAlignment(Pos.CENTER);
-                getChildren().add(new Label("Go to"){
-                    {
-                        setFont(new Font(12));
-                        setPadding(new Insets(5, 10, 5, 0));
-                    }
-                });
-                getChildren().add(new Label("x: "){
-                    {
-                        setFont(new Font(9));
-                        setBorder(new Border(new BorderStroke(
-                            Color.rgb(220, 220, 220),       // A soft, light gray color
-                            BorderStrokeStyle.SOLID,        // Solid line style
-                            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
-                            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
-                        )));
-                        setPadding(new Insets(3, 0, 3, 5));
-                    }
-                });
-                TextField xField = new TextField("0");
-                getChildren().add(xField);
-                
-                getChildren().add(new Label(" y:"){
-                    {
-                        setFont(new Font(9));
-                        setBorder(new Border(new BorderStroke(
-                            Color.rgb(220, 220, 220),       // A soft, light gray color
-                            BorderStrokeStyle.SOLID,        // Solid line style
-                            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
-                            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
-                        )));
-                        setPadding(new Insets(3, 0, 3, 5));
-                    }
-                });
-                TextField yField = new TextField("0");
-                getChildren().add(yField);
-
-                xField.setBackground(new Background(new BackgroundFill(
-                    Color.WHITE,
-                    new CornerRadii(0, 2, 2, 0, false),
-                    new Insets(2, 2, 2, 0)
-                )));
-                xField.setBorder(new Border(new BorderStroke(
-                    Color.rgb(220, 220, 220),       // A soft, light gray color
-                    BorderStrokeStyle.SOLID,        // Solid line style
-                    new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
-                    new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
-                )));
-                xField.setPadding(new Insets(3,0,3,0));
-                xField.setFont(new Font(9));
-                xField.setPrefWidth(30);
-
-                yField.setBackground(new Background(new BackgroundFill(
-                    Color.WHITE,
-                    new CornerRadii(0, 2, 2, 0, false),
-                    new Insets(2, 2, 2, 0)
-                )));
-                yField.setBorder(new Border(new BorderStroke(
-                    Color.rgb(220, 220, 220),       // A soft, light gray color
-                    BorderStrokeStyle.SOLID,        // Solid line style
-                    new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
-                    new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
-                )));
-                yField.setPadding(new Insets(3,0,3,0));
-                yField.setFont(new Font(9));
-                yField.setPrefWidth(30);
-                
-                setPadding(new Insets(0, 0, 0, 0));
-                setPrefSize(170, 35);
-                setMaxHeight(35);
-                setBorder(new Border(
-                    new BorderStroke(
-                        Color.LIGHTGRAY,
-                        BorderStrokeStyle.SOLID,
-                        new CornerRadii(3),
-                        new BorderWidths(2)
-                    )
-                ));
-                setBackground(new Background(
-                    new BackgroundFill(
-                        Color.WHITE,
-                        new CornerRadii(3),
-                        new Insets(2)
-                    )
-                ));
-
-                setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent e){
-                        scene.getCameraSystem().goTo(Double.parseDouble(xField.getText()), Double.parseDouble(yField.getText()));
                     }
                 });
             }

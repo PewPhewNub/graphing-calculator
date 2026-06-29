@@ -4,12 +4,17 @@ import java.io.File;
 
 import interaction.InputController;
 import interaction.UndoManager;
+import javafx.geometry.Insets;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import plotting.PlotManager;
 import rendering.camera.Viewport;
 import scene.GraphScene;
@@ -40,6 +45,16 @@ public class GraphTab extends Tab{
         graphHolder.getChildren().add(scene.getGraph());
         graphHolder.setMinSize(0, 0);
         graphHolder.setMaxWidth(Double.MAX_VALUE);
+
+        graphHolder.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    CornerRadii.EMPTY,
+                    Insets.EMPTY
+                )
+            )
+        );
         VBox.setVgrow(graphHolder, Priority.ALWAYS);
         HBox.setHgrow(graphHolder, Priority.ALWAYS);
 
