@@ -19,8 +19,8 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     public String expression2;
     public String equivExpression;
     public final double CHUNK_SIZE = 16;
-    private final double BASE_SIZE = 16;
-    private final int maxCellsPerSide = 128;
+    private final double BASE_SIZE = .125;
+    private final int maxCellsPerSide = 4096;
     
     public ImplicitPlot(String name, String expression1, String expression2, BiFunction<Double, Double, Double> function, Color color){
         this.name = name;

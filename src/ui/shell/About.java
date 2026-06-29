@@ -7,7 +7,7 @@ public class About extends Alert{
         super(AlertType.INFORMATION);
 
         setTitle("About");
-        setHeaderText("PLACEHOLDER");
+        setHeaderText("Graphing Calculator");
         setContentText("""
         Version 1.0
 
@@ -21,7 +21,7 @@ public class About extends Alert{
 
         Designed and implemented from scratch in Java and JavaFX
 
-        © 2026 PERSON
+        © 2026 PewPhewNub
         """);
     }
 }
