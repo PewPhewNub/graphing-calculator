@@ -174,7 +174,6 @@ public class ColorChooser extends StackPane{
             circle.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent e){
-                    circle.requestFocus();
                     setSelectedColor(i);
                 }
             });

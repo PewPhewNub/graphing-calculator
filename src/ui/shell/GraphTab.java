@@ -49,6 +49,9 @@ public class GraphTab extends Tab{
         scene.getGraph().heightProperty().addListener((obs,o,n) -> scene.render());
 
         statusBar = new StatusBar();
+        graphHolder.focusedProperty().addListener((obs, oldV, newV) -> {
+            if(newV) scene.getGraph().requestFocus();
+        });
 
         VBox graphPane = new VBox();
         graphPane.getChildren().add(toolBar);
@@ -123,7 +126,10 @@ public class GraphTab extends Tab{
         statusBar.update(
             input.worldX, 
             input.worldY, 
-            viewport.getZoom(),
+            viewport.getScaleX()/viewport.getZoom(),
+            viewport.getScaleY()/viewport.getZoom(),
+            viewport.getWidth(),
+            viewport.getHeight(),
             plotManager.getCount()
         );
     }

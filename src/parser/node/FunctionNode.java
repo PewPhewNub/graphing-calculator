@@ -56,4 +56,10 @@ public class FunctionNode extends ExpressionNode{
     public HashSet<String> getVariables() {
         return argument.getVariables();
     }
+    public String getFunctionName() {
+        return functionName;
+    }
+    public ExpressionNode getArgument() {
+        return argument;
+    }
 }

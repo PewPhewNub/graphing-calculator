@@ -132,4 +132,12 @@ public class CameraSystem {
         }
 
     }
+
+    public void setToCurrentViewport(){
+        this.targetCameraX = viewport.getCameraX();
+        this.targetCameraY = viewport.getCameraY();
+        this.targetScaleX = viewport.getScaleX();
+        this.targetScaleY = viewport.getScaleY();
+        this.targetZoom = viewport.getZoom();
+    }
 }

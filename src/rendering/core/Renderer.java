@@ -40,20 +40,29 @@ public class Renderer {
         if(rendererSettings.showLabels)drawLabels(scene.gridData(), rendererSettings.showLabelsOutOfView);
         for(CurveData curve : (scene.getPlotManager()).curveCache){
             if(curve == null) continue;
+            double width = 2;
+            if(curve.plot().equals(scene.getPlotManager().getSelectedPlot())) width = 4;
             drawCurveSegmented(
                 curve.visibleSegments(),
-                curve.plot().getColor()
+                curve.plot().getColor(),
+                width
             );
             if(null == curve.featurePoints()) continue;
-            for(Point2D point: curve.featurePoints()){
-                drawMarker(point, 7, labelColor);    
+            if(curve.plot().equals(scene.getPlotManager().getSelectedPlot())){
+                for(Point2D point: curve.featurePoints()){
+                    drawMarker(point, 7, labelColor);    
+                }
             }  
         }
         for(Intersection intersection : scene.getPlotManager().intersectionCache){
+            if(intersection.isOn(scene.getPlotManager().getSelectedPlot()))
             drawMarker(intersection.getPoint(), 7, labelColor);
         }
         Point2D selectedPoint = scene.getPlotManager().interactionController.getSelectedPoint();
-        if(selectedPoint!= null) drawMarker(selectedPoint, 7, scene.getPlotManager().interactionController.getSelectedPlot().getColor());
+        if(selectedPoint!= null){
+            drawMarker(selectedPoint, 7, scene.getPlotManager().interactionController.getSelectedPlot().getColor());
+            drawInspectionLabel(selectedPoint, axesColor);
+        }
     }
 
     public void setColor(Color axesColor, Color gridColor, Color labelColor){
@@ -80,8 +89,8 @@ public class Renderer {
     public void drawCurve(ArrayList<Point2D> points, Color color){
         curveRenderer.drawCurve(context, points, color);
     }
-    public void drawCurveSegmented(ArrayList<Segment2D> segments, Color color){
-        curveRenderer.drawCurveSegmented(context, segments, color);
+    public void drawCurveSegmented(ArrayList<Segment2D> segments, Color color, double width){
+        curveRenderer.drawCurveSegmented(context, segments, color, width);
     }
     public void drawMarker(Point2D point, double radius, Color color){
         overlayRenderer.drawMarker(context, point, radius, color);

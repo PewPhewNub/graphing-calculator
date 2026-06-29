@@ -93,8 +93,14 @@ public class FileActions {
                 tabPane.getSelectionModel().select(tab);
                 tab.setDirty(false);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Open Project");
+            alert.setHeaderText("Invalid project file");
+            alert.setContentText(
+                "The selected file is not a valid project."
+            );
+            alert.showAndWait();
         }
     }
 

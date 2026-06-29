@@ -39,7 +39,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
 
         box1.setText(Double.toString(plot.tMin));
         box2.setText(Double.toString(plot.tMax));
-
+        nameLabel.setText(plot.getName());
         addHandlers();
     }
 

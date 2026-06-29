@@ -1,18 +1,23 @@
 package ui.shell;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import interaction.UndoManager;
 import interaction.commands.AddPlotCommand;
+import interaction.commands.DuplicatePlotCommand;
+import interaction.commands.PushPlotToBottomCommand;
+import interaction.commands.PushPlotToTopCommand;
+import interaction.commands.RemovePlotCommand;
 import interaction.commands.ReorderPlotCommand;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Background;
@@ -53,7 +58,8 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     boolean isVisible = true;
     double maxWidth;
     double minWidth;
-    public MenuButton addPlotButton;
+    public Button addPlotButton;
+    public ContextMenu plotMenu;
     private Map<AbstractPlot, AbstractPlotEditor> editors;
     private UndoManager undoManager;
     public UIPanel(double width, double height, GraphScene graphScene){
@@ -109,15 +115,25 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         initializePlotButtons();
         initializeControlButtons();
 
-        plotPane.setPadding(new Insets(5, 0, 5, 5));
+        plotPane.setPadding(new Insets(5, 0, 5, 0));
 
-        controlPane.setPadding(new Insets(5));
+        controlPane.setPadding(new Insets(0));
         controlPane.setMinHeight(45);
-        controlPane.setBorder(Border.EMPTY);
+        controlPane.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    CornerRadii.EMPTY,
+                    new BorderWidths(0, 0, 2, 0)
+                )
+            )
+        );
 
         plotPane.setTop(controlPane);
 
         plotEditorPane = new VBox();
+        plotEditorPane.setPadding(new Insets(5, 0, 0, 0));
         plotPane.setCenter(plotEditorPane);
         
         plotPane.setBorder(
@@ -166,22 +182,6 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 new BorderWidths(2, 2, 2, 2)
             )
         ));
-
-        StackPane arrow = (StackPane) this.addPlotButton.lookup(".arrow");
-        if (arrow != null) {
-            arrow.setVisible(false);
-            arrow.setManaged(false); // Ensures the space is reclaimed
-        }
-
-        setOnMouseClicked(e -> {
-            int clicks = e.getClickCount();
-            if(clicks > 1){
-                plotManager.setSelectedPlot(null);
-            }
-        });
-
-        // Use a look-up to find the arrow node
-        
     }
     public void collapse(){
         isVisible = false;
@@ -243,62 +243,60 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 editor.setUndoManager(undoManager);
                 editors.put(p, editor);
             }
+            
+            if(plot instanceof ImplicitPlot p) {
+                AbstractPlotEditor editor = new ImplicitPlotEditor(
+                        plotManager,
+                        p
+                    );
+                plotEditorPane.getChildren().add(
+                    editor
+                );
+                editor.setUndoManager(undoManager);
+                editors.put(p, editor);
+            }
         }
     }
     @Override
     public void plotAdded(AbstractPlot plot) {
         PlotManager plotManager = graphScene.getPlotManager();
+        AbstractPlotEditor editor = null;
         if(plot instanceof FunctionPlot p) {
-            AbstractPlotEditor editor = new FunctionPlotEditor(
+            editor = new FunctionPlotEditor(
                     plotManager,
                     p
                 );
-            plotEditorPane.getChildren().add(
-                editor
-            );
-            editor.setUndoManager(undoManager);
-            editors.put(p, editor);
-            return;
         }
         if(plot instanceof ParametricPlot p) {
-            AbstractPlotEditor editor = new ParametricPlotEditor(
+            editor = new ParametricPlotEditor(
                     plotManager,
                     p
                 );
-            plotEditorPane.getChildren().add(
-                editor
-            );
-            editor.setUndoManager(undoManager);
-            editors.put(p, editor);
-            return;
         }
         if(plot instanceof PolarPlot p) {
-            AbstractPlotEditor editor = new PolarPlotEditor(
+            editor = new PolarPlotEditor(
                     plotManager,
                     p
                 );
-            plotEditorPane.getChildren().add(
-                editor
-            );
-            editor.setUndoManager(undoManager);
-            editors.put(p, editor);
-            return;
         }
         if(plot instanceof ImplicitPlot p) {
-            AbstractPlotEditor editor = new ImplicitPlotEditor(
+            editor = new ImplicitPlotEditor(
                     plotManager,
                     p
                 );
-            plotEditorPane.getChildren().add(
-                editor
-            );
-            editor.setUndoManager(undoManager);
-            editors.put(p, editor);
-            return;
         }
+        if(editor == null) return;
+        plotEditorPane.getChildren().add(
+            plotManager.plots.indexOf(plot),
+            editor
+        );
+        editor.setUndoManager(undoManager);
+        editors.put(plot, editor);
+        return;
     }
     @Override
     public void plotRemoved(AbstractPlot plot) { 
+        if(plot == null) return;
         AbstractPlotEditor editor = editors.get(plot);
         if(editor != null){
             plotEditorPane.getChildren().remove(editor);
@@ -349,7 +347,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     }
 
     public void initializePlotButtons(){
-        addPlotButton = new MenuButton(" Add Plot");
+        addPlotButton = new Button("\u2795");
 
         MenuItem functionItem = new MenuItem("Explicit");
         functionItem.setOnAction(e ->{
@@ -387,31 +385,42 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             );
         });
         
-
-        addPlotButton.getItems().addAll(
+        plotMenu = new ContextMenu();
+        plotMenu.getItems().addAll(
             functionItem,
             parametricItem,
             polarItem,
             implicitItem
         );
-        addPlotButton.setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGRAY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(3),
-                new BorderWidths(2)
+        addPlotButton.setPadding(new Insets(0, 0, 0, 0));
+        addPlotButton.setFont(new Font(18));
+        addPlotButton.setMaxSize(30, 30);
+        addPlotButton.setPrefSize(30, 30);
+        addPlotButton.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(2),
+                    new Insets(2)
+                )
             )
-        ));
-
-        
-        addPlotButton.setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(3),
-                new Insets(2)
+        );
+        addPlotButton.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2),
+                    new BorderWidths(2)
+                )
             )
-        ));
+        );
+        addPlotButton.setOnAction(e -> {
+            plotMenu.show(addPlotButton, Side.BOTTOM, 0, 0);
+        });
         controlPane.getChildren().add(addPlotButton);
+
+        addPlotButton.setVisible(true);
     }
 
     void initializeControlButtons(){
@@ -451,13 +460,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 )
             )
         );
-        
-        controlPane.getChildren().add(moveUpButton);
 
         Button moveDownButton = new Button("\u2193");
         moveDownButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
-            if (index > plotManager.getCount() - 1) return;
+            if (index >= plotManager.getCount() - 1) return;
 
             AbstractPlot current = plotManager.plots.get(index);
             AbstractPlot above = plotManager.plots.get(index + 1);
@@ -491,7 +498,167 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             )
         );
 
-        
+        Button moveTopButton = new Button("\u21A5");
+        moveTopButton.setOnAction(e -> {
+            int index = plotManager.getSelectedIndex();
+            if (index <= 0) return;
+
+            AbstractPlot current = plotManager.plots.get(index);
+
+            undoManager.execute(
+                new PushPlotToTopCommand(current, plotManager)
+            );
+        });
+
+        moveTopButton.setPadding(new Insets(0, 0, 0, 0));
+        moveTopButton.setFont(new Font(18));
+        moveTopButton.setMaxSize(30, 30);
+        moveTopButton.setPrefSize(30, 30);
+        moveTopButton.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(2),
+                    new Insets(2)
+                )
+            )
+        );
+        moveTopButton.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2),
+                    new BorderWidths(2)
+                )
+            )
+        );
+
+        Button moveBottomButton = new Button("\u21A7");
+        moveBottomButton.setOnAction(e -> {
+            int index = plotManager.getSelectedIndex();
+            if (index >= plotManager.getCount() - 1) return;
+
+            AbstractPlot current = plotManager.plots.get(index);
+
+            undoManager.execute(
+                new PushPlotToBottomCommand(current, plotManager)
+            );
+        });
+
+        moveBottomButton.setPadding(new Insets(0, 0, 0, 0));
+        moveBottomButton.setFont(new Font(18));
+        moveBottomButton.setMaxSize(30, 30);
+        moveBottomButton.setPrefSize(30, 30);
+        moveBottomButton.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(2),
+                    new Insets(2)
+                )
+            )
+        );
+        moveBottomButton.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2),
+                    new BorderWidths(2)
+                )
+            )
+        );
+
+        Button duplicateButton = new Button("\u2398");
+        duplicateButton.setOnAction(e -> {
+            int index = plotManager.getSelectedIndex();
+            if (index < 0) return;
+            AbstractPlot current = plotManager.plots.get(index);
+            undoManager.execute(
+                new DuplicatePlotCommand(current, plotManager)
+            );
+        });
+
+        duplicateButton.setPadding(new Insets(0, 0, 0, 0));
+        duplicateButton.setFont(new Font(18));
+        duplicateButton.setMaxSize(30, 30);
+        duplicateButton.setPrefSize(30, 30);
+        duplicateButton.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(2),
+                    new Insets(2)
+                )
+            )
+        );
+        duplicateButton.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2),
+                    new BorderWidths(2)
+                )
+            )
+        );
+
+        Button uhSpaceTaker = new Button("\u1234");
+
+        uhSpaceTaker.setPadding(new Insets(0, 0, 0, 0));
+        uhSpaceTaker.setFont(new Font(18));
+        uhSpaceTaker.setMaxSize(30, 30);
+        uhSpaceTaker.setPrefSize(30, 30);
+        uhSpaceTaker.setVisible(false);
+        uhSpaceTaker.setManaged(true);
+
+        Button closeButton = new Button("\u274c");
+        closeButton.setOnAction(e -> {
+            int index = plotManager.getSelectedIndex();
+            if (index < 0) return;
+            AbstractPlot current = plotManager.plots.get(index);
+            undoManager.execute(
+                new RemovePlotCommand(current, plotManager)
+            );
+        });
+
+        closeButton.setPadding(new Insets(0, 0, 0, 0));
+        closeButton.setFont(new Font(18));
+        closeButton.setMaxSize(30, 30);
+        closeButton.setPrefSize(30, 30);
+        closeButton.setBackground(
+            new Background(
+                new BackgroundFill(
+                    Color.WHITE,
+                    new CornerRadii(2),
+                    new Insets(2)
+                )
+            )
+        );
+        closeButton.setBorder(
+            new Border(
+                new BorderStroke(
+                    Color.LIGHTGRAY,
+                    BorderStrokeStyle.SOLID,
+                    new CornerRadii(2),
+                    new BorderWidths(2)
+                )
+            )
+        );
+        controlPane.setSpacing(10);
+        controlPane.setAlignment(Pos.CENTER);
+        controlPane.getChildren().add(duplicateButton);
+        controlPane.getChildren().add(moveTopButton);
+        controlPane.getChildren().add(moveUpButton);
         controlPane.getChildren().add(moveDownButton);
+        controlPane.getChildren().add(moveBottomButton);
+        controlPane.getChildren().add(uhSpaceTaker);
+        controlPane.getChildren().add(closeButton);
+    }
+
+    @Override
+    public void plotMovedTo(AbstractPlot plot, int index) {
+        rebuildEditors();
     }
 }

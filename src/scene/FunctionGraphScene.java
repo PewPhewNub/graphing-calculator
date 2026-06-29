@@ -275,6 +275,10 @@ public class FunctionGraphScene extends GraphScene{
         // TODO Auto-generated method stub
         
     }
+
+    @Override
+    public void plotMovedTo(AbstractPlot plot, int index) {
+    }
 }
     
 

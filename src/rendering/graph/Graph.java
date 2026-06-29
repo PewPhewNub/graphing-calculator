@@ -1,6 +1,7 @@
 package rendering.graph;
 
 import interaction.InputController;
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -12,7 +13,6 @@ public class Graph extends Canvas{
     public InputController input;
     public GraphSettings settings;
 
-    
     public Graph(double width, double height){
         setWidth(width);
         setHeight(height);
@@ -27,6 +27,12 @@ public class Graph extends Canvas{
     private void addHandlers(){
 
         setFocusTraversable(true);
+        addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+            requestFocus();
+        });
+        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            requestFocus();
+        });
 
         addEventHandler(MouseEvent.MOUSE_MOVED, e -> {
             input.mouseX = e.getX();
@@ -47,7 +53,6 @@ public class Graph extends Canvas{
 
 
         addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
-
             requestFocus();
 
             input.pressedX = e.getX();
@@ -64,8 +69,8 @@ public class Graph extends Canvas{
         });
 
 
-        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-
+        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {    
+            requestFocus();
             input.mousePressed = false;
             input.mouseReleased = true;
             input.mouseDown = false;
@@ -73,17 +78,17 @@ public class Graph extends Canvas{
 
 
         addEventHandler(ScrollEvent.SCROLL, e -> {
-
             input.deltaScrollX = e.getDeltaX();
             input.deltaScrollY = e.getDeltaY();
-
+                        
+            input.isShiftDown = e.isShiftDown();
+            input.isCtrlDown = e.isControlDown();
         });
-
 
         addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             input.keysPressed.add(e.getCode());
+            System.out.println("KEY: " + e.getCode());
         });
-
 
         addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             input.keysPressed.remove(e.getCode());
@@ -96,7 +101,22 @@ public class Graph extends Canvas{
         heightProperty().addListener((obs, oldV, newV) -> {
             viewport.setHeight(newV.doubleValue());
         });
+
+        addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
+            input.mouseX = Double.NaN;
+            input.mouseY = Double.NaN;
+            input.worldX = Double.NaN;
+            input.worldY = Double.NaN;
+        });
+
+        focusedProperty().addListener((obs, oldVal, newVal) -> {
+    if (!newVal) {
+        Platform.runLater(() -> {
+            System.out.println("Focus owner = " + getScene().getFocusOwner());
+        });
     }
+});
+        }
 
     @Override
     public boolean isResizable() {

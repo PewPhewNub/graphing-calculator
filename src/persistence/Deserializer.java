@@ -22,6 +22,8 @@ public final class Deserializer {
     public static void apply(ProjectData data, GraphScene scene){
         setViewport(data.viewport,scene.getGraph().viewport);
         setPlots(data.plots, scene.getPlotManager());
+
+        scene.getCameraSystem().setToCurrentViewport();
     }
 
     public static void setViewport(ViewportData viewportData, Viewport viewport){

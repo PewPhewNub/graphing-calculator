@@ -55,6 +55,7 @@ public class MainWindow implements SettingsListener{
         
         tabPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tabPane.setMinSize(0, 100);
+        tabPane.setFocusTraversable(false);
 
         addGraphScene("New Graph");
         undoManager.clearStacks();

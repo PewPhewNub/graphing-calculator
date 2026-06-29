@@ -57,8 +57,8 @@ public class GraphToolBar extends HBox{
         Border thinBorder = new Border(new BorderStroke(
             Color.rgb(220, 220, 220),       // A soft, light gray color
             BorderStrokeStyle.SOLID,        // Solid line style
-            CornerRadii.EMPTY,              // Perfectly square corners
-            new BorderWidths(2, 2, 2, 2)             // 1-pixel thickness
+            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
+            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
         ));
         setBorder(thinBorder);
 

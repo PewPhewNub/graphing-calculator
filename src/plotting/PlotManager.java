@@ -15,7 +15,7 @@ import rendering.camera.Viewport;
 
 public class PlotManager{
     public ArrayList<AbstractPlot> plots;
-    public ArrayList<CurveData> curveCache;
+    public final ArrayList<CurveData> curveCache;
     public ArrayList<Intersection> intersectionCache;
     public PlotInteractionController interactionController;
     public ArrayList<PlotListener> listeners;
@@ -80,8 +80,8 @@ public class PlotManager{
                 e.printStackTrace();
             }
         }
-
-        curveCache = newCurveCache;
+        curveCache.clear();
+        curveCache.addAll(newCurveCache);
     }
 
     public void removeAll(){
@@ -163,5 +163,26 @@ public class PlotManager{
             listener.plotReordered(index1, index2);
         }
         setSelectedPlot(plot1);
+    }
+
+    public void movePlotTo(AbstractPlot plot, int index){
+        if(plot == null) return;
+
+        int currIndex = plots.indexOf(plot);
+        if(currIndex == -1 || currIndex == index) return;
+
+        plots.remove(currIndex);
+        plots.add(index, plot);
+
+        System.out.println("After move:");
+        for(int i = 0; i < plots.size(); i++){
+            System.out.println(i + ": " + plots.get(i));
+        }
+
+        for(PlotListener listener : listeners){    System.out.println("PLOT MOVED LISTENER CALLED");
+            listener.plotMovedTo(plot, index);
+        }
+
+        setSelectedPlot(plot);
     }
 }

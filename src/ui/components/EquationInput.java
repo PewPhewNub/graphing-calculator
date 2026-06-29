@@ -7,6 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TextInputControl;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -57,6 +60,7 @@ public class EquationInput extends VBox{
             change.setText(text);
             return change;
         }));
+        
         functionInputField.setTextFormatter(
             new TextFormatter<>(change -> {
 

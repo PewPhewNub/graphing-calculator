@@ -18,7 +18,9 @@ import javafx.scene.paint.Color;
 public class StatusBar extends HBox{
     public Label mouseX;
     public Label mouseY;
-    public Label currentZoom;
+    public Label currentScaleX;
+    public Label currentScaleY;
+    public Label view;
     public Label plotsCount;
     public StatusBar(){
         setPadding(new Insets(2, 10, 2, 10));
@@ -48,15 +50,19 @@ public class StatusBar extends HBox{
         getChildren().add(mouseX);
         mouseY = new Label("y: ----");
         getChildren().add(mouseY);
-        currentZoom = new Label("Zoom: ----");
-        getChildren().add(currentZoom);
+        currentScaleX = new Label("Scale X: ----/--");
+        getChildren().add(currentScaleX);
+        currentScaleY = new Label("Scale Y: ----/--");
+        getChildren().add(currentScaleY);
+        view = new Label("View : --x--");
+        getChildren().add(view);
         plotsCount = new Label("Plots: --");
         getChildren().add(plotsCount);
 
         setHeight(30);
     }
 
-    public void update(double mouseX, double mouseY, double zoom, int plotCount){
+    public void update(double mouseX, double mouseY, double scaleX, double scaleY, double width, double height, int plotCount){
         if(Double.isNaN(mouseX)){
             this.mouseX.setText("x: ----");
         }else{
@@ -67,11 +73,9 @@ public class StatusBar extends HBox{
         }else{
             this.mouseY.setText("y: " + String.format("%.2f", mouseY));
         }
-        if(Double.isNaN(zoom)){
-            this.currentZoom.setText("Zoom: ----");
-        }else{
-            this.currentZoom.setText("Zoom: " + String.format("%.1f", (zoom)));
-        }
+        this.currentScaleX.setText("Scale X: " + String.format("%.2f", scaleX) + "u/ 1px");
+        this.currentScaleY.setText("Y: " + String.format("%.2f", scaleY) + "u/ 1px");
+        this.view.setText("View :" + (int)width + " x " + (int)(height));
         if(plotCount < 0){
             this.plotsCount.setText("Plots: --");
         }else{

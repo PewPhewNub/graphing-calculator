@@ -49,7 +49,6 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
         );
     }
 
-
     @Override
     protected void buildPlot(){
         String text = box0.getText();

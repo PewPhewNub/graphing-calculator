@@ -48,10 +48,10 @@ public class CurveRenderer {
         context.getGc().stroke();
     }
 
-    public void drawCurveSegmented(RenderContext context, ArrayList<Segment2D> list, Color color) {
+    public void drawCurveSegmented(RenderContext context, ArrayList<Segment2D> list, Color color, double width) {
         if (list.isEmpty()) return;
         context.getGc().setStroke(color);
-        context.getGc().setLineWidth(2);
+        context.getGc().setLineWidth(width);
         double limit = Math.max(context.getGc().getCanvas().getWidth(), context.getGc().getCanvas().getHeight()) * 10;
         for (Segment2D seg : list) {
             double x1 = context.getViewport().worldToScreenX(seg.point1.getX());

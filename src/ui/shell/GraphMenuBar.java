@@ -23,6 +23,7 @@ public class GraphMenuBar extends MenuBar{
     Menu file;
     Menu view;
     Menu edit;
+    Menu plot;
 
     public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions, UndoManager undoManager){
         setBackground(new Background(

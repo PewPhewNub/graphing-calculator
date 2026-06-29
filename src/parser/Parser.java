@@ -1,6 +1,7 @@
 package parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import parser.node.BinaryNode;
@@ -112,6 +113,9 @@ public class Parser{
                 advance();
                 ExpressionNode right = parsePower();
                 left = new BinaryNode(left, BinaryOp.DIVIDE, right);
+                if(right instanceof NumberNode n){
+                    if(n.evaluate(new HashMap<>()) == 0) throw new ParseException("Cannot divide by 0");
+                }
             }else if (type == TokenType.STAR){
                 advance();
                 ExpressionNode right = parsePower();
