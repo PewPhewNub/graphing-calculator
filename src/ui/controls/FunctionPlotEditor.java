@@ -2,10 +2,10 @@ package ui.controls;
 
 import java.util.function.Function;
 
-import interaction.commands.EditPlotCommand;
+import interaction.commands.EditElementCommand;
 import javafx.scene.layout.VBox;
 import parser.ParseException;
-import plotting.PlotManager;
+import plotting.GraphElementManager;
 import plotting.plots.FunctionPlot;
 import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
@@ -24,7 +24,7 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
-    public FunctionPlotEditor(PlotManager plotManager, FunctionPlot plot){
+    public FunctionPlotEditor(GraphElementManager plotManager, FunctionPlot plot){
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();
@@ -71,7 +71,7 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
         box0.textProperty().addListener((obs, oldValue, newValue) -> {
             if(updatingFields)
                 return;
-            buildPlot();
+            updateElement();
         });
 
         box1.textProperty().addListener((obs, oldValue, newValue) -> {
@@ -79,7 +79,7 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
             box0.setLabelText(dependent + "(" + independent + ") = ");
             if(updatingFields)
                 return;
-            buildPlot();
+            updateElement();
         });
 
         box2.textProperty().addListener((obs, oldValue, newValue) -> {
@@ -87,31 +87,33 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
             box0.setLabelText(dependent + "(" + independent + ") = ");
             if(updatingFields)
                 return;
-            buildPlot();
+            updateElement();
         });
     }
     @Override
-    protected void buildPlot(){
+    protected void updateElement() {
         String text = box0.getText();
-        FunctionPlot before = (FunctionPlot)plot.copy();
+        FunctionPlot before = (FunctionPlot) plot.copy();
 
         box0.highlightError(null);
-        Function<Double, Double> f;
+
+        FunctionPlot after;
         try {
-            f = PlotGenerator.generateFunction(
+            after = new FunctionPlot(
+                nameLabel.getText(),
                 text,
-                dependent,
-                independent
+                colorChooser.getSelectedColor()
             );
         } catch (ParseException e) {
             box0.highlightError(e.getMessage());
             return;
         }
-        FunctionPlot after = new FunctionPlot(nameLabel.getText(), text, f, colorChooser.getSelectedColor());
-        if(before.equals(after)) return;
+
+        if (before.equals(after)) return;
+
         undoManager.execute(
-            new EditPlotCommand(
-                plot, 
+            new EditElementCommand(
+                plot,
                 before,
                 after,
                 plotManager
@@ -119,7 +121,7 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
         );
     }
     @Override
-    public void updateFields(){   
+    public void updateValues(){   
         updatingFields = true;
         FunctionPlot fPlot = (FunctionPlot)plot;    
         dependent = fPlot.dependent;

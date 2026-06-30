@@ -15,7 +15,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import plotting.PlotManager;
+import plotting.GraphElementManager;
 import rendering.camera.Viewport;
 import scene.GraphScene;
 import settings.ApplicationSettings;
@@ -137,7 +137,7 @@ public class GraphTab extends Tab{
     public void updateStatusBar(){
         InputController input = scene.getGraph().getInput();
         Viewport viewport = scene.getGraph().viewport;
-        PlotManager plotManager = scene.getPlotManager();
+        GraphElementManager plotManager = scene.getPlotManager();
         statusBar.update(
             input.worldX, 
             input.worldY, 

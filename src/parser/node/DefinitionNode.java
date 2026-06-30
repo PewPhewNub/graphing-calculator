@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import parser.EvaluationContext;
+
 public class DefinitionNode extends ExpressionNode{
     private final ExpressionNode expression;
     private final Set<String> params;
@@ -19,8 +21,8 @@ public class DefinitionNode extends ExpressionNode{
     }
 
     @Override
-    public double evaluate(Map<String, Double> map) {
-        return expression.evaluate(map);
+    public double evaluate(EvaluationContext context) {
+        return expression.evaluate(context);
     }
 
     @Override

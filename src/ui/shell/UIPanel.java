@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import interaction.UndoManager;
-import interaction.commands.AddPlotCommand;
-import interaction.commands.DuplicatePlotCommand;
-import interaction.commands.PushPlotToBottomCommand;
-import interaction.commands.PushPlotToTopCommand;
-import interaction.commands.RemovePlotCommand;
-import interaction.commands.ReorderPlotCommand;
+import interaction.commands.AddElementCommand;
+import interaction.commands.DuplicateElementCommand;
+import interaction.commands.PushElementToBottomCommand;
+import interaction.commands.PushElementToTopCommand;
+import interaction.commands.RemoveElementCommand;
+import interaction.commands.SwapElementsCommand;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -33,9 +33,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import plotting.PlotListener;
-import plotting.PlotManager;
-import plotting.plots.AbstractPlot;
+import plotting.GraphElement;
+import plotting.GraphElementListener;
+import plotting.GraphElementManager;
+import plotting.Variable;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.ParametricPlot;
@@ -43,14 +44,16 @@ import plotting.plots.PolarPlot;
 import scene.GraphScene;
 import settings.ThemeColors;
 import ui.components.ToolTip;
+import ui.controls.AbstractEditor;
 import ui.controls.AbstractPlotEditor;
 import ui.controls.FunctionPlotEditor;
 import ui.controls.ImplicitPlotEditor;
 import ui.controls.ParametricPlotEditor;
 import ui.controls.PolarPlotEditor;
-public class UIPanel extends BorderPane implements PlotListener, Themeable{
+import ui.controls.VariableEditor;
+public class UIPanel extends BorderPane implements GraphElementListener, Themeable{
     GraphScene graphScene;
-    PlotManager plotManager;
+    GraphElementManager plotManager;
     HBox controlPane;
     Button showButton;
     VBox sidePane;
@@ -61,7 +64,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     double minWidth;
     public Button addPlotButton;
     public ContextMenu plotMenu;
-    private Map<AbstractPlot, AbstractPlotEditor> editors;
+    private Map<GraphElement, AbstractEditor> editors;
     private UndoManager undoManager;
     public UIPanel(double width, double height, GraphScene graphScene){
         super();
@@ -229,8 +232,8 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     public void rebuildEditors(){
         plotEditorPane.getChildren().clear();
         editors.clear();
-        PlotManager plotManager = graphScene.getPlotManager();
-        for(AbstractPlot plot : plotManager.plots){
+        GraphElementManager plotManager = graphScene.getPlotManager();
+        for(GraphElement plot : plotManager.elements){
             if(plot instanceof FunctionPlot p) {
                 AbstractPlotEditor editor = new FunctionPlotEditor(
                         plotManager,
@@ -276,68 +279,83 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
                 editor.setUndoManager(undoManager);
                 editors.put(p, editor);
             }
+            
+            if(plot instanceof Variable p) {
+                AbstractEditor editor = new VariableEditor(
+                        plotManager,
+                        p
+                    );
+                plotEditorPane.getChildren().add(
+                    editor
+                );
+                editor.setUndoManager(undoManager);
+                editors.put(p, editor);
+            }
         }
     }
     @Override
-    public void plotAdded(AbstractPlot plot) {
-        PlotManager plotManager = graphScene.getPlotManager();
-        AbstractPlotEditor editor = null;
-        if(plot instanceof FunctionPlot p) {
+    public void elementAdded(GraphElement element) {
+        GraphElementManager elementManager = graphScene.getPlotManager();
+        AbstractEditor editor = null;
+        if(element instanceof FunctionPlot p) {
             editor = new FunctionPlotEditor(
-                    plotManager,
+                    elementManager,
                     p
                 );
         }
-        if(plot instanceof ParametricPlot p) {
+        if(element instanceof ParametricPlot p) {
             editor = new ParametricPlotEditor(
-                    plotManager,
+                    elementManager,
                     p
                 );
         }
-        if(plot instanceof PolarPlot p) {
+        if(element instanceof PolarPlot p) {
             editor = new PolarPlotEditor(
-                    plotManager,
+                    elementManager,
                     p
                 );
         }
-        if(plot instanceof ImplicitPlot p) {
+        if(element instanceof ImplicitPlot p) {
             editor = new ImplicitPlotEditor(
-                    plotManager,
+                    elementManager,
+                    p
+                );
+        }
+        if(element instanceof Variable p) {
+            editor = new VariableEditor(
+                    elementManager,
                     p
                 );
         }
         if(editor == null) return;
         plotEditorPane.getChildren().add(
-            plotManager.plots.indexOf(plot),
+            elementManager.elements.indexOf(element),
             editor
         );
         editor.setUndoManager(undoManager);
-        editors.put(plot, editor);
+        editors.put(element, editor);
         return;
     }
     @Override
-    public void plotRemoved(AbstractPlot plot) { 
-        if(plot == null) return;
-        AbstractPlotEditor editor = editors.get(plot);
+    public void elementRemoved(GraphElement element) { 
+        if(element == null) return;
+        AbstractEditor editor = editors.get(element);
         if(editor != null){
             plotEditorPane.getChildren().remove(editor);
-            editors.remove(plot);
+            editors.remove(element);
         }
     }
+
     @Override
-    public void plotsChanged() {
-    }
-    @Override
-    public void plotChanged(AbstractPlot plot) {
-        AbstractPlotEditor editor = editors.get(plot);
-        editor.updateFields();
+    public void elementChanged(GraphElement element) {
+        AbstractEditor editor = editors.get(element);
+        editor.updateValues();
     }
 
     public void setUndoManager(UndoManager undoManager) {
         this.undoManager = undoManager;
-        for(AbstractPlotEditor editor : editors.values()){
+        for(AbstractEditor editor : editors.values()){
             editor.setUndoManager(undoManager);
-            
         }
     }
     @Override
@@ -345,11 +363,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         
     }
     @Override
-    public void selectedPlotChanged(AbstractPlot plot) {
-        for(AbstractPlotEditor editor : editors.values()){
+    public void selectedElementChanged(GraphElement element) {
+        for(AbstractEditor editor : editors.values()){
             editor.setSelected(false);
         }
-        if(plot == null){
+        if(element == null){
             for(Node i : controlPane.getChildren()){
                 ((Button)i).setDisable(true);
             }
@@ -358,20 +376,20 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         for(Node i : controlPane.getChildren()){
             ((Button)i).setDisable(false);
         }
-        AbstractPlotEditor editor = editors.get(plot);
+        AbstractEditor editor = editors.get(element);
         if(editor == null) return;
         editor.setSelected(true);
     }
 
     @Override
-    public void plotReordered(AbstractPlot plot1, AbstractPlot plot2) {
-        if(plot1 == null || plot2 == null) return;
-        int index1 = plotManager.plots.indexOf(plot1);
-        int index2 = plotManager.plots.indexOf(plot2);
+    public void elementsSwapped(GraphElement element1, GraphElement element2) {
+        if(element1 == null || element2 == null) return;
+        int index1 = plotManager.elements.indexOf(element1);
+        int index2 = plotManager.elements.indexOf(element2);
         Collections.swap(plotEditorPane.getChildren(), index1, index2);
     }
     @Override
-    public void plotReordered(int index1, int index2) {
+    public void elementsSwapped(int index1, int index2) {
         rebuildEditors();
     }
 
@@ -382,7 +400,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         MenuItem functionItem = new MenuItem("Explicit");
         functionItem.setOnAction(e ->{
             this.undoManager.execute(
-                new AddPlotCommand(
+                new AddElementCommand(
                     new FunctionPlot(),
                     this.plotManager)
             );
@@ -392,7 +410,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         MenuItem parametricItem = new MenuItem("Parametric");
         parametricItem.setOnAction(e ->{
             this.undoManager.execute(
-                new AddPlotCommand(
+                new AddElementCommand(
                     new ParametricPlot(),
                     this.plotManager)
             );
@@ -400,7 +418,7 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         MenuItem polarItem = new MenuItem("Polar");
         polarItem.setOnAction(e ->{
             this.undoManager.execute(
-                new AddPlotCommand(
+                new AddElementCommand(
                     new PolarPlot(),
                     this.plotManager)
             );
@@ -409,8 +427,17 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         MenuItem implicitItem = new MenuItem("Implicit (EXPERIMENTAL)");
         implicitItem.setOnAction(e ->{
             this.undoManager.execute(
-                new AddPlotCommand(
+                new AddElementCommand(
                     new ImplicitPlot(),
+                    this.plotManager)
+            );
+        });
+
+        MenuItem variableItem = new MenuItem("Variable (EXPERIMENTAL)");
+        variableItem.setOnAction(e ->{
+            this.undoManager.execute(
+                new AddElementCommand(
+                    new Variable(),
                     this.plotManager)
             );
         });
@@ -420,7 +447,8 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             functionItem,
             parametricItem,
             polarItem,
-            implicitItem
+            implicitItem,
+            variableItem
         );
         addPlotButton.setPadding(new Insets(0, 0, 0, 0));
         addPlotButton.setFont(new Font(18));
@@ -460,11 +488,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             int index = plotManager.getSelectedIndex();
             if (index <= 0) return;
 
-            AbstractPlot current = plotManager.plots.get(index);
-            AbstractPlot above = plotManager.plots.get(index - 1);
+            GraphElement current = plotManager.elements.get(index);
+            GraphElement above = plotManager.elements.get(index - 1);
 
             undoManager.execute(
-                new ReorderPlotCommand(current, above, plotManager)
+                new SwapElementsCommand(current, above, plotManager)
             );
         });
 
@@ -498,11 +526,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             int index = plotManager.getSelectedIndex();
             if (index >= plotManager.getCount() - 1) return;
 
-            AbstractPlot current = plotManager.plots.get(index);
-            AbstractPlot above = plotManager.plots.get(index + 1);
+            GraphElement current = plotManager.elements.get(index);
+            GraphElement above = plotManager.elements.get(index + 1);
 
             undoManager.execute(
-                new ReorderPlotCommand(current, above, plotManager)
+                new SwapElementsCommand(current, above, plotManager)
             );
         });
 
@@ -536,10 +564,10 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             int index = plotManager.getSelectedIndex();
             if (index <= 0) return;
 
-            AbstractPlot current = plotManager.plots.get(index);
+            GraphElement current = plotManager.elements.get(index);
 
             undoManager.execute(
-                new PushPlotToTopCommand(current, plotManager)
+                new PushElementToTopCommand(current, plotManager)
             );
         });
 
@@ -573,10 +601,10 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
             int index = plotManager.getSelectedIndex();
             if (index >= plotManager.getCount() - 1) return;
 
-            AbstractPlot current = plotManager.plots.get(index);
+            GraphElement current = plotManager.elements.get(index);
 
             undoManager.execute(
-                new PushPlotToBottomCommand(current, plotManager)
+                new PushElementToBottomCommand(current, plotManager)
             );
         });
 
@@ -609,9 +637,9 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         duplicateButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index < 0) return;
-            AbstractPlot current = plotManager.plots.get(index);
+            GraphElement current = plotManager.elements.get(index);
             undoManager.execute(
-                new DuplicatePlotCommand(current, plotManager)
+                new DuplicateElementCommand(current, plotManager)
             );
         });
 
@@ -653,9 +681,9 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
         closeButton.setOnAction(e -> {
             int index = plotManager.getSelectedIndex();
             if (index < 0) return;
-            AbstractPlot current = plotManager.plots.get(index);
+            GraphElement current = plotManager.elements.get(index);
             undoManager.execute(
-                new RemovePlotCommand(current, plotManager)
+                new RemoveElementCommand(current, plotManager)
             );
         });
 
@@ -694,7 +722,11 @@ public class UIPanel extends BorderPane implements PlotListener, Themeable{
     }
 
     @Override
-    public void plotMovedTo(AbstractPlot plot, int index) {
+    public void elementMovedTo(GraphElement plot, int index) {
         rebuildEditors();
+    }
+    @Override
+    public void elementsChanged() {
+        return;
     }
 }

@@ -1,8 +1,12 @@
 package plotting.plots;
 
-import javafx.scene.paint.Color;
+import java.util.Set;
 
-public abstract class AbstractPlot {
+import javafx.scene.paint.Color;
+import parser.EvaluationContext;
+import plotting.GraphElement;
+
+public abstract class AbstractPlot extends GraphElement{
     String name;
     Color color;
 
@@ -16,8 +20,8 @@ public abstract class AbstractPlot {
         this.color = color;
     }
     public abstract AbstractPlot copy();
-    public abstract boolean copyFrom(AbstractPlot other);
-    public abstract void update();
+    public abstract void update(EvaluationContext context);
     public abstract boolean equals(AbstractPlot plot);
+    public abstract Set<String> getReferencedVariables();
 }
 

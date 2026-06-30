@@ -3,6 +3,8 @@ package parser.node;
 import java.util.HashSet;
 import java.util.Map;
 
+import parser.EvaluationContext;
+
 public class VariableNode extends ExpressionNode {
     public String name;
 
@@ -10,16 +12,12 @@ public class VariableNode extends ExpressionNode {
         this.name = name;
     }
 
-    public double evaluate(double x){
-        if(name.equals("pi"))
-            return Math.PI;
-        if(name.equals("e"))
-            return Math.E;
-        return x;
-    }
-
-    public double evaluate(Map<String, Double> variables){
-        return variables.get(name);
+    public double evaluate(EvaluationContext context){
+        return switch (name) {
+            case "pi" -> Math.PI;
+            case "e"  -> Math.E;
+            default   -> context.get(name);
+        };
     }
 
     public String toString(){

@@ -3,6 +3,8 @@ package parser.node;
 import java.util.HashSet;
 import java.util.Map;
 
+import parser.EvaluationContext;
+
 public class NumberNode extends ExpressionNode {
     private final double number;
 
@@ -10,7 +12,7 @@ public class NumberNode extends ExpressionNode {
         this.number = number;
     }
 
-    public double evaluate(Map<String, Double> map){
+    public double evaluate(EvaluationContext context){
         return number;
     }
     public String toString(){

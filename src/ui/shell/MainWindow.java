@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import parser.ParseException;
 import plotting.plots.FunctionPlot;
 import scene.FunctionGraphScene;
 import scene.GraphScene;
@@ -60,7 +61,12 @@ public class MainWindow implements SettingsListener{
 
         addGraphScene("New Graph");
         GraphTab tab = (GraphTab)(tabPane.getSelectionModel().getSelectedItem());
-        tab.getGraphScene().getPlotManager().addPlot(new FunctionPlot("New Explicit Plot", "x", Color.RED));
+        try {
+            tab.getGraphScene().getPlotManager().addElement(new FunctionPlot("New Explicit Plot", "x", Color.RED));
+        } catch (ParseException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
         undoManager.clearStacks();
 

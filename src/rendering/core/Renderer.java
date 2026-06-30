@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import plotting.GraphElement;
 import plotting.data.GridData;
 import plotting.data.Segment2D;
 import plotting.data.curve.CurveData;
 import plotting.data.curve.Intersection;
+import plotting.plots.AbstractPlot;
 import rendering.layers.AxisRenderer;
 import rendering.layers.CurveRenderer;
 import rendering.layers.GridRenderer;
@@ -39,25 +41,28 @@ public class Renderer {
         if(rendererSettings.showAxes)drawAxes();
         if(rendererSettings.showAxesTicks)drawAxesTicks(scene.gridData());
         if(rendererSettings.showLabels)drawLabels(scene.gridData(), rendererSettings.showLabelsOutOfView);
+        GraphElement element = scene.getPlotManager().getSelectedElement();
         for(CurveData curve : (scene.getPlotManager()).curveCache){
             if(curve == null) continue;
             double width = 2;
-            if(curve.plot().equals(scene.getPlotManager().getSelectedPlot())) width = 4;
+            if(curve.plot().equals(element)) width = 4;
             drawCurveSegmented(
                 curve.visibleSegments(),
                 curve.plot().getColor(),
                 width
             );
             if(null == curve.featurePoints()) continue;
-            if(curve.plot().equals(scene.getPlotManager().getSelectedPlot())){
+            if(curve.plot().equals(element)){
                 for(Point2D point: curve.featurePoints()){
                     drawMarker(point, 7, labelColor);    
                 }
             }  
         }
-        for(Intersection intersection : scene.getPlotManager().intersectionCache){
-            if(intersection.isOn(scene.getPlotManager().getSelectedPlot()))
-            drawMarker(intersection.getPoint(), 7, labelColor);
+        if(element instanceof AbstractPlot p){
+            for(Intersection intersection : scene.getPlotManager().intersectionCache){
+                if(intersection.isOn(p))
+                drawMarker(intersection.getPoint(), 7, labelColor);
+            }
         }
         Point2D selectedPoint = scene.getPlotManager().interactionController.getSelectedPoint();
         if(selectedPoint!= null){

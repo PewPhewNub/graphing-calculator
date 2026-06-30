@@ -3,6 +3,8 @@ package parser.node;
 import java.util.HashSet;
 import java.util.Map;
 
+import parser.EvaluationContext;
+
 public class BinaryNode extends ExpressionNode{
     private final ExpressionNode left;
     private final ExpressionNode right;
@@ -12,9 +14,9 @@ public class BinaryNode extends ExpressionNode{
         this.left = left; this.right = right; this.operator = operator;
     }
 
-    public double evaluate(Map<String, Double> map){
-        final double leftValue = left.evaluate(map);
-        final double rightValue = right.evaluate(map);
+    public double evaluate(EvaluationContext context){
+        final double leftValue = left.evaluate(context);
+        final double rightValue = right.evaluate(context);
         switch (operator) {
             case PLUS:
                 return leftValue + rightValue;

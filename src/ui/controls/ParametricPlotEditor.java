@@ -2,10 +2,10 @@ package ui.controls;
 
 import java.util.function.Function;
 
-import interaction.commands.EditPlotCommand;
+import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
-import plotting.PlotManager;
+import plotting.GraphElementManager;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
@@ -31,7 +31,7 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
     
     private boolean updatingFields = false;
 
-    public ParametricPlotEditor(PlotManager plotManager, ParametricPlot plot){
+    public ParametricPlotEditor(GraphElementManager plotManager, ParametricPlot plot){
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();
@@ -79,14 +79,14 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
             (obs, oldValue, newValue) -> {
                 if(updatingFields)
                 return;
-                buildPlot();
+                updateElement();
             }
         );
         box1.textProperty().addListener(
             (obs, oldValue, newValue) -> {
                 if(updatingFields)
                 return;
-                buildPlot();
+                updateElement();
             }
         );
         TextFormatter<String> formatter1 = new TextFormatter<>(change -> {
@@ -132,14 +132,14 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
         Runnable action = () -> {
             minT = (Double.parseDouble(box2.getText().trim()));
             maxT = (Double.parseDouble(box3.getText().trim()));
-            buildPlot();
+            updateElement();
         };
         box2.setOnAction(action);
         box3.setOnAction(action);
     }
 
     @Override
-    protected void buildPlot(){
+    protected void updateElement(){
         String text1 = box0.getText();
         String text2 = box1.getText();
         ParametricPlot before = (ParametricPlot)plot.copy();
@@ -172,7 +172,7 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
         ParametricPlot after = new ParametricPlot(nameLabel.getText(), text1, text2, x, y, minT, maxT, colorChooser.getSelectedColor());
         if(before.equals(after)) return;
         undoManager.execute(
-            new EditPlotCommand(
+            new EditElementCommand(
                 plot, 
                 before,
                 after,
@@ -180,7 +180,7 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
             )
         );
     }
-    public void updateFields(){   
+    public void updateValues(){   
         updatingFields = true;
         ParametricPlot fPlot = (ParametricPlot)plot;  
         colorChooser.setSelectedColor(plot.getColor());

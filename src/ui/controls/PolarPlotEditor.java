@@ -2,11 +2,11 @@ package ui.controls;
 
 import java.util.function.Function;
 
-import interaction.commands.EditPlotCommand;
+import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import parser.ParseException;
-import plotting.PlotManager;
+import plotting.GraphElementManager;
 import plotting.plots.PlotGenerator;
 import plotting.plots.PolarPlot;
 import ui.components.EquationInput;
@@ -27,7 +27,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
-    public PolarPlotEditor(PlotManager plotManager, PolarPlot plot){
+    public PolarPlotEditor(GraphElementManager plotManager, PolarPlot plot){
         this.plotManager = plotManager;
         initialize();
         this.plot = plot;
@@ -49,7 +49,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
             (obs, oldValue, newValue) -> {
                 newValue.replace("theta", "\u03b8");
                 box0.setFieldText(newValue);
-                buildPlot();
+                updateElement();
             }
         );
         TextFormatter<String> formatter1 = new TextFormatter<>(change -> {
@@ -95,7 +95,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
         Runnable action = () -> {
             minT = (Double.parseDouble(box1.getText().trim()));
             maxT = (Double.parseDouble(box2.getText().trim()));
-            buildPlot();
+            updateElement();
         };
         box1.setOnAction(action);
         box2.setOnAction(action);
@@ -122,7 +122,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
     }
     
     @Override
-    protected void buildPlot(){
+    protected void updateElement(){
         String text1 = box0.getText();
         PolarPlot before = (PolarPlot)plot.copy();
 
@@ -141,7 +141,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
         PolarPlot after = new PolarPlot(nameLabel.getText(), text1, r, minT, maxT, colorChooser.getSelectedColor());
         if(before.equals(after)) return;
         undoManager.execute(
-            new EditPlotCommand(
+            new EditElementCommand(
                 plot, 
                 before,
                 after,
@@ -151,7 +151,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
     }
 
     @Override
-    public void updateFields(){   
+    public void updateValues(){   
         updatingFields = true;
         PolarPlot fPlot = (PolarPlot)plot;    
         colorChooser.setSelectedColor(plot.getColor());

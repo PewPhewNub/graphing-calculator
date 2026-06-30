@@ -1,17 +1,17 @@
 package interaction.commands;
 
-import plotting.PlotManager;
-import plotting.plots.AbstractPlot;
+import plotting.GraphElement;
+import plotting.GraphElementManager;
 
-public class PushPlotToBottomCommand implements Command{
-    AbstractPlot plot;
-    PlotManager plotManager;
+public class PushElementToBottomCommand implements Command{
+    GraphElement plot;
+    GraphElementManager plotManager;
     int index;
 
-    public PushPlotToBottomCommand(AbstractPlot plot, PlotManager plotManager){
+    public PushElementToBottomCommand(GraphElement plot, GraphElementManager plotManager){
         this.plot = plot;
         this.plotManager = plotManager;
-        index = plotManager.plots.indexOf(plot);
+        index = plotManager.elements.indexOf(plot);
     }
 
     @Override

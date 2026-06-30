@@ -2,8 +2,8 @@ package ui.controls;
 
 import java.util.function.BiFunction;
 
-import interaction.commands.EditPlotCommand;
-import plotting.PlotManager;
+import interaction.commands.EditElementCommand;
+import plotting.GraphElementManager;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
@@ -15,7 +15,7 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
     public String dependent = "y";
     public String independent = "x";
 
-    public ImplicitPlotEditor(PlotManager plotManager, ImplicitPlot plot){
+    public ImplicitPlotEditor(GraphElementManager plotManager, ImplicitPlot plot){
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();
@@ -42,13 +42,13 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
         super.attachListeners();
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
-                buildPlot();
+                updateElement();
             }
         );
     }
 
     @Override
-    protected void buildPlot(){
+    protected void updateElement(){
         String text = box0.getText();
         ImplicitPlot before = (ImplicitPlot)plot.copy();
         BiFunction<Double, Double, Double> f = 
@@ -64,7 +64,7 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
         ImplicitPlot after = new ImplicitPlot(nameLabel.getText(), exp1, exp2, f, colorChooser.getSelectedColor());
         if(before.equals(after)) return;
         undoManager.execute(
-            new EditPlotCommand(
+            new EditElementCommand(
                 plot, 
                 before,
                 after,
@@ -73,7 +73,7 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
         );
     }
 
-    public void updateFields(){   
+    public void updateValues(){   
         updatingFields = true;
         ImplicitPlot fPlot = (ImplicitPlot)plot;
         colorChooser.setSelectedColor(plot.getColor());

@@ -19,8 +19,8 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     public String expression2;
     public String equivExpression;
     public final double CHUNK_SIZE = 16;
-    private final double BASE_SIZE = .125;
-    private final int maxCellsPerSide = 4096;
+    private final double BASE_SIZE = 1f/16;
+    private final int maxCellsPerSide = 512;
     
     public ImplicitPlot(String name, String expression1, String expression2, BiFunction<Double, Double, Double> function, Color color){
         this.name = name;
@@ -70,20 +70,19 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
 
     public ArrayList<Segment2D> marchingSquares(ImplicitChunk chunk, int LOD){
         ArrayList<Segment2D> segments = new ArrayList<>();
-
         double left = chunk.bounds.getMinX();
         double bottom = chunk.bounds.getMinY();
 
         double step = BASE_SIZE / (1 << LOD);
-
-        double stepX = step;
-        double stepY = step;
 
         int maxCells = (int)(chunk.bounds.getHeight()/step);
         if(maxCells > maxCellsPerSide){
             maxCells = maxCellsPerSide;
             step = chunk.bounds.getHeight() / (double)maxCells;
         }
+        
+        double stepX = step;
+        double stepY = step;
         // We need maxCells + 1 points to create maxCells cells (0 to maxCells)
         double[] prevRow = new double[maxCells + 1];
         for (int j = 0; j <= maxCells; j++) {

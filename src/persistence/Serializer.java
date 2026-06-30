@@ -6,11 +6,13 @@ import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.ImplicitPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PolarPlotData;
-import plotting.PlotManager;
+import persistence.plotdata.VariableData;
+import plotting.GraphElement;
+import plotting.GraphElementManager;
+import plotting.Variable;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
 import plotting.plots.ParametricPlot;
-import plotting.plots.AbstractPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
 import scene.GraphScene;
@@ -35,11 +37,11 @@ public final class Serializer {
         data.viewport.width = viewport.getWidth();
     }
 
-    public static void serializePlotData(ProjectData data, PlotManager plotManager){
-        ArrayList<AbstractPlot> plots = plotManager.plots;
+    public static void serializePlotData(ProjectData data, GraphElementManager plotManager){
+        ArrayList<GraphElement> elements = plotManager.elements;
 
-        for(AbstractPlot plot : plots){
-            if(plot instanceof FunctionPlot p){
+        for(GraphElement element : elements){
+            if(element instanceof FunctionPlot p){
                 FunctionPlotData plotData = new FunctionPlotData();
                 plotData.expression = p.expression;
                 plotData.name = p.getName();
@@ -47,9 +49,9 @@ public final class Serializer {
                 plotData.dependent = p.dependent;
                 plotData.independent = p.independent;
 
-                data.plots.add(plotData);
+                data.elements.add(plotData);
             }
-            if(plot instanceof ParametricPlot p){
+            if(element instanceof ParametricPlot p){
                 ParametricPlotData plotData = new ParametricPlotData();
                 plotData.expression1 = p.expression1;
                 plotData.expression2 = p.expression2;
@@ -58,9 +60,9 @@ public final class Serializer {
                 plotData.minParameter = p.tMin;
                 plotData.maxParameter = p.tMax;
 
-                data.plots.add(plotData);
+                data.elements.add(plotData);
             }
-            if(plot instanceof PolarPlot p){
+            if(element instanceof PolarPlot p){
                 PolarPlotData plotData = new PolarPlotData();
                 plotData.expression = p.expression;
                 plotData.name = p.getName();
@@ -68,16 +70,23 @@ public final class Serializer {
                 plotData.minParameter = p.tMin;
                 plotData.maxParameter = p.tMax;
 
-                data.plots.add(plotData);
+                data.elements.add(plotData);
             }
-            if(plot instanceof ImplicitPlot p){
+            if(element instanceof ImplicitPlot p){
                 ImplicitPlotData plotData = new ImplicitPlotData();
                 plotData.expression1 = p.expression1;
                 plotData.expression2 = p.expression2;
                 plotData.name = p.getName();
                 plotData.color = p.getColor().toString();
 
-                data.plots.add(plotData);
+                data.elements.add(plotData);
+            }
+            if(element instanceof Variable p){
+                VariableData plotData = new VariableData();
+                plotData.name = p.getName();
+                plotData.value = p.getValue();
+
+                data.elements.add(plotData);
             }
         }
     }

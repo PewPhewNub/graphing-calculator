@@ -2,11 +2,11 @@ package scene;
 
 import java.util.ArrayList;
 
+import plotting.GraphElement;
+import plotting.GraphElementListener;
+import plotting.GraphElementManager;
 import plotting.PlotInteractionController;
-import plotting.PlotListener;
-import plotting.PlotManager;
 import plotting.data.GridData;
-import plotting.plots.AbstractPlot;
 import rendering.camera.CameraSystem;
 import rendering.camera.ViewportListener;
 import rendering.core.RenderContext;
@@ -14,9 +14,9 @@ import rendering.core.Renderer;
 import rendering.graph.Graph;
 import settings.ApplicationSettings;
 
-public abstract class GraphScene implements PlotListener, ViewportListener{
+public abstract class GraphScene implements GraphElementListener, ViewportListener{
     protected Graph graph;
-    protected PlotManager plotManager;
+    protected GraphElementManager plotManager;
     protected CameraSystem cameraSystem;
     protected GridData gridData;
     protected Renderer renderer;
@@ -26,6 +26,7 @@ public abstract class GraphScene implements PlotListener, ViewportListener{
 
     protected boolean viewportMoved = true;
     protected boolean plotsChanged = true;
+    protected boolean variablesChanged = true;
 
     public abstract void render();
     public abstract void update();
@@ -38,10 +39,10 @@ public abstract class GraphScene implements PlotListener, ViewportListener{
     public GridData gridData(){
         return gridData;
     }
-    public ArrayList<AbstractPlot> plots(){
-        return plotManager.plots;
+    public ArrayList<GraphElement> elements(){
+        return plotManager.elements;
     }
-    public PlotManager getPlotManager(){
+    public GraphElementManager getPlotManager(){
         return plotManager;
     }
     public PlotInteractionController getInteraction(){
@@ -59,7 +60,7 @@ public abstract class GraphScene implements PlotListener, ViewportListener{
     public ApplicationSettings getSettings() {
         return settings;
     }
-    public void setPlotManager(PlotManager plotManager) {
+    public void setPlotManager(GraphElementManager plotManager) {
         this.plotManager = plotManager;
     }
 }

@@ -1,7 +1,8 @@
 package parser.node;
 
 import java.util.HashSet;
-import java.util.Map;
+
+import parser.EvaluationContext;
 
 public class FunctionNode extends ExpressionNode{
     private final String functionName;
@@ -11,8 +12,8 @@ public class FunctionNode extends ExpressionNode{
         this.argument = argument;
     }
 
-    public double evaluate(Map<String, Double> map){
-        double argumentValue = argument.evaluate(map);
+    public double evaluate(EvaluationContext context){
+        double argumentValue = argument.evaluate(context);
 
         switch (functionName) {
             case "sin":

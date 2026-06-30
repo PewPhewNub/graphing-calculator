@@ -13,6 +13,7 @@ import parser.ParseException;
 import parser.node.DefinitionNode;
 
 public class PlotGenerator {
+    /*
     public static FunctionPlot generateFunctionPlot(String name, String expression, String dependent, String independent, Color color) throws ParseException{
         Function<Double, Double> function = generateFunction(expression, dependent, independent);
         if(function == null) return null;
@@ -128,5 +129,13 @@ public class PlotGenerator {
         }
         return null;
     }
+    */
 
+    public static DefinitionNode generateDefinition(String expression, String dependent, Set<String> independents) throws ParseException{
+        Lexer lexer = new Lexer(expression);
+        lexer.tokenize();
+        Parser parser = new Parser(lexer.tokenList);
+
+        return parser.parseDefinition(dependent, independents);
+    }
 }

@@ -65,7 +65,7 @@ public class CartesianInteractionController extends PlotInteractionController{
     }
 
     public void selectHovered(ArrayList<Intersection> intersections, Viewport viewport){
-        plotManager.setSelectedPlot(hoveredPlot);
+        plotManager.setSelectedElement(hoveredPlot);
         
         if(hoveredPlot == null) return;
 
@@ -169,7 +169,7 @@ public class CartesianInteractionController extends PlotInteractionController{
 
     public void clearSelection(){
         selectedPlot = null;
-        plotManager.setSelectedPlot(null);
+        plotManager.setSelectedElement(null);
         selectedCurve = null;
         selectedPoint = null;
     }
@@ -180,52 +180,54 @@ public class CartesianInteractionController extends PlotInteractionController{
         hoveredCurve = null;
         hoveredPoint = null;
     }
-
-    @Override
-    public void plotAdded(AbstractPlot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotAdded'");
-    }
-
-    @Override
-    public void plotRemoved(AbstractPlot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotRemoved'");
-    }
-
-    @Override
-    public void plotsChanged() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotsChanged'");
-    }
-
-    @Override
-    public void plotChanged(AbstractPlot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotChanged'");
-    }
-
-    @Override
+    
     public void selectedPlotChanged(AbstractPlot plot) {
         selectedPlot = plot;
     }
 
     @Override
-    public void plotReordered(AbstractPlot plot1, AbstractPlot plot2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotReordered'");
+    public void elementsChanged() {
+        return;
     }
 
     @Override
-    public void plotReordered(int index1, int index2) {
+    public void elementAdded(GraphElement element) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotReordered'");
+        return;
     }
 
     @Override
-    public void plotMovedTo(AbstractPlot plot, int index) {
+    public void elementRemoved(GraphElement element) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'plotMovedTo'");
+        return;
     }
-    
+
+    @Override
+    public void elementChanged(GraphElement element) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void selectedElementChanged(GraphElement element) {
+        
+    }
+
+    @Override
+    public void elementsSwapped(GraphElement element1, GraphElement element2) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void elementsSwapped(int index1, int index2) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void elementMovedTo(GraphElement element, int index) {
+        // TODO Auto-generated method stub
+        return;
+    }
 }

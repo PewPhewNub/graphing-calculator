@@ -34,7 +34,7 @@ import math.Point;
 import parser.Lexer;
 import parser.Parser;
 import parser.node.DefinitionNode;
-import plotting.PlotManager;
+import plotting.GraphElementManager;
 import plotting.plots.ODEPlot;
 import ui.components.ColorChooser;
 
@@ -61,7 +61,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
     private CheckBox autoGenerate;
     private CheckBox slopeField;
 
-    public ODEPlotEditor(PlotManager plotManager){
+    public ODEPlotEditor(GraphElementManager plotManager){
         this.plotManager = plotManager;
 
         setBackground(new Background(
@@ -153,7 +153,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         generate.setBorder(Border.EMPTY);
         generate.setOnAction(e -> {
             try {
-                buildPlot();
+                updateElement();
             } catch (Exception e1) {
                 System.out.println(e1.getMessage());
             }
@@ -332,14 +332,14 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         advancedOptionsPanel.getChildren().add(slopeField);
 
         try {
-            buildPlot();
+            updateElement();
         } catch(Exception e1) {
             System.out.println(e1.getMessage());
         }
     }
 
     @Override
-    public void buildPlot(){
+    public void updateElement(){
         String text = functionInputField.getText();
         
         Lexer lexer = new Lexer(text);
@@ -351,14 +351,14 @@ public class ODEPlotEditor extends AbstractPlotEditor{
                         dependent,
                         Set.of(independent, dependent)
                     );
-            plotManager.removePlot(plot);
+            plotManager.removeElement(plot);
             plot = new ODEPlot(dependent, 
                 (x, y) -> {
                     map.put(independent, x);
                     map.put(dependent, y);
                     return node.evaluate(map);
                 }, new Point(0, 1), colorChooser.getSelectedColor());       
-            plotManager.addPlot(plot);
+            plotManager.addElement(plot);
             ((ODEPlot)plot).setShowSlopeField(slopeField.isSelected());
         }catch(Exception e1){
             System.out.println(e1.getMessage());
@@ -366,7 +366,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
     }
 
     @Override
-    public void updateFields() {
+    public void updateValues() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateFields'");
     }

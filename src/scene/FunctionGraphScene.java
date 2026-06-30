@@ -3,12 +3,12 @@ package scene;
 import interaction.InputController;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
-import javafx.scene.Scene;
 import plotting.CartesianInteractionController;
-import plotting.PlotManager;
+import plotting.GraphElement;
+import plotting.GraphElementManager;
 import plotting.data.GridData;
-import plotting.plots.CartesianPlot;
 import plotting.plots.AbstractPlot;
+import plotting.plots.CartesianPlot;
 import rendering.camera.CameraIntent;
 import rendering.camera.CameraSystem;
 import rendering.camera.Viewport;
@@ -27,7 +27,7 @@ public class FunctionGraphScene extends GraphScene{
         graph = new Graph(width, height);
         this.settings = settings;
         interaction = new CartesianInteractionController();
-        plotManager = new PlotManager(interaction);
+        plotManager = new GraphElementManager(interaction);
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
         renderer = new Renderer(context, this.settings.rendererSettings);
         cameraSystem = new CameraSystem(graph.viewport);
@@ -160,7 +160,7 @@ public class FunctionGraphScene extends GraphScene{
     }
 
     public void lateUpdate(){
-        if(plotsChanged || viewportMoved){
+        if(plotsChanged || viewportMoved || variablesChanged){
             plotManager.computeCurveData(graph.viewport);
         }
         
@@ -170,6 +170,7 @@ public class FunctionGraphScene extends GraphScene{
 
         plotsChanged = false;
         viewportMoved = false;
+        variablesChanged = false;
     }
     
     private void handleInteraction(){
@@ -237,22 +238,7 @@ public class FunctionGraphScene extends GraphScene{
     }
 
     @Override
-    public void plotAdded(AbstractPlot plot) {
-        return;
-    }
-
-    @Override
-    public void plotRemoved(AbstractPlot plot) {
-        return;
-    }
-
-    @Override
-    public void plotChanged(AbstractPlot plot) {
-        return;
-    }
-    
-    @Override
-    public void plotsChanged() {
+    public void elementsChanged() {
         plotsChanged = true;
     }
 
@@ -262,23 +248,46 @@ public class FunctionGraphScene extends GraphScene{
     }
 
     @Override
-    public void selectedPlotChanged(AbstractPlot plot) {
+    public void elementAdded(GraphElement element) {
         return;
     }
 
     @Override
-    public void plotReordered(AbstractPlot plot1, AbstractPlot plot2) {
-        return;
-    }
-    @Override
-    public void plotReordered(int index1, int index2) {
+    public void elementRemoved(GraphElement element) {
         // TODO Auto-generated method stub
-        
+        return;
     }
 
     @Override
-    public void plotMovedTo(AbstractPlot plot, int index) {
+    public void elementChanged(GraphElement element) {
+        // TODO Auto-generated method stub
+        return;
     }
+
+    @Override
+    public void selectedElementChanged(GraphElement element) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void elementsSwapped(GraphElement element1, GraphElement element2) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void elementsSwapped(int index1, int index2) {
+        // TODO Auto-generated method stub
+        return;
+    }
+
+    @Override
+    public void elementMovedTo(GraphElement element, int index) {
+        // TODO Auto-generated method stub
+        return;
+    }
+    
 }
     
 

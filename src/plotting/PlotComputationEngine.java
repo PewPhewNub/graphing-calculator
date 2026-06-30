@@ -11,6 +11,7 @@ import math.Point;
 import math.RootFinding;
 import math.RootSolution;
 import math.SolverStatus;
+import parser.EvaluationContext;
 import plotting.data.ImplicitChunk;
 import plotting.data.ODECurveChunk;
 import plotting.data.ParametricCurveChunk;
@@ -33,8 +34,8 @@ import rendering.camera.ViewportState;
 
 public class PlotComputationEngine { 
 
-    private static ArrayList<Point2D> computeIntercepts(FunctionPlot plot1, ViewportState state){
-        Function<Double, Double> function = plot1.getFunction();
+    private static ArrayList<Point2D> computeIntercepts(FunctionPlot plot1, EvaluationContext context, ViewportState state){
+        Function<Double, Double> function = plot1.getFunction(context);
         double prev = function.apply(state.left);
         ArrayList<Point2D> list = new ArrayList<>();
         double stepSize = state.worldWidth/state.viewportWidth;
@@ -54,7 +55,7 @@ public class PlotComputationEngine {
         return list;
     }
 
-    private static ArrayList<Point2D> computeIntercepts(ParametricPlot plot1){
+    private static ArrayList<Point2D> computeIntercepts(ParametricPlot plot1, EvaluationContext context){
         Function<Double, Double> x = plot1.x;
         Function<Double, Double> y = plot1.y;
         double prevX = x.apply(plot1.tMin);
@@ -82,7 +83,7 @@ public class PlotComputationEngine {
         return list;
     }
 
-    private static ArrayList<Point2D> computeIntercepts(PolarPlot plot1){
+    private static ArrayList<Point2D> computeIntercepts(PolarPlot plot1, EvaluationContext context){
         Function<Double, Double> x = plot1.x;
         Function<Double, Double> y = plot1.y;
         double prevX = x.apply(plot1.tMin);
@@ -110,8 +111,8 @@ public class PlotComputationEngine {
         return list;
     }
 
-    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, FunctionPlot plot2, ViewportState state){
-        Function<Double, Double> function = x -> plot1.getFunction().apply(x) - plot2.getFunction().apply(x);
+    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, FunctionPlot plot2, EvaluationContext context, ViewportState state){
+        Function<Double, Double> function = x -> plot1.getFunction(context).apply(x) - plot2.getFunction(context).apply(x);
         double prev = function.apply(state.left);
         ArrayList<Intersection> list = new ArrayList<>();
         double stepSize = state.worldWidth/state.viewportWidth;
@@ -126,7 +127,7 @@ public class PlotComputationEngine {
                         new Intersection(
                             new Point2D(
                                 solution.root(), 
-                                plot1.getFunction().apply(solution.root())
+                                plot1.getFunction(context).apply(solution.root())
                             ),
                         plot1,
                         plot2)
@@ -138,8 +139,8 @@ public class PlotComputationEngine {
         return list;
     }
 
-    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, ParametricPlot plot2, ViewportState state){
-        Function<Double, Double> function1 = plot1.getFunction();
+    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, ParametricPlot plot2, EvaluationContext context, ViewportState state){
+        Function<Double, Double> function1 = plot1.getFunction(context);
         Function<Double, Double> x = plot2.x;
         Function<Double, Double> y = plot2.y;
         Function<Double, Double> function = t -> function1.apply(x.apply(t)) - y.apply(t);
@@ -170,8 +171,8 @@ public class PlotComputationEngine {
         return list;
     }
     
-    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, PolarPlot plot2, ViewportState state){
-        Function<Double, Double> function1 = plot1.getFunction();
+    private static ArrayList<Intersection> computeIntersections(FunctionPlot plot1, PolarPlot plot2, EvaluationContext context, ViewportState state){
+        Function<Double, Double> function1 = plot1.getFunction(context);
         Function<Double, Double> x = plot2.x;
         Function<Double, Double> y = plot2.y;
         Function<Double, Double> function = t -> function1.apply(x.apply(t)) - y.apply(t);
@@ -202,8 +203,8 @@ public class PlotComputationEngine {
         return list;
     }
 
-    private static ArrayList<Point2D> computeCriticalPoints(FunctionPlot plot1, ViewportState state){
-        Function<Double, Double> function = plot1.getFunction();
+    private static ArrayList<Point2D> computeCriticalPoints(FunctionPlot plot1, EvaluationContext context, ViewportState state){
+        Function<Double, Double> function = plot1.getFunction(context);
         Function<Double, Double> derivative = Calculus.derivative(function, 1e-7);
         double prev = derivative.apply(state.left);
         ArrayList<Point2D> list = new ArrayList<>();
@@ -422,7 +423,7 @@ public class PlotComputationEngine {
         }
     }
 
-    private static CurveData computeCurveData(FunctionPlot plot, Viewport viewport){
+    private static CurveData computeCurveData(FunctionPlot plot, EvaluationContext context, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
         double samples = (int)(viewport.getWidth());
         double stepX = (state.right - state.left)/samples;
@@ -437,7 +438,7 @@ public class PlotComputationEngine {
         double offset = stepX * 0.123;
 
         ArrayList<Segment2D> segments = new ArrayList<>();
-        Function<Double, Double> function = plot.getFunction();
+        Function<Double, Double> function = plot.getFunction(context);
         for(int i = 0; i < samples - 1; i+=2){
             double x = state.left + i*stepX + offset;
             ArrayList<Point2D> points = new ArrayList<>();
@@ -452,17 +453,17 @@ public class PlotComputationEngine {
                 segments.add(new Segment2D(p1, p2));
             }
         }
-        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, state);
-        featurePoints.addAll(computeIntercepts(plot, state));
+        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, context, state);
+        featurePoints.addAll(computeIntercepts(plot, context, state));
 
         return new FunctionCurveData(plot, segments, featurePoints);
     }
 
-    private static CurveData computeCurveData(PolarPlot plot, Viewport viewport){
+    private static CurveData computeCurveData(PolarPlot plot, EvaluationContext context, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
         BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
-        Function<Double, Double> x = plot.x;
-        Function<Double, Double> y = plot.y;    
+        Function<Double, Double> x = plot.getX(context);
+        Function<Double, Double> y = plot.getY(context);    
         double toleranceY = Math.abs(
                 viewport.screenToWorldY(.5)
             - viewport.screenToWorldY(0)
@@ -477,8 +478,8 @@ public class PlotComputationEngine {
                 segments.addAll(generateChunkSegments(x, y, chunk, state, toleranceX, toleranceY));
             }
         }
-        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, state);
-        featurePoints.addAll(computeIntercepts(plot, state));
+        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, context, state);
+        featurePoints.addAll(computeIntercepts(plot, context, state));
 
         return new PolarCurveData(plot, segments, featurePoints);
     }
@@ -495,7 +496,7 @@ public class PlotComputationEngine {
         return segments;
     }
 
-    private static CurveData computeCurveData(ParametricPlot plot, Viewport viewport){
+    private static CurveData computeCurveData(ParametricPlot plot, EvaluationContext context, Viewport viewport){
         ViewportState state = new ViewportState(viewport);
         BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
         Function<Double, Double> x = plot.x;
@@ -515,8 +516,8 @@ public class PlotComputationEngine {
             }
         }
 
-        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, state);
-        featurePoints.addAll(computeIntercepts(plot, state));
+        ArrayList<Point2D> featurePoints = computeCriticalPoints(plot, context, state);
+        featurePoints.addAll(computeIntercepts(plot, context, state));
 
         return new ParametricCurveData(plot, segments, featurePoints);
     }
@@ -744,43 +745,43 @@ public class PlotComputationEngine {
 
         return new CurveData(plot, segments);
     }
-    public static ArrayList<Point2D> computeIntercepts(AbstractPlot plot, ViewportState state) {
+    public static ArrayList<Point2D> computeIntercepts(AbstractPlot plot, EvaluationContext context, ViewportState state) {
         if (plot instanceof FunctionPlot fp)
-            return computeIntercepts(fp, state);
+            return computeIntercepts(fp, context, state);
 
         if (plot instanceof ParametricPlot pp)
-            return computeIntercepts(pp);
+            return computeIntercepts(pp, context);
 
         if (plot instanceof PolarPlot pp)
-            return computeIntercepts(pp);
+            return computeIntercepts(pp, context);
 
         if (plot instanceof ImplicitPlot ip)
             return computeIntercepts(ip, state);
 
         return new ArrayList<>();
     }
-    public static ArrayList<Intersection> computeIntersections(AbstractPlot plot1, AbstractPlot plot2, Viewport viewport){
+    public static ArrayList<Intersection> computeIntersections(AbstractPlot plot1, AbstractPlot plot2, EvaluationContext context, Viewport viewport){
         if(plot1 instanceof ODEPlot) return new ArrayList<>();
         if(plot2 instanceof ODEPlot) return new ArrayList<>();
         ViewportState state = new ViewportState(viewport);
         if(plot1 instanceof FunctionPlot p1){
-            if(plot2 instanceof FunctionPlot p2) return computeIntersections(p1, p2, state);   
+            if(plot2 instanceof FunctionPlot p2) return computeIntersections(p1, p2, context, state);   
             if(plot2 instanceof PolarPlot p2){
-                ArrayList<Intersection> list = computeIntersections(p1, p2, state);
+                ArrayList<Intersection> list = computeIntersections(p1, p2, context, state);
                 return list;
             }
             if(plot2 instanceof ParametricPlot p2){
-                ArrayList<Intersection> list = computeIntersections(p1, p2, state);
+                ArrayList<Intersection> list = computeIntersections(p1, p2, context, state);
                 return list;
             }
         }else if(plot1 instanceof ParametricPlot p1){
             if(plot2 instanceof FunctionPlot p2){
-                ArrayList<Intersection> list = computeIntersections(p2, p1, state);
+                ArrayList<Intersection> list = computeIntersections(p2, p1, context, state);
                 return list;
             }else return computeIntersectionsCurves(plot1, plot2, viewport);
         }else if(plot1 instanceof PolarPlot p1){
             if(plot2 instanceof FunctionPlot p2){
-                ArrayList<Intersection> list = computeIntersections(p2, p1, state);
+                ArrayList<Intersection> list = computeIntersections(p2, p1, context, state);
                 return list;
             }else return computeIntersectionsCurves(plot1, plot2, viewport);
         }else{
@@ -788,9 +789,9 @@ public class PlotComputationEngine {
         }
         return new ArrayList<>();
     }
-    private static ArrayList<Point2D> computeCriticalPoints(AbstractPlot plot, ViewportState state){
+    private static ArrayList<Point2D> computeCriticalPoints(AbstractPlot plot, EvaluationContext context, ViewportState state){
          if (plot instanceof FunctionPlot fp)
-            return computeCriticalPoints(fp, state);
+            return computeCriticalPoints(fp, context, state);
 
         if (plot instanceof ParametricPlot pp)
             return computeCriticalPoints(pp);
@@ -940,12 +941,12 @@ public class PlotComputationEngine {
         return new double[]{x1+t0*dx, y1+t0*dy, x1+t1*dx, y1+t1*dy};
     }
 
-    public static CurveData computeCurveData(AbstractPlot plot, Viewport viewport){
+    public static CurveData computeCurveData(AbstractPlot plot, EvaluationContext context, Viewport viewport){
         if(plot == null) return null;
-        if(plot instanceof FunctionPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
+        if(plot instanceof FunctionPlot p) return PlotComputationEngine.computeCurveData(p, context, viewport);
         if(plot instanceof ODEPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
-        if(plot instanceof ParametricPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
-        if(plot instanceof PolarPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
+        if(plot instanceof ParametricPlot p) return PlotComputationEngine.computeCurveData(p, context, viewport);
+        if(plot instanceof PolarPlot p) return PlotComputationEngine.computeCurveData(p, context, viewport);
         if(plot instanceof ImplicitPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
         if(plot instanceof VectorFieldPlot p) return PlotComputationEngine.computeCurveData(p, viewport);
         else return null;
