@@ -20,7 +20,6 @@ public abstract class AbstractPlot extends GraphElement{
         this.color = color;
     }
     public abstract AbstractPlot copy();
-    public abstract void update(EvaluationContext context);
     public abstract boolean equals(AbstractPlot plot);
     public abstract Set<String> getReferencedVariables();
 }

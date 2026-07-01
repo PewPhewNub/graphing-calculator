@@ -2,76 +2,64 @@ package plotting.plots;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import parser.EvaluationContext;
+import parser.ParseException;
+import parser.node.DefinitionNode;
+import plotting.GraphElement;
 import plotting.data.ImplicitChunk;
 import plotting.data.Segment2D;
 import rendering.camera.Viewport;
 import rendering.camera.ViewportState;
 
 public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
-    public BiFunction<Double, Double, Double> function;
     public HashMap<Point2D, ImplicitChunk> chunks;
     public String expression1;
     public String expression2;
+    public DefinitionNode definition;
     public String equivExpression;
     public final double CHUNK_SIZE = 16;
     private final double BASE_SIZE = 1f/16;
     private final int maxCellsPerSide = 512;
     
-    public ImplicitPlot(String name, String expression1, String expression2, BiFunction<Double, Double, Double> function, Color color){
-        this.name = name;
-        this.function = function;
-        this.color = color;
-        this.expression1 = expression1;
-        this.expression2 = expression2;
-        this.equivExpression = "(" +  expression2 + ") - (" + expression1 + ")";
-        chunks = new HashMap<>();
-    }
-    
-    public ImplicitPlot(String name, String expression1, String expression2, Color color){
+    public ImplicitPlot(String name, String expression1, String expression2, Color color) throws ParseException{
         this.name = name;
         this.expression1 = expression1;
         this.expression2 = expression2;
         this.equivExpression = "(" +  expression2 + ") - (" + expression1 + ")";
-        this.function = PlotGenerator.generateBiFunction(equivExpression);
         this.color = color;
+
+        definition = PlotGenerator.generateDefinition(equivExpression, "y", Set.of("x", "y"));
 
         chunks = new HashMap<>();
     }
 
-    
-    public ImplicitPlot(String name, String expression, Color color){
-        this.name = name;
-        this.equivExpression = expression.trim();
-        this.function = PlotGenerator.generateBiFunction(equivExpression);
-        this.color = color;
-
-        int index = equivExpression.indexOf((int)('='));
-        if(index == -1) return;
-        expression1 = equivExpression.substring(0, index).trim();
-        expression2 = equivExpression.substring(index + 1).trim();
-
-        chunks = new HashMap<>();
-    }
     public ImplicitPlot(){
         this.name = "New Implicit Plot";
         this.expression1 = "y";
         this.expression2 = "x";
         this.equivExpression = "(y) - (x)";
-        this.function = PlotGenerator.generateBiFunction(equivExpression);
         this.color = Color.RED;
+
+        try {
+            definition = PlotGenerator.generateDefinition(equivExpression, "y", Set.of("x", "y"));
+        } catch (ParseException e) {
+            return;
+        }
 
         chunks = new HashMap<>();
     }
 
-    public ArrayList<Segment2D> marchingSquares(ImplicitChunk chunk, int LOD){
+    public ArrayList<Segment2D> marchingSquares(ImplicitChunk chunk, int LOD, EvaluationContext context){
         ArrayList<Segment2D> segments = new ArrayList<>();
         double left = chunk.bounds.getMinX();
         double bottom = chunk.bounds.getMinY();
+        BiFunction<Double, Double, Double> function = getFunction(context);
 
         double step = BASE_SIZE / (1 << LOD);
 
@@ -159,7 +147,7 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
         return segments; 
     }
 
-    public void ensureCoverage(Viewport viewport){
+    public void ensureCoverage(Viewport viewport, EvaluationContext context){
         ViewportState state = new ViewportState(viewport);
 
         int LOD = calculateLOD(viewport);
@@ -174,14 +162,14 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
                 Point2D key = new Point2D(cx, cy);
 
                 if(!chunks.containsKey(key)) {
-                    generateChunk(cx, cy, LOD);
+                    generateChunk(cx, cy, LOD, context);
                     continue;
                 }
 
                 ImplicitChunk chunk = chunks.get(key);
                 if(!chunk.generated) continue;
                 if(chunk.LOD != LOD){
-                    generateChunk(cx, cy, LOD);
+                    generateChunk(cx, cy, LOD, context);
                 }
             }
         }
@@ -203,10 +191,10 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
         return Math.min(Math.max(0, lod), 4);
     }
 
-    public void generateChunk(double cx, double cy, int LOD){
+    public void generateChunk(double cx, double cy, int LOD, EvaluationContext context){
         ImplicitChunk chunk = new ImplicitChunk();
         chunk.bounds = new BoundingBox(cx * CHUNK_SIZE, cy*CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE);
-        ArrayList<Segment2D> segments = marchingSquares(chunk, LOD);
+        ArrayList<Segment2D> segments = marchingSquares(chunk, LOD, context);
         if(segments== null){
             chunk.generated = false;
             return;
@@ -223,8 +211,14 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
         chunks.put(new Point2D(cx, cy), chunk);
     }
 
-    public boolean sample(double x, double y){ //using marching squares
-        return Math.abs(function.apply(x, y)) < 1e-6;
+    public double sample(double x, double y, EvaluationContext context){ 
+        context.set("x", x);
+        context.set("y", y);
+        return definition.evaluate(context);
+    }
+
+    public BiFunction<Double, Double, Double> getFunction(EvaluationContext context){
+        return (x, y) -> sample(x, y, context);
     }
 
     public Color getColor() {
@@ -249,23 +243,18 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
     }
 
     @Override
-    public boolean copyFrom(AbstractPlot other) {
+    public boolean copyFrom(GraphElement other) {
         if(other instanceof ImplicitPlot p){
             name = p.name;
             expression1 = p.expression1;
             expression2 = p.expression2;
             equivExpression = p.equivExpression;
             color = p.color;
-            function = p.function;
+            definition = p.definition;
             chunks.clear();
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void update() {
-
     }
 
     @Override
@@ -276,5 +265,10 @@ public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
                    color.equals(p.color)&&
                    name.equals(p.name);
         }else return false;
+    }
+
+    @Override
+    public Set<String> getReferencedVariables() {
+        return definition.getVariables();
     }
 }

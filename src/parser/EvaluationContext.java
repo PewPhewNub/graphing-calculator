@@ -1,5 +1,6 @@
 package parser;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class EvaluationContext {
@@ -15,5 +16,9 @@ public class EvaluationContext {
 
     public void set(String name, double value){
         values.put(name, value);
+    }
+    
+    public EvaluationContext copy(){
+        return new EvaluationContext(new HashMap<>(values));
     }
 }

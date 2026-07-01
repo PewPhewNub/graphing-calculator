@@ -4,56 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import parser.EvaluationContext;
-import plotting.data.curve.CurveData;
-import plotting.data.curve.Intersection;
-import plotting.plots.AbstractPlot;
-import rendering.camera.Viewport;
 
 public class GraphElementManager{
     public ArrayList<GraphElement> elements;
-    public final ArrayList<CurveData> curveCache;
-    public final ArrayList<Intersection> intersectionCache;
-    public PlotInteractionController interactionController;
     public ArrayList<GraphElementListener> listeners;
     private Runnable dirtyCallback;
     private GraphElement selectedGraphElement;
     private boolean isVariablesChanged = true;
-    private final ExecutorService computeExecutor = Executors.newSingleThreadExecutor(
-        r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            return t;
-        });
-    private final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-        r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            return t;
-        });
 
-    public GraphElementManager(PlotInteractionController plotInteractionController){
+    public GraphElementManager(){
         elements = new ArrayList<>();
         selectedGraphElement = null;
-        curveCache = new ArrayList<>();
-        interactionController = plotInteractionController;
-        intersectionCache = new ArrayList<>();
-        plotInteractionController.setCaches(this);
         this.listeners = new ArrayList<>();
     }
     public void addElement(GraphElement element){
         if(element instanceof Variable)isVariablesChanged = true;
         elements.add(element);
         for(GraphElementListener listener : listeners){
-            listener.elementsChanged();
             listener.elementAdded(element);
+            listener.elementsChanged();
         }
         markUnsaved();
     }
@@ -64,56 +35,28 @@ public class GraphElementManager{
             setSelectedElement(null);
         }
         for(GraphElementListener listener : listeners){
-            listener.elementsChanged();
             listener.elementRemoved(element);
+            listener.elementsChanged();
         }
         markUnsaved();
     }
-    public void computeCurveData(Viewport viewport){
-        computeExecutor.submit(() -> {
-            computeCurveDataInternal(viewport);
-        });
-    }
-
-    private void computeCurveDataInternal(Viewport viewport){
-        Map<String, Double> variables = buildVariableMap();
-
-        EvaluationContext context = new EvaluationContext(variables);
-        ArrayList<Intersection> newIntersectionCache = new ArrayList<>();
-        for(int i = 0; i < elements.size(); i++){
-            if(elements.get(i) instanceof AbstractPlot element1)
-            for(int j = i + 1; j < elements.size(); j++){
-                if(elements.get(j) instanceof AbstractPlot element2)
-                newIntersectionCache.addAll(PlotComputationEngine.computeIntersections(element1, element2, context, viewport));
-            }
-        }
-
-        ArrayList<CurveData> newCurveCache = new ArrayList<>();
-
-        ArrayList<Future<CurveData>> futures = new ArrayList<>();
-        for(GraphElement element : elements){
-            if(element instanceof AbstractPlot plot)
-            futures.add(pool.submit(
-                () -> PlotComputationEngine.computeCurveData(plot, context, viewport)
-            ));
-        }
-        for(Future<CurveData> future : futures){
-            try {
-                newCurveCache.add(future.get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-        Platform.runLater(() -> {
-            intersectionCache.clear();
-            intersectionCache.addAll(newIntersectionCache);
-            curveCache.clear();
-            curveCache.addAll(newCurveCache);
-        });
-    }
 
     public void removeAll(){
+        ArrayList<GraphElement> old = new ArrayList<>(elements);
+
         elements.clear();
+
+        for(GraphElement element : old){
+            for(GraphElementListener listener : listeners){
+                listener.elementRemoved(element);
+            }
+        }
+
+        for(GraphElementListener listener : listeners){
+            listener.elementsChanged();
+        }
+
+        setSelectedElement(null);
         markUnsaved();
     }
     public void addElement(int index, GraphElement element){
@@ -135,6 +78,7 @@ public class GraphElementManager{
         if(element instanceof Variable)isVariablesChanged = true;
         for(GraphElementListener listener : listeners){
             listener.elementChanged(element);
+            System.out.println("yes");
             listener.elementsChanged();
         }
         markUnsaved();
@@ -146,20 +90,6 @@ public class GraphElementManager{
     void markUnsaved(){
         if(dirtyCallback!= null){
             dirtyCallback.run();
-        }
-    }
-
-    public void close() {
-        computeExecutor.shutdownNow();
-        pool.shutdownNow(); 
-
-        try {
-            if (!pool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
-                pool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            pool.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -225,8 +155,11 @@ public class GraphElementManager{
                 variables.put(variable.getName(), variable.getValue());
             }
         }
-        System.out.println(variables);
-
         return variables;
+    }
+
+    public EvaluationContext buildEvaluationContext(){
+        Map<String, Double> variables = buildVariableMap();
+        return new EvaluationContext(variables);
     }
 }

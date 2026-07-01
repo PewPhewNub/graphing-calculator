@@ -2,8 +2,7 @@ package plotting;
 
 public class Variable extends GraphElement{
     String name = "a";
-    String value= "1";
-    boolean slider = false;
+    double value = 1;
 
     double min = -10;
     double max = 10;
@@ -11,6 +10,13 @@ public class Variable extends GraphElement{
 
     public Variable(String name){
         this.name = name;
+    }
+    public Variable(String name, double value, double min, double max, double step){
+        this.name = name;
+        this.min = min;
+        this.value = value;
+        this.max = max;
+        this.step = step;
     }
     public Variable(){
         this.name = "a";
@@ -28,15 +34,9 @@ public class Variable extends GraphElement{
         return step;
     }
     public double getValue() {
-        return Double.parseDouble(value);
-    }
-    public boolean isSlider() {
-        return slider;
+        return value;
     }
     public void setValue(double value) {
-        this.value = value + "";
-    }
-    public void setValue(String value) {
         this.value = value;
     }
     public void setMax(double max) {
@@ -48,23 +48,19 @@ public class Variable extends GraphElement{
     public void setStep(double step) {
         this.step = step;
     }
-    public void setSlider(boolean slider) {
-        this.slider = slider;
-    }
-    public String getString(){
-        return value;
-    }
 
     public boolean equals(Variable variable){
         return name.trim().equals(variable.name.trim())&&
-               value.equals(variable.value);
+               value == variable.value&&
+               min == variable.min &&
+               max == variable.max && 
+               step == variable.step;
     }
     public Variable copy(){
         Variable variable = new Variable();
         variable.name = this.name;
         variable.max = this.max;
         variable.min = this.min;
-        variable.slider = this.slider;
         variable.step = this.step;
         variable.value = this.value;
         return variable;
@@ -75,7 +71,6 @@ public class Variable extends GraphElement{
             this.name = variable.name;
             this.max = variable.max;
             this.min = variable.min;
-            this.slider = variable.slider;
             this.step = variable.step;
             this.value = variable.value;
             return true;

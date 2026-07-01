@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import interaction.InteractionResult;
 import javafx.geometry.Point2D;
+import parser.EvaluationContext;
 import plotting.data.Segment2D;
 import plotting.plots.AbstractPlot;
 
-public class CurveData{
+public abstract class CurveData{
 
     AbstractPlot originalPlot;
     ArrayList<Segment2D> visibleSegments;
@@ -23,6 +24,13 @@ public class CurveData{
         this.originalPlot = plot;
         this.visibleSegments = segments;
     }
+    public CurveData(AbstractPlot plot){
+        this.originalPlot = plot;
+        this.visibleSegments = new ArrayList<>();
+        this.featurePoints = new ArrayList<>();
+    }
+
+    public abstract CurveData copy(CurveData data);
 
     public AbstractPlot plot(){
         return originalPlot;
@@ -82,5 +90,13 @@ public class CurveData{
 
     public void addFeaturePoints(ArrayList<Point2D> points){
         this.featurePoints = points;
+    }
+
+    public abstract Point2D targettedPoint(double x, double y, EvaluationContext context);
+    public void setFeaturePoints(ArrayList<Point2D> featurePoints) {
+        this.featurePoints = new ArrayList<>(featurePoints);
+    }
+    public void setVisibleSegments(ArrayList<Segment2D> visibleSegments) {
+        this.visibleSegments = new ArrayList<>(visibleSegments);
     }
 }

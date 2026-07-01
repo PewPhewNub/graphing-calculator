@@ -19,12 +19,12 @@ public class EditElementCommand implements Command{
     @Override
     public void execute() {
         target.copyFrom(after);
-        plotManager.plotChanged(target);
+        plotManager.elementChanged(target);
     }
 
     @Override
     public void undo() {
         target.copyFrom(before);
-        plotManager.plotChanged(target);
+        plotManager.elementChanged(target);
     }
 }

@@ -136,7 +136,7 @@ public class MainWindow implements SettingsListener{
 
         graphTab.setOnCloseRequest(e -> {
             e.consume();
-            graphTab.getGraphScene().getPlotManager().close();
+            graphTab.getGraphScene().getCoordinator().close();
             removeGraphScene();
             return;
         });
@@ -152,8 +152,7 @@ public class MainWindow implements SettingsListener{
             if(!fileActions.unsaved(graphTab)) return;
         }
         graphTab.getGraphScene()
-            .getPlotManager()
-            .close();
+            .getCoordinator().close();
         undoManager.execute(new RemoveGraphCommand(
             tabPane.getSelectionModel().getSelectedIndex(), 
             graphTab, 
@@ -191,7 +190,7 @@ public class MainWindow implements SettingsListener{
         ArrayList<Tab> tabs = new ArrayList<>(tabPane.getTabs());
 
         for(Tab tab : tabs){
-            ((GraphTab)tab).getGraphScene().getPlotManager().close();
+            ((GraphTab)tab).getGraphScene().getCoordinator().close();
         }
         tabPane.getTabs().clear();
         timer.stop();

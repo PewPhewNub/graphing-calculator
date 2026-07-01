@@ -1,13 +1,10 @@
 package ui.controls;
 
-import java.util.function.Function;
-
 import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import parser.ParseException;
 import plotting.GraphElementManager;
-import plotting.plots.PlotGenerator;
 import plotting.plots.PolarPlot;
 import ui.components.EquationInput;
 import ui.components.LabelledInput;
@@ -47,7 +44,7 @@ public class PolarPlotEditor extends AbstractPlotEditor{
         super.attachListeners();
         box0.textProperty().addListener(
             (obs, oldValue, newValue) -> {
-                newValue.replace("theta", "\u03b8");
+                newValue = newValue.replace("theta", "\u03B8");
                 box0.setFieldText(newValue);
                 updateElement();
             }
@@ -121,28 +118,32 @@ public class PolarPlotEditor extends AbstractPlotEditor{
         advancedOptionsPanel.getChildren().add(box2);
     }
     
-    @Override
-    protected void updateElement(){
-        String text1 = box0.getText();
-        PolarPlot before = (PolarPlot)plot.copy();
 
-        Function<Double, Double> r;
+    protected void updateElement() {
+        String text = box0.getText();
+        PolarPlot before = (PolarPlot) plot.copy();
+
+        box0.highlightError(null);
+
+        PolarPlot after;
         try {
-            r = PlotGenerator.generateFunction(
-                text1,
-                "r",
-                "\u03B8"
+            after = new PolarPlot(
+                nameLabel.getText(),
+                text,
+                minT,
+                maxT,
+                colorChooser.getSelectedColor()
             );
         } catch (ParseException e) {
             box0.highlightError(e.getMessage());
             return;
         }
 
-        PolarPlot after = new PolarPlot(nameLabel.getText(), text1, r, minT, maxT, colorChooser.getSelectedColor());
-        if(before.equals(after)) return;
+        if (before.equals(after)) return;
+
         undoManager.execute(
             new EditElementCommand(
-                plot, 
+                plot,
                 before,
                 after,
                 plotManager
@@ -158,8 +159,13 @@ public class PolarPlotEditor extends AbstractPlotEditor{
 
         box0.setFieldText(fPlot.expression);
 
-        box1.setText(Double.toString(fPlot.tMin));
-        box2.setText(Double.toString(fPlot.tMax));
+        if(!box1.isFocused()){
+            box1.setText(Double.toString(fPlot.tMin));
+        }
+
+        if(!box2.isFocused()){
+            box2.setText(Double.toString(fPlot.tMax));
+        }
         minT = fPlot.tMin;
         maxT = fPlot.tMax;
         nameLabel.setText(plot.getName());

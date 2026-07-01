@@ -19,7 +19,6 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
     public double tMax;
     public String expression;
     private DefinitionNode definition;
-    public ArrayList<ParametricCurveChunk> chunks;
     public String dependent = "r";
     public String independent = "\u03B8";
 
@@ -31,7 +30,6 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
         this.tMax = tMax;
         this.expression = expression;
         this.definition = PlotGenerator.generateDefinition(expression, dependent, Set.of(independent));
-        chunks = new ArrayList<>();
     }
     
     public PolarPlot(){
@@ -45,47 +43,6 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        chunks = new ArrayList<>();
-    }
-
-    public void reloadChunks(EvaluationContext context){
-        double chunkSize = 2; // radians
-
-        for(double t = tMin; t < tMax; t += chunkSize){
-            chunks.add(
-                new ParametricCurveChunk(
-                    new Interval(t, Math.min(t + chunkSize, tMax)),
-                    sample(t, context),
-                    sample(Math.min(t + chunkSize, tMax), context),
-                    computeBounds(t, Math.min(t + chunkSize, tMax), context)
-                )
-            );
-        }
-    }
-
-    public BoundingBox computeBounds(double t0, double t1, EvaluationContext context){
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
-
-        int samples = 128;
-        Function<Double, Double> x = t -> sampleX(t, context);
-        Function<Double, Double> y = t -> sampleY(t, context);
-
-        for(int i=0;i<=samples;i++){
-            double t = t0 + (t1-t0)*i/(double)samples;
-
-            double xt = x.apply(t);
-            double yt = y.apply(t);
-
-            minX = Math.min(minX, xt);
-            minY = Math.min(minY, yt);
-            maxX = Math.max(maxX, xt);
-            maxY = Math.max(maxY, yt);
-        }
-
-        return new BoundingBox(minX,minY,maxX - minX,maxY - minY);
     }
 
     public Point2D sample(double t, EvaluationContext context){
@@ -121,14 +78,11 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
             color = p.color;
             tMin = p.tMin;
             tMax = p.tMax;
+            definition = p.definition;
             return true;
         }else{
             return false;
         }
-    }
-    @Override
-    public void update(EvaluationContext context) {
-        reloadChunks(context);
     }
     @Override
     public boolean equals(AbstractPlot plot) {
@@ -148,9 +102,9 @@ public class PolarPlot extends AbstractPlot implements CartesianPlot{
     }
 
     public Function<Double, Double> getX(EvaluationContext context){
-        return t -> sampleX(tMax, context);
+        return t -> sampleX(t, context);
     }
     public Function<Double, Double> getY(EvaluationContext context){
-        return t -> sampleY(tMax, context);
+        return t -> sampleY(t, context);
     }
 }

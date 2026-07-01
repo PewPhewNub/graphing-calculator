@@ -2,10 +2,11 @@ package scene;
 
 import java.util.ArrayList;
 
+import computation.ComputationCoordinator;
+import interaction.PlotInteractionController;
 import plotting.GraphElement;
 import plotting.GraphElementListener;
 import plotting.GraphElementManager;
-import plotting.PlotInteractionController;
 import plotting.data.GridData;
 import rendering.camera.CameraSystem;
 import rendering.camera.ViewportListener;
@@ -23,6 +24,7 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
     protected PlotInteractionController interaction;
     protected RenderContext context;
     protected ApplicationSettings settings;
+    protected ComputationCoordinator coordinator;
 
     protected boolean viewportMoved = true;
     protected boolean plotsChanged = true;
@@ -62,5 +64,11 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
     }
     public void setPlotManager(GraphElementManager plotManager) {
         this.plotManager = plotManager;
+    }
+    public ComputationCoordinator getCoordinator() {
+        return coordinator;
+    }
+    public void setCoordinator(ComputationCoordinator coordinator) {
+        this.coordinator = coordinator;
     }
 }

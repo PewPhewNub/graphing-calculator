@@ -55,8 +55,14 @@ public final class Deserializer {
                 
             }
             if(data instanceof ParametricPlotData d){
-                ParametricPlot plot = new ParametricPlot(d.name, d.expression1, d.expression2, d.minParameter, d.maxParameter, Color.web(d.color));
-                graphElementManager.addElement(plot);
+                ParametricPlot plot;
+                try {
+                    plot = new ParametricPlot(d.name, d.expression1, d.expression2, d.minParameter, d.maxParameter, Color.web(d.color));
+                    graphElementManager.addElement(plot);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             if(data instanceof PolarPlotData d){
                 PolarPlot plot;
@@ -69,8 +75,14 @@ public final class Deserializer {
                 }
             }
             if(data instanceof ImplicitPlotData d){
-                ImplicitPlot plot = new ImplicitPlot(d.name, d.expression1, d.expression2, Color.web(d.color));
+                ImplicitPlot plot;
+                try {
+                    plot = new ImplicitPlot(d.name, d.expression1, d.expression2, Color.web(d.color));
                 graphElementManager.addElement(plot);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             if(data instanceof VariableData d){
                 Variable variable = new Variable(d.name);

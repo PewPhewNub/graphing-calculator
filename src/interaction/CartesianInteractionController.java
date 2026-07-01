@@ -1,26 +1,31 @@
-package plotting;
+package interaction;
 
 import java.util.ArrayList;
 
-import interaction.InteractionResult;
+import computation.ComputationCoordinator;
 import javafx.geometry.Point2D;
+import parser.EvaluationContext;
+import plotting.GraphElement;
+import plotting.GraphElementManager;
 import plotting.data.curve.CurveData;
 import plotting.data.curve.FunctionCurveData;
 import plotting.data.curve.ImplicitCurveData;
 import plotting.data.curve.Intersection;
 import plotting.data.curve.ParametricCurveData;
 import plotting.data.curve.PolarCurveData;
-import plotting.plots.AbstractPlot;
 import rendering.camera.Viewport;
 
 public class CartesianInteractionController extends PlotInteractionController{
+    
+    public CartesianInteractionController(GraphElementManager plotManager, ComputationCoordinator coordinator) {
+        super(plotManager, coordinator);
+    }
 
     @Override
-    public void update(Viewport viewport, double mouseX, double mouseY) {
+    public void update(double mouseX, double mouseY, Viewport viewport, EvaluationContext context) {
         if(Double.isNaN(mouseY) || Double.isNaN(mouseX)) return;
-        updateHover(curveData, mouseX, mouseY, viewport);
-
-        updateSelection(mouseX, mouseY, intersections, viewport);
+        updateHover(coordinator.getCurveData(), mouseX, mouseY, viewport);
+        updateSelection(mouseX, mouseY, context,  coordinator.getIntersections(), viewport);
     }
 
     public InteractionResult findClosestCurve(ArrayList<CurveData> curves, double mouseX, double mouseY){
@@ -64,19 +69,17 @@ public class CartesianInteractionController extends PlotInteractionController{
         hoveredCurve = hover.getCurveData();
     }
 
-    public void selectHovered(ArrayList<Intersection> intersections, Viewport viewport){
-        plotManager.setSelectedElement(hoveredPlot);
-        
+    public void selectHovered(Viewport viewport){
         if(hoveredPlot == null) return;
 
-        selectedPlot = hoveredPlot;
+        super.setSelectedPlot(hoveredPlot);
         selectedCurve = hoveredCurve;
 
-        selectedPoint = applySnapping(hoveredPoint, hoveredCurve, intersections, viewport);
+        selectedPoint = applySnapping(hoveredPoint, hoveredCurve, coordinator.getIntersections(), viewport);
     }
 
-    public void updateSelection(double mouseX, double mouseY, ArrayList<Intersection> intersections, Viewport viewport){
-        if(selectedPlot == null){
+    public void updateSelection(double mouseX, double mouseY, EvaluationContext context, ArrayList<Intersection> intersections, Viewport viewport){
+        if(super.getSelectedPlot() == null){
             return;
         }
 
@@ -90,7 +93,7 @@ public class CartesianInteractionController extends PlotInteractionController{
         selectedCurve = curve;
         if(selectedCurve instanceof FunctionCurveData f){
             selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY),
+                f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
                 intersections,
                 viewport
@@ -98,21 +101,21 @@ public class CartesianInteractionController extends PlotInteractionController{
         }
         if(selectedCurve instanceof ParametricCurveData f){
             selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY),
+                f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
                 intersections,
                 viewport
             );
         }if(selectedCurve instanceof PolarCurveData f){
             selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY),
+                f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
                 intersections,
                 viewport
             );
         }if(selectedCurve instanceof ImplicitCurveData f){
             selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY),
+                f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
                 intersections,
                 viewport
@@ -121,10 +124,10 @@ public class CartesianInteractionController extends PlotInteractionController{
     }
 
     private CurveData currentSelectedCurve(){
-        if(selectedPlot == null) return null;
+        if(super.getSelectedPlot() == null) return null;
 
-        for(CurveData curve : curveData){
-            if(curve.plot() == selectedPlot){
+        for(CurveData curve : coordinator.getCurveData()){
+            if(curve.plot() == super.getSelectedPlot()){
                 return curve;
             }
         }
@@ -166,23 +169,11 @@ public class CartesianInteractionController extends PlotInteractionController{
 
         return points;
     }
-
-    public void clearSelection(){
-        selectedPlot = null;
-        plotManager.setSelectedElement(null);
-        selectedCurve = null;
-        selectedPoint = null;
-    }
-
     
     public void clearHover(){
         hoveredPlot = null;
         hoveredCurve = null;
         hoveredPoint = null;
-    }
-    
-    public void selectedPlotChanged(AbstractPlot plot) {
-        selectedPlot = plot;
     }
 
     @Override

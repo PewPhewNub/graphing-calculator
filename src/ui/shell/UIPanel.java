@@ -371,6 +371,7 @@ public class UIPanel extends BorderPane implements GraphElementListener, Themeab
             for(Node i : controlPane.getChildren()){
                 ((Button)i).setDisable(true);
             }
+            controlPane.getChildren().get(0).setDisable(false);
             return;
         }
         for(Node i : controlPane.getChildren()){

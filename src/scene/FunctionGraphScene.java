@@ -1,9 +1,10 @@
 package scene;
 
+import computation.ComputationCoordinator;
+import interaction.CartesianInteractionController;
 import interaction.InputController;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
-import plotting.CartesianInteractionController;
 import plotting.GraphElement;
 import plotting.GraphElementManager;
 import plotting.data.GridData;
@@ -20,14 +21,14 @@ import settings.ApplicationSettings;
 public class FunctionGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
-    private CartesianInteractionController interaction;
     private boolean unsaved;
     
     public FunctionGraphScene(double width, double height, ApplicationSettings settings){
         graph = new Graph(width, height);
         this.settings = settings;
-        interaction = new CartesianInteractionController();
-        plotManager = new GraphElementManager(interaction);
+        plotManager = new GraphElementManager();
+        coordinator = new ComputationCoordinator(plotManager);
+        interaction = new CartesianInteractionController(plotManager, coordinator);
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
         renderer = new Renderer(context, this.settings.rendererSettings);
         cameraSystem = new CameraSystem(graph.viewport);
@@ -37,6 +38,7 @@ public class FunctionGraphScene extends GraphScene{
 
         graph.viewport.addListener(this);
         plotManager.addListener(this);
+        plotManager.addListener(coordinator);
     }
 
     @Override
@@ -161,7 +163,7 @@ public class FunctionGraphScene extends GraphScene{
 
     public void lateUpdate(){
         if(plotsChanged || viewportMoved || variablesChanged){
-            plotManager.computeCurveData(graph.viewport);
+            coordinator.compute(graph.viewport);
         }
         
         generateGridData(80);
@@ -177,7 +179,7 @@ public class FunctionGraphScene extends GraphScene{
         InputController input = graph.getInput();
         double worldX = graph.viewport.screenToWorldX(input.mouseX);
         double worldY = graph.viewport.screenToWorldY(input.mouseY);
-        interaction.update(graph.viewport, worldX, worldY);
+        interaction.update(worldX, worldY, graph.viewport, plotManager.buildEvaluationContext());
     }
 
     private void updateMode(){
@@ -185,7 +187,7 @@ public class FunctionGraphScene extends GraphScene{
         if(input.mousePressed){
             if(interaction.getHoveredCurve() != null){
                 currentMode = CurrentMode.INSPECTING;
-                interaction.selectHovered(plotManager.intersectionCache, graph.viewport);
+                interaction.selectHovered(graph.viewport);
             }
             else{
                 currentMode = CurrentMode.PANNING;
@@ -238,9 +240,10 @@ public class FunctionGraphScene extends GraphScene{
     }
 
     @Override
-    public void elementsChanged() {
-        plotsChanged = true;
-    }
+public void elementsChanged() {
+    System.out.println("ELEMENTS CHANGED");
+    plotsChanged = true;
+}
 
     @Override
     public void viewportMoved() {

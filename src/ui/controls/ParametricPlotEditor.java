@@ -1,10 +1,12 @@
 package ui.controls;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
+import parser.ParseException;
 import plotting.GraphElementManager;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PlotGenerator;
@@ -139,41 +141,60 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
     }
 
     @Override
-    protected void updateElement(){
+    protected void updateElement() {
         String text1 = box0.getText();
         String text2 = box1.getText();
-        ParametricPlot before = (ParametricPlot)plot.copy();
+
+        ParametricPlot before = (ParametricPlot) plot.copy();
+
         box0.highlightError(null);
         box1.highlightError(null);
-        Function<Double, Double> x = null;
-        Function<Double, Double> y = null;
+
         boolean failed = false;
-        try{
-            x = PlotGenerator.generateFunction(
+
+        try {
+            PlotGenerator.generateDefinition(
                 text1,
                 "x",
-                "t"
+                Set.of("t")
             );
-        }catch(Exception e){
+        } catch (ParseException e) {
             box0.highlightError(e.getMessage());
             failed = true;
         }
-        try{
-            y = PlotGenerator.generateFunction(
+
+        try {
+            PlotGenerator.generateDefinition(
                 text2,
                 "y",
-                "t"
+                Set.of("t")
             );
-        }catch(Exception e){
+        } catch (ParseException e) {
             box1.highlightError(e.getMessage());
             failed = true;
         }
+
         if(failed) return;
-        ParametricPlot after = new ParametricPlot(nameLabel.getText(), text1, text2, x, y, minT, maxT, colorChooser.getSelectedColor());
+
+        ParametricPlot after;
+        try {
+            after = new ParametricPlot(
+                nameLabel.getText(),
+                text1,
+                text2,
+                minT,
+                maxT,
+                colorChooser.getSelectedColor()
+            );
+        } catch (ParseException e) {
+            return;
+        }
+
         if(before.equals(after)) return;
+
         undoManager.execute(
             new EditElementCommand(
-                plot, 
+                plot,
                 before,
                 after,
                 plotManager

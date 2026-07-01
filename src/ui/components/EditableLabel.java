@@ -73,4 +73,8 @@ public class EditableLabel extends StackPane{
     public StringProperty textProperty(){
         return label.textProperty();
     }
+
+    public TextField getField(){
+        return textField;
+    }
 }

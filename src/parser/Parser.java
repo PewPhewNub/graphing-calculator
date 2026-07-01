@@ -145,6 +145,10 @@ public class Parser{
             ExpressionNode expr2 = parseExpression();
             return new DefinitionNode(new BinaryNode(expr, BinaryOp.SUBTRACT, expr2), dependentVariable, knownVariables);
         }
+        
+        if (peek().type != TokenType.EOF) {
+            throw new ParseException("Unexpected token: " + peek().value);
+        }
         return new DefinitionNode(expr, dependentVariable, knownVariables);
     } 
 }

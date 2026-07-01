@@ -1,14 +1,15 @@
 package rendering.core;
 
 import java.util.ArrayList;
+import java.util.Map;
 
+import computation.AbstractPlotComputer;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import plotting.GraphElement;
 import plotting.data.GridData;
 import plotting.data.Segment2D;
 import plotting.data.curve.CurveData;
-import plotting.data.curve.Intersection;
 import plotting.plots.AbstractPlot;
 import rendering.layers.AxisRenderer;
 import rendering.layers.CurveRenderer;
@@ -41,34 +42,57 @@ public class Renderer {
         if(rendererSettings.showAxes)drawAxes();
         if(rendererSettings.showAxesTicks)drawAxesTicks(scene.gridData());
         if(rendererSettings.showLabels)drawLabels(scene.gridData(), rendererSettings.showLabelsOutOfView);
-        GraphElement element = scene.getPlotManager().getSelectedElement();
-        for(CurveData curve : (scene.getPlotManager()).curveCache){
-            if(curve == null) continue;
-            double width = 2;
-            if(curve.plot().equals(element)) width = 4;
-            drawCurveSegmented(
-                curve.visibleSegments(),
-                curve.plot().getColor(),
-                width
-            );
-            if(null == curve.featurePoints()) continue;
-            if(curve.plot().equals(element)){
-                for(Point2D point: curve.featurePoints()){
-                    drawMarker(point, 7, labelColor);    
-                }
-            }  
-        }
-        if(element instanceof AbstractPlot p){
-            for(Intersection intersection : scene.getPlotManager().intersectionCache){
-                if(intersection.isOn(p))
-                drawMarker(intersection.getPoint(), 7, labelColor);
+        GraphElement selectedElement = scene.getPlotManager().getSelectedElement();
+
+        Map<AbstractPlot, AbstractPlotComputer<?, ?>> computers = scene.getCoordinator().getComputers();
+        ArrayList<GraphElement> elements = scene.getPlotManager().elements;
+
+        for(int i = elements.size() - 1; i >= 0; i--){
+            GraphElement element = elements.get(i);
+            if(element instanceof AbstractPlot p){
+                if(p.equals(selectedElement))continue;
+                CurveData curve = computers.get(p).getData();
+                if(curve == null) continue;
+                double width = 2;
+                drawCurveSegmented(
+                    curve.visibleSegments(),
+                    curve.plot().getColor(),
+                    width
+                );
+                /*for(Intersection intersection : scene.getPlotManager().intersectionCache){
+                    if(intersection.isOn(p))
+                    drawMarker(intersection.getPoint(), 7, labelColor);
+                }*/
             }
         }
-        Point2D selectedPoint = scene.getPlotManager().interactionController.getSelectedPoint();
-        if(selectedPoint!= null){
-            drawMarker(selectedPoint, 7, scene.getPlotManager().interactionController.getSelectedPlot().getColor());
-            drawInspectionLabel(selectedPoint, axesColor);
+        
+        if (selectedElement instanceof AbstractPlot p) {
+            AbstractPlotComputer<?, ?> computer = computers.get(p);
+
+            if (computer != null) {
+                CurveData data = computer.getData();
+                if (data != null) {
+                    drawSelected(data, scene.getInteraction().getSelectedPoint());
+                }
+            }
         }
+    }
+
+    public void drawSelected(CurveData curve, Point2D selectedPoint){
+        double width = 4;
+        if(curve == null) return;
+        drawCurveSegmented(
+            curve.visibleSegments(),
+            curve.plot().getColor(),
+            width
+        );
+        if(null == curve.featurePoints()) return;
+        for(Point2D point: curve.featurePoints()){
+                drawMarker(point, 10, labelColor);    
+        }  
+        if(selectedPoint == null) return;
+        drawMarker(selectedPoint, 10, curve.plot().getColor());
+        drawInspectionLabel(selectedPoint, axesColor);
     }
 
     public void setColor(Color axesColor, Color gridColor, Color labelColor){

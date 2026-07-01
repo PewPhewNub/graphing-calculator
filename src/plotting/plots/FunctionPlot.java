@@ -92,10 +92,6 @@ public class FunctionPlot extends AbstractPlot implements CartesianPlot{
         }
     }
 
-    public void update(EvaluationContext context){
-        return;
-    }
-
     public boolean equals(AbstractPlot plot) {
         if(plot instanceof FunctionPlot p){
             return p.name.trim().equals(name.trim())&&

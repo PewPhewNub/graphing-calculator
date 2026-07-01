@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import computation.ComputationCoordinator;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
@@ -49,6 +50,7 @@ public final class ImageExporter {
         GraphScene newScene = new FunctionGraphScene(width, height, tab.getSettings());
         newScene.getGraph().viewport = tab.getGraphScene().getGraph().viewport.copy();
         newScene.setPlotManager(tab.getGraphScene().getPlotManager());
+        newScene.setCoordinator(tab.getGraphScene().getCoordinator());
 
         if(transparent) newScene.getRenderer().setBackgroundColor(Color.TRANSPARENT);
 

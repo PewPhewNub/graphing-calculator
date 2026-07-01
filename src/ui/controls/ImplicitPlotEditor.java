@@ -1,11 +1,9 @@
 package ui.controls;
 
-import java.util.function.BiFunction;
-
 import interaction.commands.EditElementCommand;
+import parser.ParseException;
 import plotting.GraphElementManager;
 import plotting.plots.ImplicitPlot;
-import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
 
 public class ImplicitPlotEditor extends AbstractPlotEditor{
@@ -51,17 +49,26 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
     protected void updateElement(){
         String text = box0.getText();
         ImplicitPlot before = (ImplicitPlot)plot.copy();
-        BiFunction<Double, Double, Double> f = 
-            PlotGenerator.generateBiFunction(text);
-        if(f == null){
-            return;
-        }
+        box0.highlightError(null);
+
         int index = text.indexOf((int)('='));
         if(index == -1) return;
         String exp1 = text.substring(0, index).trim();
         String exp2 = text.substring(index + 1).trim();
 
-        ImplicitPlot after = new ImplicitPlot(nameLabel.getText(), exp1, exp2, f, colorChooser.getSelectedColor());
+        ImplicitPlot after;
+        try {
+            after = new ImplicitPlot(
+                nameLabel.getText(),
+                exp1,
+                exp2,
+                colorChooser.getSelectedColor()
+            );
+        } catch (ParseException e) {
+            box0.highlightError(e.getMessage());
+            return;
+        }
+
         if(before.equals(after)) return;
         undoManager.execute(
             new EditElementCommand(
