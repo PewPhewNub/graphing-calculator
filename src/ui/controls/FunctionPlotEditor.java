@@ -1,13 +1,10 @@
 package ui.controls;
 
-import java.util.function.Function;
-
 import interaction.commands.EditElementCommand;
 import javafx.scene.layout.VBox;
 import parser.ParseException;
 import plotting.GraphElementManager;
 import plotting.plots.FunctionPlot;
-import plotting.plots.PlotGenerator;
 import ui.components.EquationInput;
 import ui.components.LabelledInput;
 import ui.components.MoreOptionsButton;

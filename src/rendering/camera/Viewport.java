@@ -89,6 +89,7 @@ public class Viewport {
         if (Math.abs(scaleY - this.scaleY) < 1e-6)
             return;
         this.scaleY = scaleY;
+        notifyListeners();
     }
 
     public Point2D screenDeltaToWorld(double x1, double y1, double x2, double y2) {

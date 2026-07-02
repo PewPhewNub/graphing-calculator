@@ -290,8 +290,8 @@ public class GraphToolBar extends HBox{
                             .2,
                             0, 0,
                             false,
-                            scene.getGraph().getInput().mouseX,
-                            scene.getGraph().getInput().mouseY
+                            scene.getInput().mouseX,
+                            scene.getInput().mouseY
                         ));
                     }    
                 });
@@ -329,8 +329,8 @@ public class GraphToolBar extends HBox{
                             -.2,
                             0, 0,
                             false,
-                            scene.getGraph().getInput().mouseX,
-                            scene.getGraph().getInput().mouseY
+                            scene.getInput().mouseX,
+                            scene.getInput().mouseY
                         ));
                     }
                 });

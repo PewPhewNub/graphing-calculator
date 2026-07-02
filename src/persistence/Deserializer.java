@@ -8,7 +8,6 @@ import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.GraphElementData;
 import persistence.plotdata.ImplicitPlotData;
 import persistence.plotdata.ParametricPlotData;
-import persistence.plotdata.PlotData;
 import persistence.plotdata.PolarPlotData;
 import persistence.plotdata.VariableData;
 import plotting.GraphElementManager;

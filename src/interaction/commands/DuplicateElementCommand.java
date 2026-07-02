@@ -2,7 +2,6 @@ package interaction.commands;
 
 import plotting.GraphElement;
 import plotting.GraphElementManager;
-import plotting.plots.AbstractPlot;
 
 public class DuplicateElementCommand implements Command{
     GraphElement plotCopy;

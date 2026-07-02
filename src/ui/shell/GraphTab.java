@@ -4,17 +4,11 @@ import java.io.File;
 
 import interaction.InputController;
 import interaction.UndoManager;
-import javafx.geometry.Insets;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import plotting.GraphElementManager;
 import rendering.camera.Viewport;
 import scene.GraphScene;
@@ -41,36 +35,11 @@ public class GraphTab extends Tab{
         this.settings = scene.getSettings();
         BorderPane mainPane = new BorderPane();
 
-        StackPane graphHolder = new StackPane();
-        graphHolder.getChildren().add(scene.getGraph());
-        graphHolder.setMinSize(0, 0);
-        graphHolder.setMaxWidth(Double.MAX_VALUE);
-
-        graphHolder.setBackground(
-            new Background(
-                new BackgroundFill(
-                    Color.WHITE,
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY
-                )
-            )
-        );
-        VBox.setVgrow(graphHolder, Priority.ALWAYS);
-        HBox.setHgrow(graphHolder, Priority.ALWAYS);
-
-        scene.getGraph().widthProperty().bind(graphHolder.widthProperty());
-        scene.getGraph().heightProperty().bind(graphHolder.heightProperty());
-        scene.getGraph().widthProperty().addListener((obs,o,n) -> scene.render());
-        scene.getGraph().heightProperty().addListener((obs,o,n) -> scene.render());
-
         statusBar = new StatusBar();
-        graphHolder.focusedProperty().addListener((obs, oldV, newV) -> {
-            if(newV) scene.getGraph().requestFocus();
-        });
 
         VBox graphPane = new VBox();
         graphPane.getChildren().add(toolBar);
-        graphPane.getChildren().add(graphHolder);
+        graphPane.getChildren().add(scene.getRoot());
         graphPane.getChildren().add(statusBar);
         graphPane.setMinSize(0, 0);
         graphPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -84,8 +53,6 @@ public class GraphTab extends Tab{
         scene.getPlotManager().setDirtyCallback(
             () -> setDirty(true)
         );
-        
-        VBox.setVgrow(graphHolder, Priority.ALWAYS);
 
         setContent(mainPane);
     }
@@ -135,7 +102,7 @@ public class GraphTab extends Tab{
     }
 
     public void updateStatusBar(){
-        InputController input = scene.getGraph().getInput();
+        InputController input = scene.getInput();
         Viewport viewport = scene.getGraph().viewport;
         GraphElementManager plotManager = scene.getPlotManager();
         statusBar.update(

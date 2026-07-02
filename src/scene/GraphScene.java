@@ -3,7 +3,9 @@ package scene;
 import java.util.ArrayList;
 
 import computation.ComputationCoordinator;
+import interaction.InputController;
 import interaction.PlotInteractionController;
+import javafx.scene.layout.StackPane;
 import plotting.GraphElement;
 import plotting.GraphElementListener;
 import plotting.GraphElementManager;
@@ -16,6 +18,7 @@ import rendering.graph.Graph;
 import settings.ApplicationSettings;
 
 public abstract class GraphScene implements GraphElementListener, ViewportListener{
+    protected StackPane root;
     protected Graph graph;
     protected GraphElementManager plotManager;
     protected CameraSystem cameraSystem;
@@ -25,6 +28,7 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
     protected RenderContext context;
     protected ApplicationSettings settings;
     protected ComputationCoordinator coordinator;
+    protected InputController input;
 
     protected boolean viewportMoved = true;
     protected boolean plotsChanged = true;
@@ -70,5 +74,11 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
     }
     public void setCoordinator(ComputationCoordinator coordinator) {
         this.coordinator = coordinator;
+    }
+    public StackPane getRoot() {
+        return root;
+    }
+    public InputController getInput() {
+        return input;
     }
 }

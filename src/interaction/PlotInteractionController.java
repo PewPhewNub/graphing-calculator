@@ -1,7 +1,5 @@
 package interaction;
 
-import java.util.ArrayList;
-
 import computation.ComputationCoordinator;
 import javafx.geometry.Point2D;
 import parser.EvaluationContext;
@@ -9,7 +7,6 @@ import plotting.GraphElement;
 import plotting.GraphElementListener;
 import plotting.GraphElementManager;
 import plotting.data.curve.CurveData;
-import plotting.data.curve.Intersection;
 import plotting.plots.AbstractPlot;
 import rendering.camera.Viewport;
 

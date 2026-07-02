@@ -1,7 +1,6 @@
 package ui.controls;
 
 import java.util.Set;
-import java.util.function.Function;
 
 import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;

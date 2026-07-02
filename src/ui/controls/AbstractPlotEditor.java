@@ -1,6 +1,5 @@
 package ui.controls;
 
-import interaction.UndoManager;
 import interaction.commands.RemoveElementCommand;
 import javafx.scene.layout.VBox;
 import plotting.GraphElementManager;

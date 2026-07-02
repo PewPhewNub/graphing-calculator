@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import computation.ComputationCoordinator;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;

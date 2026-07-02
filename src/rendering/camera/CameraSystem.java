@@ -2,7 +2,7 @@ package rendering.camera;
 
 public class CameraSystem {
     Viewport viewport;
-    boolean smoothMovements = true;
+    boolean smoothMovements = false;
 
     double targetCameraX;
     double targetCameraY;
@@ -26,34 +26,41 @@ public class CameraSystem {
     }
 
     public void handle(CameraIntent intent){
+        
         targetCameraX -= intent.deltaX();
         targetCameraY -= intent.deltaY();
         if(intent.zoomAtMouse()){
-            double worldBeforeX =
-                viewport.screenToWorldX(intent.mouseX());
+            double worldBeforeX = viewport.screenToWorldX(
+                intent.mouseX(),
+                targetCameraX,
+                targetZoom
+            );
 
-            double worldBeforeY =
-                viewport.screenToWorldY(intent.mouseY());
+            double worldBeforeY = viewport.screenToWorldY(
+                intent.mouseY(),
+                targetCameraY,
+                targetZoom
+            );
+
             double newTargetZoom = targetZoom * (1 + intent.zoomDelta());
-            double worldAfterX =
-                viewport.screenToWorldX(
-                    intent.mouseX(),
-                    targetCameraX,
-                    newTargetZoom
-                );
 
-            double worldAfterY =
-                viewport.screenToWorldY(
-                    intent.mouseY(),
-                    targetCameraY,
-                    newTargetZoom
-                );
+            double worldAfterX = viewport.screenToWorldX(
+                intent.mouseX(),
+                targetCameraX,
+                newTargetZoom
+            );
+
+            double worldAfterY = viewport.screenToWorldY(
+                intent.mouseY(),
+                targetCameraY,
+                newTargetZoom
+            );
+
             targetCameraX += worldBeforeX - worldAfterX;
             targetCameraY += worldBeforeY - worldAfterY;
-
             targetZoom = newTargetZoom;
-
-        }else if(intent.zoomDelta() != 0){
+        }
+        else if(intent.zoomDelta() != 0){
             targetZoom *= (1 + intent.zoomDelta());
         }else{
             targetScaleX *= (1 + intent.stretchXDelta());
@@ -79,8 +86,8 @@ public class CameraSystem {
     }
 
     public void resetAspectRatio(){
-        targetScaleX = 01;
-        targetScaleY = 01;
+        targetScaleX = 1;
+        targetScaleY = 1;
     }
 
     public void goTo(double x, double y){
@@ -89,43 +96,38 @@ public class CameraSystem {
     }
 
     public void update(){
+        double now = System.nanoTime();
+        double dt = (now - lastTime) / 1e9; // seconds
+        lastTime = now;
+
         if(!smoothMovements){
             viewport.setCameraX(targetCameraX);
             viewport.setCameraY(targetCameraY);
             viewport.setZoom(targetZoom);
-
             viewport.setScaleX(targetScaleX);
             viewport.setScaleY(targetScaleY);
             return;
         }
-        viewport.setCameraX(viewport.getCameraX() + (targetCameraX - viewport.getCameraX()) * .87);
 
-        viewport.setCameraY(viewport.getCameraY() + (targetCameraY - viewport.getCameraY()) * .87);
+        // Shared time constant so camera & zoom converge together.
+        double smoothing = 1 - Math.exp(-dt / 0.045); // tune 0.05 = "speed"
+
+        viewport.setCameraX(viewport.getCameraX() + (targetCameraX - viewport.getCameraX()) * smoothing);
+        viewport.setCameraY(viewport.getCameraY() + (targetCameraY - viewport.getCameraY()) * smoothing);
 
         double currentLog = Math.log(viewport.getZoom());
         double targetLog = Math.log(targetZoom);
-
-        currentLog += (targetLog - currentLog) * .3;
-
+        currentLog += (targetLog - currentLog) * smoothing;
         viewport.setZoom(Math.exp(currentLog));
 
-        viewport.setScaleX(
-            viewport.getScaleX() +
-            (targetScaleX - viewport.getScaleX()) * 0.15
-        );
+        viewport.setScaleX(viewport.getScaleX() + (targetScaleX - viewport.getScaleX()) * smoothing);
+        viewport.setScaleY(viewport.getScaleY() + (targetScaleY - viewport.getScaleY()) * smoothing);
 
-        viewport.setScaleY(
-            viewport.getScaleY() +
-            (targetScaleY - viewport.getScaleY()) * 0.15
-        );
-
-        if(Math.abs(targetCameraX - viewport.getCameraX()) < 0.001 &&
-        Math.abs(targetCameraY - viewport.getCameraY()) < 0.001){
-            
+        if(Math.abs(targetCameraX - viewport.getCameraX()) < 1e-3 &&
+        Math.abs(targetCameraY - viewport.getCameraY()) < 1e-3){
             viewport.setCameraX(targetCameraX);
             viewport.setCameraY(targetCameraY);
         }
-
     }
 
     public void setToCurrentViewport(){

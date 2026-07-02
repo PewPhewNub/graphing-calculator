@@ -12,7 +12,6 @@ import math.SolverStatus;
 import parser.EvaluationContext;
 import plotting.data.ImplicitChunk;
 import plotting.data.Segment2D;
-import plotting.data.curve.CurveData;
 import plotting.data.curve.ImplicitCurveData;
 import plotting.plots.ImplicitPlot;
 import rendering.camera.Viewport;
