@@ -21,6 +21,7 @@ import parser.ParseException;
 import plotting.plots.FunctionPlot;
 import scene.FunctionGraphScene;
 import scene.GraphScene;
+import settings.ApplicationSettings;
 import settings.SettingsListener;
 import settings.SettingsManager;
 import settings.Theme;
@@ -59,10 +60,11 @@ public class MainWindow implements SettingsListener{
         tabPane.setMinSize(0, 100);
         tabPane.setFocusTraversable(false);
 
-        addGraphScene("New Graph");
-        GraphTab tab = (GraphTab)(tabPane.getSelectionModel().getSelectedItem());
+        GraphTab tab = new GraphTab("New Graph", new FunctionGraphScene(new ApplicationSettings()));
+        addGraphScene(tab);
         try {
             tab.getGraphScene().getPlotManager().addElement(new FunctionPlot("New Explicit Plot", "x", Color.RED));
+            tab.getGraphScene().getPlotManager().addElement(new FunctionPlot("New Explicit Plot", "x^2", Color.BLUE));
         } catch (ParseException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -131,21 +133,6 @@ public class MainWindow implements SettingsListener{
         return stage;
     }
 
-    public void addGraphScene(String text){
-        GraphTab graphTab = new GraphTab(text, new FunctionGraphScene(1200, 850, settingsManager.getSettings()));
-
-        graphTab.setOnCloseRequest(e -> {
-            e.consume();
-            graphTab.getGraphScene().getCoordinator().close();
-            removeGraphScene();
-            return;
-        });
-        graphTab.setUndoManager(undoManager);
-        undoManager.execute(new AddGraphCommand(
-            tabPane.getSelectionModel().getSelectedIndex() + 1,
-            graphTab, 
-            tabPane));
-    }
     public void removeGraphScene(){
         GraphTab graphTab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
         if(graphTab.isDirty()){
@@ -174,12 +161,12 @@ public class MainWindow implements SettingsListener{
         }
     }
     public void addGraphScene(GraphTab graphTab){
+        graphTab.setUndoManager(undoManager);
         graphTab.setOnCloseRequest(e -> {
             e.consume();
             removeGraphScene();
             return;
         });
-        graphTab.setUndoManager(undoManager);
         undoManager.execute(new AddGraphCommand(
             tabPane.getSelectionModel().getSelectedIndex() + 1,
             graphTab, 

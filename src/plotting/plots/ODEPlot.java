@@ -1,134 +1,43 @@
 package plotting.plots;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import math.ODESolution;
-import math.ODESolving;
-import math.ODEStatus;
 import math.Point;
-import plotting.data.ODECurveChunk;
-import rendering.camera.Viewport;
+import parser.EvaluationContext;
+import parser.ParseException;
+import parser.node.DefinitionNode;
+import plotting.GraphElement;
 
-public class ODEPlot extends AbstractPlot {
-    public BiFunction<Double, Double, Double> equation;
-    ODEStatus statusLeft;
-    ODEStatus statusRight;
-    public Point initial;
-
-    public ArrayList<Point> rightPoints = new ArrayList<>();
-    public ArrayList<Point> leftPoints  = new ArrayList<>();
-    public ArrayList<ODECurveChunk> rightBranch = new ArrayList<>();
-    public ArrayList<ODECurveChunk> leftBranch  = new ArrayList<>();
+public class ODEPlot extends AbstractPlot implements ODECapable{
     
-    double rightExtent;
-    double leftExtent;
-    
-    static final double CHUNK_WIDTH   = 16.0;
-    static final double INIT_EXTENT   = 128.0;
-    static final double EXTEND_BY     = 128.0; // how far to extend each time
+    Point initial;
+    DefinitionNode definition;
+    public String expression;
     boolean autoGenerate = false;
-    public final Set<String> knownVariables = Set.of("x", "y");
-    public boolean showSlopeField = false;
-    public ODEPlot(String name, BiFunction<Double, Double, Double> equation, Point initial, Color color){
-        long t = System.currentTimeMillis();
-        System.out.println("ODE constructor start");
-        this.equation = equation;
+    boolean showSlopeField = false;
+
+
+    public ODEPlot(String name, String expression, Point initial, Color color) throws ParseException{
         this.initial = initial;
         this.name = name;
-        leftBranch = new ArrayList<ODECurveChunk>();
-        rightBranch = new ArrayList<ODECurveChunk>();
-
+        this.expression = expression;
+        definition = PlotGenerator.generateDefinition(expression, "y", Set.of("x"));
         this.color = color;
-        initialize();
-        System.out.println("ODE constructor end " + (System.currentTimeMillis() - t));
     }
 
-    public void initialize() {
-        rightPoints.add(new Point(initial.x, initial.y));
-        leftPoints.add(new Point(initial.x, initial.y));
-        rightExtent = initial.x;
-        leftExtent  = initial.x;
-        extendRight(initial.x + INIT_EXTENT);
-        extendLeft (initial.x - INIT_EXTENT);
-    }
-
-    // called from computeCurveData before rendering
-    public void ensureCovers(double xMin, double xMax) {
-        if (xMax > rightExtent) extendRight(xMax + EXTEND_BY);
-        if (xMin < leftExtent)  extendLeft (xMin - EXTEND_BY);
-    }
-
-    private void extendRight(double targetX) {
-        Point last = rightPoints.get(rightPoints.size() - 1);
-        int prevEnd = rightPoints.size() - 1;
-
-        ODESolution sol = ODESolving.adaptiveRK4(
-            equation, new Point(last.x, last.y), 0.05, targetX, 1e-3);
-        if (sol.status() != ODEStatus.SUCCESS) return;
-        List<Point> pts = sol.list();
-        for (int i = 1; i < pts.size(); i++) rightPoints.add(pts.get(i)); // skip [0], already stored
-
-        buildChunks(rightPoints, rightBranch, prevEnd);
-        rightExtent = targetX;
-    }
-
-    private void extendLeft(double targetX) {
-        Point last = leftPoints.get(leftPoints.size() - 1);
-        int prevEnd = leftPoints.size() - 1;
-
-        ODESolution sol = ODESolving.adaptiveRK4(
-            equation, new Point(last.x, last.y), -0.05, targetX, 1e-3);
-        if (sol.status() != ODEStatus.SUCCESS) return;
-        List<Point> pts = sol.list();
-        for (int i = 1; i < pts.size(); i++) leftPoints.add(pts.get(i));
-
-        buildChunks(leftPoints, leftBranch, prevEnd);
-        leftExtent = targetX;
-    }
-
-    private void buildChunks(ArrayList<Point> points, ArrayList<ODECurveChunk> chunks, int fromIndex) {
-        int i = fromIndex;
-        while (i < points.size() - 1) {
-            double chunkStartX = points.get(i).x;
-            int j = i + 1;
-            // group points until we've covered CHUNK_WIDTH in x
-            while (j < points.size() &&
-                   Math.abs(points.get(j).x - chunkStartX) < CHUNK_WIDTH) j++;
-            
-            int end = Math.min(j, points.size() - 1);
-
-            double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
-            double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
-            for (int k = i; k <= end; k++) {
-                Point p = points.get(k);
-                if (!Double.isFinite(p.x) || !Double.isFinite(p.y)) continue;
-                minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
-                minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
-            }
-            if (minX < Double.MAX_VALUE)
-                chunks.add(new ODECurveChunk(i, end,
-                    new BoundingBox(minX, minY, maxX - minX, maxY - minY)));
-            if(end == i) end++;
-            i = end;
+    public ODEPlot(){
+        this.initial = new Point(0, 1);
+        this.name = "ODE Plot";
+        this.expression = "y";
+        try {
+            definition = PlotGenerator.generateDefinition(expression, "y", Set.of("x", "y"));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-    }
-      
-    public Point2D nearestPoint(double worldX, double worldY, Viewport viewport) {
-        return null;
-    }
 
-    public double distanceSquaredFrom(double worldX, double worldY, Viewport viewport) {
-        return Double.POSITIVE_INFINITY;
-    }
-
-    public boolean contains(Point2D point){
-        return false;
+        this.color = Color.RED;
     }
 
     public void setAutoGenerate(boolean autoGenerate) {
@@ -140,26 +49,54 @@ public class ODEPlot extends AbstractPlot {
     }
 
     @Override
-    public AbstractPlot copy() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'copy'");
+    public ODEPlot copy() {
+        try {
+            return new ODEPlot(name, expression, initial, color);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public boolean copyFrom(AbstractPlot other) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'copyFrom'");
-    }
-
-    @Override
-    public void update() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public boolean copyFrom(GraphElement other) {
+        if(other instanceof ODEPlot p){
+            if(p.definition == null) return false;
+            name = p.name;
+            initial = p.initial;
+            color = p.color;
+            expression = p.expression;
+            definition = p.definition;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean equals(AbstractPlot plot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'equals'");
+        if(plot instanceof ODEPlot p){
+            return name.trim().equals(p.name.trim())&&
+                   initial.equals(p.initial)&&
+                   color.equals(p.color)&&
+                   expression.equals(p.expression);
+        }
+        return false;
+    }
+
+    @Override
+    public Set<String> getReferencedVariables() {
+        return definition.getVariables();
+    }
+    public Point getInitial() {
+        return initial;
+    }
+    public BiFunction<Double, Double, Double> getFunction(EvaluationContext context){
+        return (x, y) -> sample(x, y, context);
+    }
+    public double sample(double x, double y, EvaluationContext context){
+        context.set("x", x);
+        context.set("y", y);
+        return definition.evaluate(context);
     }
 }

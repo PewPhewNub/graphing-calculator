@@ -1,5 +1,6 @@
 package ui.controls;
 
+import interaction.UndoManager;
 import interaction.commands.EditElementCommand;
 import parser.ParseException;
 import plotting.GraphElementManager;
@@ -13,7 +14,8 @@ public class ImplicitPlotEditor extends AbstractPlotEditor{
     public String dependent = "y";
     public String independent = "x";
 
-    public ImplicitPlotEditor(GraphElementManager plotManager, ImplicitPlot plot){
+    public ImplicitPlotEditor(GraphElementManager plotManager, UndoManager undoManager, ImplicitPlot plot){
+        super(undoManager);
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();

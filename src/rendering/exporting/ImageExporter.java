@@ -46,10 +46,12 @@ public final class ImageExporter {
     }
 
     private static GraphScene createExportScene(GraphTab tab, double width, double height, boolean transparent){
-        GraphScene newScene = new FunctionGraphScene(width, height, tab.getSettings());
+        GraphScene newScene = new FunctionGraphScene(tab.getSettings());
         newScene.getGraph().viewport = tab.getGraphScene().getGraph().viewport.copy();
         newScene.setPlotManager(tab.getGraphScene().getPlotManager());
         newScene.setCoordinator(tab.getGraphScene().getCoordinator());
+
+        newScene.getRoot().setPrefSize(width, height);
 
         if(transparent) newScene.getRenderer().setBackgroundColor(Color.TRANSPARENT);
 

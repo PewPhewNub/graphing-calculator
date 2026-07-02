@@ -15,9 +15,9 @@ import plotting.data.curve.ParametricCurveData;
 import plotting.data.curve.PolarCurveData;
 import rendering.camera.Viewport;
 
-public class CartesianInteractionController extends PlotInteractionController{
+public class ODEInteractionController extends PlotInteractionController{
     
-    public CartesianInteractionController(GraphElementManager plotManager, ComputationCoordinator coordinator) {
+    public ODEInteractionController(GraphElementManager plotManager, ComputationCoordinator coordinator) {
         super(plotManager, coordinator);
     }
 

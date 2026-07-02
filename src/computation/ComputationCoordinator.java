@@ -18,11 +18,13 @@ import plotting.data.curve.CurveData;
 import plotting.data.curve.FunctionCurveData;
 import plotting.data.curve.ImplicitCurveData;
 import plotting.data.curve.Intersection;
+import plotting.data.curve.ODECurveData;
 import plotting.data.curve.ParametricCurveData;
 import plotting.data.curve.PolarCurveData;
 import plotting.plots.AbstractPlot;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
+import plotting.plots.ODEPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
@@ -31,9 +33,12 @@ public class ComputationCoordinator implements GraphElementListener{
     private final GraphElementManager manager;
     private final Map<AbstractPlot, AbstractPlotComputer<?,?>> computers = new HashMap<>();
     private final ArrayList<Intersection> intersections = new ArrayList<>();
+    private volatile Viewport pendingViewport;
+    private final Object signal = new Object();
 
     public ComputationCoordinator(GraphElementManager manager){
         this.manager = manager;
+        computeExecutor.submit(this::workerLoop);
     }
 
     private final ExecutorService computeExecutor = Executors.newSingleThreadExecutor(
@@ -50,6 +55,12 @@ public class ComputationCoordinator implements GraphElementListener{
         });
 
     public void compute(Viewport viewport) {
+        synchronized (signal) {
+            pendingViewport = viewport.copy();
+            signal.notify();
+        }
+    }
+    private void computeData(Viewport viewport) {
         EvaluationContext context = manager.buildEvaluationContext();
 
         List<Future<?>> futures = new ArrayList<>();
@@ -159,9 +170,34 @@ public class ComputationCoordinator implements GraphElementListener{
         if(plot instanceof ImplicitPlot p){
             return new ImplicitComputer(p, new ImplicitCurveData(p));
         }
+        if(plot instanceof ODEPlot p){
+            return new ODEComputer(p, new ODECurveData(p));
+        }
         return null;
     }
     public Map<AbstractPlot, AbstractPlotComputer<?, ?>> getComputers() {
         return computers;
+    }
+
+    private void workerLoop() {
+        while (!Thread.currentThread().isInterrupted()) {
+
+            Viewport viewport;
+
+            synchronized (signal) {
+                while (pendingViewport == null) {
+                    try {
+                        signal.wait();
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+
+                viewport = pendingViewport;
+                pendingViewport = null;
+            }
+
+            computeData(viewport);
+        }
     }
 }

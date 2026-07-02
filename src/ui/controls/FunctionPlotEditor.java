@@ -1,5 +1,6 @@
 package ui.controls;
 
+import interaction.UndoManager;
 import interaction.commands.EditElementCommand;
 import javafx.scene.layout.VBox;
 import parser.ParseException;
@@ -21,7 +22,8 @@ public class FunctionPlotEditor extends AbstractPlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
-    public FunctionPlotEditor(GraphElementManager plotManager, FunctionPlot plot){
+    public FunctionPlotEditor(GraphElementManager plotManager, UndoManager undoManager, FunctionPlot plot){
+        super(undoManager);
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();

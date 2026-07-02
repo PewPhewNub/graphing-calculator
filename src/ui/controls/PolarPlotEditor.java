@@ -1,5 +1,6 @@
 package ui.controls;
 
+import interaction.UndoManager;
 import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
@@ -24,7 +25,8 @@ public class PolarPlotEditor extends AbstractPlotEditor{
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
 
-    public PolarPlotEditor(GraphElementManager plotManager, PolarPlot plot){
+    public PolarPlotEditor(GraphElementManager plotManager, UndoManager undoManager, PolarPlot plot){
+        super(undoManager);
         this.plotManager = plotManager;
         initialize();
         this.plot = plot;

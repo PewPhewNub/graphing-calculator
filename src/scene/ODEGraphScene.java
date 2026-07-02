@@ -2,18 +2,16 @@ package scene;
 
 import javafx.scene.Cursor;
 import plotting.GraphElement;
-import plotting.plots.AbstractPlot;
-import plotting.plots.FunctionCapable;
 import rendering.camera.CameraIntent;
 import rendering.camera.Viewport;
 import settings.ApplicationSettings;
 
-public class FunctionGraphScene extends GraphScene{
+public class ODEGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
     
-    public FunctionGraphScene(ApplicationSettings settings){
-        super(settings, GraphMode.FUNCTION);
+    public ODEGraphScene(ApplicationSettings settings){
+        super(settings, GraphMode.ODE);
         currentMode = CurrentMode.NONE;
     }
 
@@ -21,7 +19,7 @@ public class FunctionGraphScene extends GraphScene{
     public void render() {
         renderer.render(this);
     }
-    
+
     private void handleCamera() {
         Viewport viewport = graph.viewport;
         if (currentMode == CurrentMode.PANNING && input.mouseDown) {
@@ -194,10 +192,6 @@ public class FunctionGraphScene extends GraphScene{
         }
     }
 
-    public boolean canAdd(AbstractPlot plot){
-        if(plot instanceof FunctionCapable) return true;
-        return false;
-    }
     @Override
     public void elementsChanged() {
         System.out.println("ELEMENTS CHANGED");
@@ -257,6 +251,7 @@ enum CurrentMode{
 
     PANNING,
     INSPECTING,
+    POINTDRAGGING,
     RESCALE_X,
     RESCALE_Y,
     ZOOM

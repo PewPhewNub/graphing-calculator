@@ -1,152 +1,67 @@
 package ui.controls;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import interaction.UndoManager;
+import interaction.commands.EditElementCommand;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import math.Point;
-import parser.Lexer;
-import parser.Parser;
-import parser.node.DefinitionNode;
+import parser.ParseException;
 import plotting.GraphElementManager;
 import plotting.plots.ODEPlot;
-import ui.components.ColorChooser;
+import ui.components.EquationInput;
+import ui.components.LabelledInput;
+import ui.components.MoreOptionsButton;
 
 public class ODEPlotEditor extends AbstractPlotEditor{
-
-    public String inputFunction;
-    public HBox functionInputPanel;
-    public TextField functionInputField;
-    public Label functionInputLabel;
 
     public String dependent = "y";
     public String independent = "x";
 
-    private Button advancedButton;
-    private boolean isAdvancedShow = false;
-    private VBox advancedOptionsPanel;
+    private EquationInput box0;
+    private LabelledInput box1;
+    private LabelledInput box2;
 
-    private Label independentVarLabel;
-    private Label dependentVarLabel;
-    private TextField independentVarField;
-    private TextField dependentVarField;
+    private MoreOptionsButton advancedButton;
+    private VBox advancedOptionsPanel;
 
     private Button generate;
     private CheckBox autoGenerate;
     private CheckBox slopeField;
 
-    public ODEPlotEditor(GraphElementManager plotManager){
+    public ODEPlotEditor(GraphElementManager plotManager, UndoManager undoManager, ODEPlot plot){
+        super(undoManager);
         this.plotManager = plotManager;
+        initialize();
+        this.plot = plot;
 
-        setBackground(new Background(
-            new BackgroundFill(
-                Color.WHITE,
-                new CornerRadii(5),
-                new Insets(2)
-            )
-        ));
+        box0.setLabelText("dy/dx = ");
+        box0.setFieldText(plot.expression);
 
-        setBorder(new Border(
-            new BorderStroke(
-                Color.LIGHTGREY,
-                BorderStrokeStyle.SOLID,
-                new CornerRadii(15),
-                new BorderWidths(2)
-            )
-        ));
-        
-        colorChooser = new ColorChooser(Color.RED);
-        colorChooser.setAlignment(Pos.CENTER_RIGHT);
-        colorChooser.colorProperty().addListener((obs, oldColor, newColor) -> {
-            if(plot != null) plot.setColor(newColor);
-        });
+        box1.setText(plot.getInitial().x + "");
+        box2.setText(plot.getInitial().y + "");
+        addHandlers();
+    }
 
-        functionInputPanel = new HBox();
-        functionInputLabel = new Label("d(y)/d(x) = ");
-        functionInputLabel.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
-            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
-        )));
-        functionInputLabel.setFont(new Font(20));
-        functionInputLabel.setTextAlignment(TextAlignment.LEFT);
-        functionInputLabel.setPadding(new Insets(5,0,5,15));
+    protected void initialize(){  
+        super.initialize();
 
-        functionInputField = new TextField("y");
-        functionInputField.setFont(new Font(20));
-        functionInputField.setAlignment(Pos.CENTER_LEFT);
-        functionInputField.setTextFormatter(new TextFormatter<>(change ->{
-            String text = change.getText();
-            if(text.equals("(")) text = "()";
-            change.setText(text);
-            return change;
-        }));
-        functionInputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.contains("theta")) {
-                // Use Platform.runLater to avoid conflicts with the ongoing text update
-                Platform.runLater(() -> {
-                    int caretPosition = independentVarField.getCaretPosition();
-                    
-                    // Replace the text
-                    String replaced = newValue.replace("theta", "\u03B8");
-                    functionInputField.setText(replaced);
-                    
-                    // Adjust caret position so it doesn't jump to the beginning
-                    functionInputField.positionCaret(caretPosition - 4); 
-                });
-            }
-        });
-
-        functionInputField.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(0, 2, 2, 0, false),
-            new Insets(2, 2, 2, 0)
-        )));
-        
-        functionInputField.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
-            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
-        )));
-        functionInputField.setPadding(new Insets(5,0,5,0));
-        
-        functionInputPanel.getChildren().add(functionInputLabel);
-        functionInputPanel.getChildren().add(functionInputField);
-        functionInputPanel.setPadding(new Insets(5, 25, 5, 25));
+        box0 = new EquationInput("dy/dx = ", 14, "y");
 
         generate = new Button("Generate Solution");
         generate.setFont(new Font(10));
         generate.setBackground(new Background(
             new BackgroundFill(
-                Color.WHITE,
+                Color.TRANSPARENT,
                 new CornerRadii(3),
                 new Insets(0)
             )));
@@ -161,155 +76,22 @@ public class ODEPlotEditor extends AbstractPlotEditor{
 
         generate.setPadding(new Insets(5, 15, 5, 15));
 
-        advancedButton = new Button();
-        advancedButton.setBorder(
-            Border.EMPTY
-        );
 
-        advancedButton.setBackground(
-                new Background(
-                    new BackgroundFill(
-                        Color.WHITE,
-                        new CornerRadii(0, 0, 0, 15, false),
-                        new Insets(0)
-                    )
-                )
-            );
-        advancedButton.setPadding(new Insets(5, 25, 5, 5));
-        advancedButton.setFont(new Font(10));
-        advancedButton.setText('\u25BE' + " Show " + "more options");
-        advancedButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e){
-                isAdvancedShow = !isAdvancedShow;
-                advancedButton.setText(((isAdvancedShow)?'\u25B6' + " Hide ":'\u25BE' + " Show ") + "more options");
-                advancedOptionsPanel.setVisible(isAdvancedShow);
-                advancedOptionsPanel.setManaged(isAdvancedShow);
-            }
-        });
-
-        advancedOptionsPanel =new VBox();
+        advancedOptionsPanel = new VBox();
         advancedOptionsPanel.setVisible(false);
         advancedOptionsPanel.setManaged(false);
 
+        advancedButton = new MoreOptionsButton("\u25B6 Hide more options", "\u25BE Show more options", 9, advancedOptionsPanel);
         
-        HBox box1 = new HBox();
-        HBox box2 = new HBox();
-        box1.setPadding(new Insets(5, 25, 5, 25));
-        box2.setPadding(new Insets(5, 25, 5, 25));
+        box1 = new LabelledInput("Initial Point x:", 9, "0", 14);
+        box2 = new LabelledInput("Initial Point y:", 9, "1", 14);
 
-        independentVarLabel = new Label("Independent Variable :");
-        dependentVarLabel = new Label("Dependent Variable   :");
-        independentVarLabel.setPadding(new Insets(5, 5, 5, 10));
-        dependentVarLabel.setPadding(new Insets(5, 5, 5, 10));
-        independentVarLabel.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(2, 0, 0, 2, false),
-            new Insets(2, 0, 2, 2)
-        )));
-        
-        independentVarLabel.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
-            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
-        )));
-        dependentVarLabel.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(2, 0, 0, 2, false),
-            new Insets(2, 0, 2, 2)
-        )));
-        
-        dependentVarLabel.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(2, 0, 0, 2, false),              // Perfectly square corners
-            new BorderWidths(2, 0, 2, 2)             // 1-pixel thickness
-        )));
-        
-        box1.getChildren().add(independentVarLabel);
-        independentVarField = new TextField("x");
-
-        independentVarField.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(0, 2, 2, 0, false),
-            new Insets(2, 2, 2, 0)
-        )));
-        
-        independentVarField.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
-            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
-        )));
-        independentVarField.setPadding(new Insets(5, 0, 5, 0));
-
-        independentVarField.textProperty().addListener((obs, oldValue, newValue) -> {
-            independent = independentVarField.getText();
-            functionInputLabel.setText("d(" + (dependent) + ")/d(" + independent + ") = ");
-        });
-
-        box1.getChildren().add(independentVarField);
-
-        box2.getChildren().add(dependentVarLabel);
-        dependentVarField = new TextField();
-        dependentVarField.setText("y");
-
-        dependentVarField.setBackground(new Background(new BackgroundFill(
-            Color.WHITE,
-            new CornerRadii(0, 2, 2, 0, false),
-            new Insets(2, 2, 2, 0)
-        )));
-        
-        dependentVarField.setBorder(new Border(new BorderStroke(
-            Color.rgb(220, 220, 220),       // A soft, light gray color
-            BorderStrokeStyle.SOLID,        // Solid line style
-            new CornerRadii(0, 2, 2, 0, false),              // Perfectly square corners
-            new BorderWidths(2, 2, 2, 0)             // 1-pixel thickness
-        )));
-        dependentVarField.setPadding(new Insets(5, 0, 5, 0));
-
-        dependentVarField.textProperty().addListener((obs, oldValue, newValue) -> {
-            dependent = dependentVarField.getText();
-            functionInputLabel.setText("d(" + (dependent) + ")/d(" + independent + ") = ");
-        });
-
-        box2.getChildren().add(dependentVarField);
-
-        this.getChildren().add(functionInputPanel);
+        this.getChildren().add(box0);
         this.getChildren().add(generate);
         this.getChildren().add(advancedButton);
         this.getChildren().add(advancedOptionsPanel);
         advancedOptionsPanel.getChildren().add(box1);
         advancedOptionsPanel.getChildren().add(box2);
-
-        topPanel = new BorderPane();
-        getChildren().add(0, topPanel);
-        topPanel.setLeft(colorChooser);
-        topPanel.setCenter(new Label("ODE Plot"){
-            {
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        Pane icon = new Pane();
-
-        Line l1 = new Line(8, 8, 22, 22);
-        Line l2 = new Line(22, 8, 8, 22);
-
-        l1.setStrokeWidth(2.5);
-        l2.setStrokeWidth(2.5);
-        l1.setStroke(Color.GRAY);
-        l2.setStroke(Color.GRAY);
-
-        icon.getChildren().addAll(l1, l2);
-
-        icon.setPadding(new Insets(5, 5, 0, 0));
-        
-        topPanel.setRight(icon);
-        icon.setOnMouseClicked(e ->{
-            close();
-        });
 
         autoGenerate = new CheckBox("Auto-Generate Solution upon loading chunks");
         autoGenerate.setFont(new Font(12));
@@ -330,44 +112,107 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         slopeField.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         slopeField.setPadding(new Insets(5, 28, 5, 25));
         advancedOptionsPanel.getChildren().add(slopeField);
+    }
 
-        try {
-            updateElement();
-        } catch(Exception e1) {
-            System.out.println(e1.getMessage());
-        }
+    private void addHandlers(){
+        super.attachListeners();
+        box0.textProperty().addListener(
+            (obs, oldValue, newValue) -> {
+                newValue = newValue.replace("theta", "\u03B8");
+                box0.setFieldText(newValue);
+            }
+        );
+        TextFormatter<String> formatter1 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
+        });
+        TextFormatter<String> formatter2 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
+        });
+
+        box1.setTextFormatter(formatter1);
+        box2.setTextFormatter(formatter2);
     }
 
     @Override
-    public void updateElement(){
-        String text = functionInputField.getText();
-        
-        Lexer lexer = new Lexer(text);
-        Map<String, Double> map = new HashMap<>();
+    protected void updateElement() {
+        ODEPlot before = (ODEPlot) plot.copy();
+
+        box0.highlightError(null);
+
+        ODEPlot after;
         try {
-            lexer.tokenize();
-            Parser parser = new Parser(lexer.tokenList);
-            DefinitionNode node = parser.parseDefinition(
-                        dependent,
-                        Set.of(independent, dependent)
-                    );
-            plotManager.removeElement(plot);
-            plot = new ODEPlot(dependent, 
-                (x, y) -> {
-                    map.put(independent, x);
-                    map.put(dependent, y);
-                    return node.evaluate(map);
-                }, new Point(0, 1), colorChooser.getSelectedColor());       
-            plotManager.addElement(plot);
-            ((ODEPlot)plot).setShowSlopeField(slopeField.isSelected());
-        }catch(Exception e1){
-            System.out.println(e1.getMessage());
+            after = new ODEPlot(
+                nameLabel.getText(),
+                box0.getText(),
+                new Point(
+                    Double.parseDouble(box1.getText().trim()), 
+                    Double.parseDouble(box2.getText().trim())),
+                colorChooser.getSelectedColor()
+            );
+        } catch (ParseException e) {
+            box0.highlightError(e.getMessage());
+            return;
         }
+
+        if (before.equals(after)) return;
+
+        undoManager.execute(
+            new EditElementCommand(
+                plot,
+                before,
+                after,
+                plotManager
+            )
+        );
     }
 
     @Override
-    public void updateValues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateFields'");
+    public void updateValues(){   
+        updatingFields = true;
+        ODEPlot fPlot = (ODEPlot)plot;    
+        colorChooser.setSelectedColor(plot.getColor());
+
+        box0.setFieldText(fPlot.expression);
+
+        if(!box1.isFocused()){
+            box1.setText(Double.toString(fPlot.getInitial().x));
+        }
+
+        if(!box2.isFocused()){
+            box2.setText(Double.toString(fPlot.getInitial().y));
+        }
+
+        nameLabel.setText(plot.getName());
+        updatingFields = false;
     }
 }

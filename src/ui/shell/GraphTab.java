@@ -49,7 +49,6 @@ public class GraphTab extends Tab{
         mainPane.setLeft(uiPanel);
         mainPane.setCenter(graphPane);
 
-        scene.getPlotManager().addListener(uiPanel);
         scene.getPlotManager().setDirtyCallback(
             () -> setDirty(true)
         );

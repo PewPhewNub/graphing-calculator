@@ -15,12 +15,16 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import rendering.camera.CameraIntent;
+import scene.FunctionGraphScene;
+import scene.ODEGraphScene;
+import settings.ApplicationSettings;
 
 public class GraphMenuBar extends MenuBar{
 
     Menu file;
     Menu view;
     Menu edit;
+    Menu graph;
     Menu plot;
     Menu help;
 
@@ -33,9 +37,10 @@ public class GraphMenuBar extends MenuBar{
             )
         ));
         populateFileMenu(tabPane, window, windowManager, fileActions);
-        getMenus().add(new Menu("Plot"));
         populateViewMenu(tabPane);
         populateEditMenu(undoManager);
+        populateGraphMenu(window);
+        getMenus().add(new Menu("Plot"));
         populateHelpMenu();
     }
     public void populateFileMenu(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions){
@@ -43,7 +48,7 @@ public class GraphMenuBar extends MenuBar{
         MenuItem newGraph = new MenuItem("New");
         file.getItems().add(newGraph);
         newGraph.setOnAction(e -> {
-            window.addGraphScene("New Graph");
+            window.addGraphScene(new GraphTab("New Graph", new FunctionGraphScene(new ApplicationSettings())));
         });
         newGraph.setAccelerator(KeyCombination.keyCombination("CTRL + N"));
         MenuItem newWindow = new MenuItem("New window");
@@ -216,5 +221,22 @@ public class GraphMenuBar extends MenuBar{
         help.getItems().add(about);
 
         getMenus().add(help);
+    }
+
+    public void populateGraphMenu(MainWindow mainWindow){
+        graph = new Menu("Graph");
+        MenuItem newFGraph = new MenuItem("New Function Graph");
+        graph.getItems().add(newFGraph);
+        newFGraph.setOnAction(e -> {
+            mainWindow.addGraphScene(new GraphTab("New Function Graph", new FunctionGraphScene(new ApplicationSettings())));
+        });
+        newFGraph.setAccelerator(KeyCombination.keyCombination("CTRL + 1"));
+        MenuItem newODEGraph = new MenuItem("New ODE Graph");
+        graph.getItems().add(newODEGraph);
+        newODEGraph.setOnAction(e -> {
+            mainWindow.addGraphScene(new GraphTab("New ODE Graph", new ODEGraphScene(new ApplicationSettings())));
+        });
+        newODEGraph.setAccelerator(KeyCombination.keyCombination("CTRL + 2"));
+        getMenus().add(graph);
     }
 }

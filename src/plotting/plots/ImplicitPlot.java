@@ -17,7 +17,7 @@ import plotting.data.Segment2D;
 import rendering.camera.Viewport;
 import rendering.camera.ViewportState;
 
-public class ImplicitPlot extends AbstractPlot implements CartesianPlot{
+public class ImplicitPlot extends AbstractPlot implements FunctionCapable{
     public HashMap<Point2D, ImplicitChunk> chunks;
     public String expression1;
     public String expression2;

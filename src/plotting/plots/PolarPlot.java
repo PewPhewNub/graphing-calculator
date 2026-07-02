@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import math.Interval;
 import parser.EvaluationContext;
 import parser.ParseException;
 import parser.node.DefinitionNode;
 import plotting.GraphElement;
-import plotting.data.ParametricCurveChunk;
 
-public class PolarPlot extends AbstractPlot implements CartesianPlot{
+public class PolarPlot extends AbstractPlot implements FunctionCapable{
     public double tMin;
     public double tMax;
     public String expression;

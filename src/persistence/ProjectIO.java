@@ -22,10 +22,9 @@ public final class ProjectIO {
 
     public static GraphTab load(File file) throws IOException{
         ProjectData data =  MAPPER.readValue(file, ProjectData.class);
-        GraphTab tab = new GraphTab(file.getName(), new FunctionGraphScene(1200, 900, new ApplicationSettings()));
+        GraphTab tab = new GraphTab(file.getName(), new FunctionGraphScene(new ApplicationSettings()));
         Deserializer.apply(data, tab.getGraphScene());
         tab.setProjectFile(file);
-        tab.getUiPanel().rebuildEditors();
         return tab;
     }
 }

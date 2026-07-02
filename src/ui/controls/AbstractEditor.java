@@ -26,6 +26,10 @@ public abstract class AbstractEditor extends VBox{
     public EditableLabel nameLabel;
     protected boolean updatingFields;
 
+    public AbstractEditor(UndoManager undoManager){
+        this.undoManager = undoManager;
+    }
+
     public VBox getUI() {
         return this;
     }
@@ -67,10 +71,6 @@ public abstract class AbstractEditor extends VBox{
         topPanel.setRight(button);
     }
     public abstract void updateValues();
-    
-    public void setUndoManager(final UndoManager undoManager) {
-        this.undoManager = undoManager;
-    }
 
     public void setSelected(boolean selected){
         if(selected){
@@ -108,5 +108,8 @@ public abstract class AbstractEditor extends VBox{
                 )
             ));
         }
+    }
+    public void setUndoManager(UndoManager undoManager) {
+        this.undoManager = undoManager;
     }
 }

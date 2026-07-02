@@ -9,7 +9,7 @@ import parser.ParseException;
 import parser.node.DefinitionNode;
 import plotting.GraphElement;
 
-public class FunctionPlot extends AbstractPlot implements CartesianPlot{
+public class FunctionPlot extends AbstractPlot implements FunctionCapable, ODECapable{
 
     public String dependent = "y";
     public String independent = "x";

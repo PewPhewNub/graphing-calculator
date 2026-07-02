@@ -2,6 +2,7 @@ package ui.controls;
 
 import java.util.Set;
 
+import interaction.UndoManager;
 import interaction.commands.EditElementCommand;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
@@ -32,7 +33,8 @@ public class ParametricPlotEditor extends AbstractPlotEditor{
     
     private boolean updatingFields = false;
 
-    public ParametricPlotEditor(GraphElementManager plotManager, ParametricPlot plot){
+    public ParametricPlotEditor(GraphElementManager plotManager, UndoManager undoManager, ParametricPlot plot){
+        super(undoManager);
         updatingFields = true;
         this.plotManager = plotManager;
         initialize();

@@ -1,5 +1,6 @@
 package ui.controls;
 
+import interaction.UndoManager;
 import interaction.commands.RemoveElementCommand;
 import javafx.scene.layout.VBox;
 import plotting.GraphElementManager;
@@ -8,6 +9,10 @@ import plotting.plots.AbstractPlot;
 public abstract class AbstractPlotEditor extends AbstractEditor {
     AbstractPlot plot;
     GraphElementManager plotManager;
+
+    AbstractPlotEditor(UndoManager undoManager){
+        super(undoManager);
+    }
 
     public VBox getUI() {
         return this;

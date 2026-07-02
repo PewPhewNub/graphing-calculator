@@ -1,5 +1,6 @@
 package ui.controls;
 
+import interaction.UndoManager;
 import interaction.commands.EditElementCommand;
 import interaction.commands.RemoveElementCommand;
 import plotting.GraphElementManager;
@@ -11,7 +12,8 @@ public class VariableEditor extends AbstractEditor{
     public GraphElementManager variableManager;
     public AdjustableSlider slider;
 
-    public VariableEditor(GraphElementManager variableManager, Variable variable){
+    public VariableEditor(GraphElementManager variableManager, UndoManager undoManager, Variable variable){
+        super(undoManager);
         this.variableManager = variableManager;
         this.variable = variable;
         initialize();

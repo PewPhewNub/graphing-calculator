@@ -1,21 +1,17 @@
 package plotting.plots;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import math.Interval;
 import parser.EvaluationContext;
 import parser.ParseException;
 import parser.node.DefinitionNode;
 import plotting.GraphElement;
-import plotting.data.ParametricCurveChunk;
 
-public class ParametricPlot extends AbstractPlot implements CartesianPlot{
+public class ParametricPlot extends AbstractPlot implements FunctionCapable{
     public String dependent1 = "x";
     public String dependent2 = "y";
     public String independent = "t";

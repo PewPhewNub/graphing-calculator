@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import parser.EvaluationContext;
+import plotting.plots.FunctionCapable;
+import plotting.plots.ODECapable;
+import scene.GraphMode;
 
 public class GraphElementManager{
     public ArrayList<GraphElement> elements;
@@ -13,13 +16,16 @@ public class GraphElementManager{
     private Runnable dirtyCallback;
     private GraphElement selectedGraphElement;
     private boolean isVariablesChanged = true;
+    private GraphMode mode;
 
-    public GraphElementManager(){
+    public GraphElementManager(GraphMode mode){
         elements = new ArrayList<>();
         selectedGraphElement = null;
         this.listeners = new ArrayList<>();
+        this.mode = mode;
     }
     public void addElement(GraphElement element){
+        if(!checkElement(element)) return;
         if(element instanceof Variable)isVariablesChanged = true;
         elements.add(element);
         for(GraphElementListener listener : listeners){
@@ -60,6 +66,7 @@ public class GraphElementManager{
         markUnsaved();
     }
     public void addElement(int index, GraphElement element){
+        if(!checkElement(element)) return;
         elements.add(index, element);
         if(element instanceof Variable)isVariablesChanged = true;
         for(GraphElementListener listener : listeners){
@@ -161,5 +168,19 @@ public class GraphElementManager{
     public EvaluationContext buildEvaluationContext(){
         Map<String, Double> variables = buildVariableMap();
         return new EvaluationContext(variables);
+    }
+    public boolean checkElement(GraphElement element){
+        if (element instanceof Variable) return true;
+
+        switch (mode) {
+            case FUNCTION:
+                return element instanceof FunctionCapable;
+
+            case ODE:
+                return element instanceof ODECapable;
+
+            default:
+                return false;
+        }
     }
 }
