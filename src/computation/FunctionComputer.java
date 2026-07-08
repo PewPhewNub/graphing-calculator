@@ -10,6 +10,7 @@ import math.RootFinding;
 import math.RootSolution;
 import math.SolverStatus;
 import parser.EvaluationContext;
+import plotting.data.GridData;
 import plotting.data.Segment2D;
 import plotting.data.curve.FunctionCurveData;
 import plotting.plots.FunctionPlot;
@@ -202,7 +203,7 @@ public class FunctionComputer extends AbstractPlotComputer<FunctionPlot, Functio
     }
 
     @Override
-    public void generateCurveData(Viewport viewport, EvaluationContext context) {
+    public void generateCurveData(Viewport viewport, GridData gridData, EvaluationContext context) {
         ViewportState state = new ViewportState(viewport);
         double samples = (int)(viewport.getWidth());
         double stepX = (state.right - state.left)/samples;
@@ -239,7 +240,7 @@ public class FunctionComputer extends AbstractPlotComputer<FunctionPlot, Functio
         data.setVisibleSegments(segments);
     }
     @Override
-    protected void invalidate() {
+    public void invalidate() {
         return;
     }
 }

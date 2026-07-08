@@ -1,6 +1,10 @@
 package scene;
 
+import interaction.ODEInteractionController;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import plotting.GraphElement;
 import rendering.camera.CameraIntent;
 import rendering.camera.Viewport;
@@ -9,15 +13,40 @@ import settings.ApplicationSettings;
 public class ODEGraphScene extends GraphScene{
     
     public CurrentMode currentMode;
+    private ODEInteractionController odeController;
     
     public ODEGraphScene(ApplicationSettings settings){
         super(settings, GraphMode.ODE);
+        odeController = (ODEInteractionController)super.interaction;
         currentMode = CurrentMode.NONE;
+
+        addHandlers();
     }
 
     @Override
     public void render() {
         renderer.render(this);
+    }
+    private void addHandlers(){
+        root.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            if(e.getClickCount() == 2){
+                if(!odeController.isEditingPoint()){
+                    odeController.setSelectedEditPoint(
+                    new Point2D(input.mouseX, input.mouseY),
+                    graph.viewport);    
+                }
+            }
+            if(e.getClickCount() == 1 && odeController.isEditingPoint()){
+                //if(!Double.isFinite(input.mouseX) || !Double.isFinite(input.mouseY)) return;
+                double worldX = graph.viewport.screenToWorldX(input.mouseX);
+                double worldY = graph.viewport.screenToWorldY(input.mouseY);
+
+                if(odeController.setInitialPoint(worldX, worldY))
+                plotManager.elementChanged(odeController.getSelectedPlot());         
+                
+                odeController.setSelectedEditPoint(null, null);
+            }
+        });
     }
 
     private void handleCamera() {
@@ -99,7 +128,7 @@ public class ODEGraphScene extends GraphScene{
 
     public void lateUpdate(){
         if(plotsChanged || viewportMoved || variablesChanged){
-            coordinator.compute(graph.viewport);
+            coordinator.compute(graph.viewport, gridData);
         }
         
         generateGridData(80);
@@ -116,6 +145,12 @@ public class ODEGraphScene extends GraphScene{
     }
 
     private void updateMode(){
+        if(odeController.isEditingPoint()){
+            currentMode = CurrentMode.EDITING;
+            graph.setCursor(Cursor.CROSSHAIR);
+            return;
+        }
+
         double xAxis = graph.viewport.worldToScreenY(0);
         double yAxis = graph.viewport.worldToScreenX(0);
 
@@ -243,16 +278,17 @@ public class ODEGraphScene extends GraphScene{
         // TODO Auto-generated method stub
         return;
     }
+    
+    enum CurrentMode{
+        NONE,
+
+        PANNING,
+        INSPECTING,
+        EDITING,
+        RESCALE_X,
+        RESCALE_Y,
+        ZOOM
+    }
 }
     
 
-enum CurrentMode{
-    NONE,
-
-    PANNING,
-    INSPECTING,
-    POINTDRAGGING,
-    RESCALE_X,
-    RESCALE_Y,
-    ZOOM
-}

@@ -11,6 +11,7 @@ import math.RootFinding;
 import math.RootSolution;
 import math.SolverStatus;
 import parser.EvaluationContext;
+import plotting.data.GridData;
 import plotting.data.ParametricCurveChunk;
 import plotting.data.Segment2D;
 import plotting.data.curve.PolarCurveData;
@@ -23,7 +24,7 @@ public class PolarComputer extends AbstractPlotComputer<PolarPlot, PolarCurveDat
         super(plot, data);
     }
 
-    public void generateCurveData(Viewport viewport, EvaluationContext context){
+    public void generateCurveData(Viewport viewport, GridData gridData, EvaluationContext context){
         ViewportState state = new ViewportState(viewport);
         BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
         Function<Double, Double> x = plot.getX(context);
@@ -294,7 +295,7 @@ public class PolarComputer extends AbstractPlotComputer<PolarPlot, PolarCurveDat
         reloadChunks(context);
     }
     @Override
-    protected void invalidate() {
+    public void invalidate() {
         data.chunks.clear();
     }
 }

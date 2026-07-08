@@ -11,6 +11,7 @@ import math.RootFinding;
 import math.RootSolution;
 import math.SolverStatus;
 import parser.EvaluationContext;
+import plotting.data.GridData;
 import plotting.data.ParametricCurveChunk;
 import plotting.data.Segment2D;
 import plotting.data.curve.ParametricCurveData;
@@ -22,7 +23,7 @@ public class ParametricComputer extends AbstractPlotComputer<ParametricPlot, Par
     public ParametricComputer(ParametricPlot plot, ParametricCurveData data){
         super(plot, data);
     }
-    public void generateCurveData( Viewport viewport, EvaluationContext context){
+    public void generateCurveData( Viewport viewport, GridData gridData, EvaluationContext context){
         ViewportState state = new ViewportState(viewport);
         BoundingBox viewportBox = new BoundingBox(state.left, state.bottom, state.worldWidth, state.worldHeight);
         Function<Double, Double> x = plot.getX(context);
@@ -292,7 +293,7 @@ public class ParametricComputer extends AbstractPlotComputer<ParametricPlot, Par
     }
     
     @Override
-    protected void invalidate() {
+    public void invalidate() {
         data.chunks.clear();
     }
 }

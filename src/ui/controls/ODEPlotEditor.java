@@ -161,6 +161,8 @@ public class ODEPlotEditor extends AbstractPlotEditor{
 
         box1.setTextFormatter(formatter1);
         box2.setTextFormatter(formatter2);
+
+        slopeField.setOnAction(e -> updateElement());
     }
 
     @Override
@@ -177,7 +179,8 @@ public class ODEPlotEditor extends AbstractPlotEditor{
                 new Point(
                     Double.parseDouble(box1.getText().trim()), 
                     Double.parseDouble(box2.getText().trim())),
-                colorChooser.getSelectedColor()
+                colorChooser.getSelectedColor(),
+                slopeField.isSelected()
             );
         } catch (ParseException e) {
             box0.highlightError(e.getMessage());

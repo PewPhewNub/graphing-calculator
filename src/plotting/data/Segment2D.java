@@ -28,6 +28,14 @@ public class Segment2D {
 
         return (new BoundingBox(minX2, maxX2, minY2, maxY2).intersects(new BoundingBox(minX1, maxX1, minY1, maxY1)));
     }
+    public BoundingBox getBounds(){
+        double minX1 = Math.min(point1.getX(), point2.getX());
+        double maxX1 = Math.max(point1.getX(), point2.getX());
+        double minY1 = Math.min(point1.getY(), point2.getY());
+        double maxY1 = Math.max(point1.getY(), point2.getY());
+
+        return new BoundingBox(minX1, minY1, maxX1 - minX1, maxY1 - minY1);
+    }
 
     public boolean intersects(BoundingBox bounds){
         double minX1 = Math.min(point1.getX(), point2.getX());

@@ -7,10 +7,13 @@ import computation.AbstractPlotComputer;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import plotting.GraphElement;
+import plotting.data.Arrow;
 import plotting.data.GridData;
 import plotting.data.Segment2D;
 import plotting.data.curve.CurveData;
+import plotting.data.curve.ODECurveData;
 import plotting.plots.AbstractPlot;
+import plotting.plots.ODECapable;
 import rendering.layers.AxisRenderer;
 import rendering.layers.CurveRenderer;
 import rendering.layers.GridRenderer;
@@ -49,6 +52,14 @@ public class Renderer {
 
         for(int i = elements.size() - 1; i >= 0; i--){
             GraphElement element = elements.get(i);
+            if(element instanceof ODECapable odePlot){
+                if(odePlot.showSlopeField()){
+                    ODECurveData data = (ODECurveData)(computers.get(odePlot).getData());
+                    for(Arrow a : data.getArrows()){
+                        drawArrowScreen(a.initial, a.dx, a.dy, ((AbstractPlot)odePlot).getColor());
+                    }
+                }
+            }
             if(element instanceof AbstractPlot p){
                 if(p.equals(selectedElement))continue;
                 CurveData curve = computers.get(p).getData();
@@ -131,8 +142,8 @@ public class Renderer {
     public void drawInspectionLabel(Point2D point, Color color){
         overlayRenderer.drawInspectionLabel(context, point, color);
     }
-    public void drawArrowScreen(Point2D worldStart, double angle, Color color, double lengthPx) {
-        overlayRenderer.drawArrowScreen(context, worldStart, angle, color, lengthPx);
+    public void drawArrowScreen(Point2D worldStart, double dx, double dy, Color color) {
+        overlayRenderer.drawArrowScreen(context, worldStart, dx, dy, color, 20);
     }
     public void setBackgroundColor(Color clearColor) {
         this.backgroundColor = clearColor;

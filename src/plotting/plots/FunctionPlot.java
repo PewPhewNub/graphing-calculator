@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import javafx.scene.paint.Color;
+import math.Point;
 import parser.EvaluationContext;
 import parser.ParseException;
 import parser.node.DefinitionNode;
@@ -108,5 +109,21 @@ public class FunctionPlot extends AbstractPlot implements FunctionCapable, ODECa
 
     public Set<String> getReferencedVariables(){
         return definition.getVariables();
+    }
+    @Override
+    public void setShowSlopeField(boolean show) {
+        return;
+    }
+    @Override
+    public boolean showSlopeField() {
+        return false;
+    }
+    @Override
+    public void setInitialPoint(Point point) {
+        return;
+    }
+    @Override
+    public Point getInitialPoint() {
+        return null;
     }
 }

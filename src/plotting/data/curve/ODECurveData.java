@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import math.ODEStatus;
 import math.Point;
 import parser.EvaluationContext;
+import plotting.data.Arrow;
 import plotting.data.ODECurveChunk;
 import plotting.data.Segment2D;
 import plotting.plots.ODEPlot;
@@ -24,6 +25,8 @@ public class ODECurveData extends CurveData{
     ArrayList<Point> leftPoints  = new ArrayList<>();
     ArrayList<ODECurveChunk> rightChunks = new ArrayList<>();
     ArrayList<ODECurveChunk> leftChunks  = new ArrayList<>();
+
+    ArrayList<Arrow> arrows = new ArrayList<>();
     
     double rightExtent;
     double leftExtent;
@@ -54,6 +57,7 @@ public class ODECurveData extends CurveData{
         copy.statusRight = other.statusRight;
 
         copy.initial = other.initial;
+        copy.arrows = new ArrayList<>(other.arrows);
 
         copy.setVisibleSegments(new ArrayList<>(other.visibleSegments()));
         copy.setFeaturePoints(new ArrayList<>(other.featurePoints()));
@@ -96,6 +100,7 @@ public class ODECurveData extends CurveData{
         leftExtent  = ((ODEPlot)originalPlot).getInitial().x;
         initial = new Point2D(((ODEPlot)originalPlot).getInitial().x, ((ODEPlot)originalPlot).getInitial().y);
         featurePoints.add(initial);
+        arrows = new ArrayList<>();
     }
     public void appendLeft(ArrayList<Point> list){
         leftPoints.addAll(list);
@@ -149,6 +154,7 @@ public class ODECurveData extends CurveData{
 
         featurePoints.clear();
         visibleSegments.clear();
+        arrows.clear();
         initialize();
     }
     public void setLeftPoints(ArrayList<Point> leftPoints) {
@@ -156,5 +162,11 @@ public class ODECurveData extends CurveData{
     }
     public void setRightPoints(ArrayList<Point> rightPoints) {
         this.rightPoints = rightPoints;
+    }
+    public void setArrows(ArrayList<Arrow> arrows) {
+        this.arrows = arrows;
+    }
+    public ArrayList<Arrow> getArrows() {
+        return arrows;
     }
 }

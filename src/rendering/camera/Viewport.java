@@ -3,6 +3,7 @@ package rendering.camera;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 
 public class Viewport {
@@ -180,5 +181,18 @@ public class Viewport {
     }
     public double getWidth() {
         return width;
+    }
+    public BoundingBox getBounds(){
+        double left  = cameraX - (width  / 2.0) * scaleX / zoom;
+        double right = cameraX + (width  / 2.0) * scaleX / zoom;
+
+        double bottom = cameraY - (height / 2.0) * scaleY / zoom;
+        double top    = cameraY + (height / 2.0) * scaleY / zoom;
+        return new BoundingBox(
+            left,
+            bottom,
+            right - left,
+            top - bottom
+        );
     }
 }

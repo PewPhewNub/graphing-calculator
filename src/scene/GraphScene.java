@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import computation.ComputationCoordinator;
 import interaction.FunctionInteractionController;
 import interaction.InputController;
+import interaction.ODEInteractionController;
 import interaction.PlotInteractionController;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -62,7 +63,12 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
         this.mode = mode;
         plotManager = new GraphElementManager(mode);
         coordinator = new ComputationCoordinator(plotManager);
-        interaction = new FunctionInteractionController(plotManager, coordinator);
+
+        interaction = switch(mode){
+            case FUNCTION -> new FunctionInteractionController(plotManager, coordinator);
+            case ODE -> new ODEInteractionController(plotManager, coordinator);
+        };
+
         context = new RenderContext(graph.getGraphicsContext2D(), graph.viewport);
         renderer = new Renderer(context, this.settings.rendererSettings);
         cameraSystem = new CameraSystem(graph.viewport);
@@ -124,8 +130,15 @@ public abstract class GraphScene implements GraphElementListener, ViewportListen
         double floorRight = viewport.screenToWorldX(viewport.getWidth());
         double floorBottom = viewport.screenToWorldY(viewport.getHeight());
         double floorTop = viewport.screenToWorldY(0);
-        for (double x = Math.floor(floorLeft / gridData.stepX) * gridData.stepX; x < floorRight; x += gridData.stepX) {
-            for (double y = Math.floor(floorBottom / gridData.stepY)* gridData.stepY; y < floorTop; y += gridData.stepY) {
+        
+        double startX = Math.floor(floorLeft / gridData.stepX) * gridData.stepX - gridData.stepX;
+        double endX   = floorRight + gridData.stepX;
+
+        double startY = Math.floor(floorBottom / gridData.stepY) * gridData.stepY - gridData.stepY;
+        double endY   = floorTop + gridData.stepY;
+
+        for (double x = startX; x <= endX; x += gridData.stepX) {
+            for (double y = startY; y <= endY; y += gridData.stepY) {
                 gridData.points.add(new Point2D(x, y));
             }
         }

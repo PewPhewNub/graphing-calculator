@@ -15,4 +15,12 @@ public class GridData {
         stepX = 1;
         stepY = 1;
     }
+
+    public GridData copy(){
+        GridData newData = new GridData();
+        newData.stepX = stepX;
+        newData.stepY = stepY;
+        newData.points = new ArrayList<>(List.copyOf(points));
+        return newData;
+    }
 }

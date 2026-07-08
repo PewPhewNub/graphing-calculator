@@ -1,6 +1,7 @@
 package plotting.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.geometry.BoundingBox;
 
@@ -12,4 +13,5 @@ public class ImplicitChunk{
     public int LOD;
 
     public ArrayList<Segment2D> segments;
+    public final HashMap<Long, Double> sampleCache = new HashMap<>();
 }

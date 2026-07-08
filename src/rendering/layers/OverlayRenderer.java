@@ -31,29 +31,38 @@ public class OverlayRenderer {
         context.getGc().fillText(value, screenX + 10 + (length * 2.9), screenY + 35);
     }
 
-    public void drawArrowScreen(RenderContext context, Point2D worldStart, double angle, Color color, double lengthPx) {
+    public void drawArrowScreen(RenderContext context, Point2D worldStart,
+                            double dx, double dy,
+                            Color color, double lengthPx) {
+
         context.getGc().setStroke(color);
         context.getGc().setFill(color);
         context.getGc().setLineWidth(0.8);
 
-        // --- convert base point to screen ---
+        // Convert direction to screen space
+        dy = -dy;
+
+        // Normalize
+        double len = Math.hypot(dx, dy);
+        if (len == 0.0) return;
+
+        dx /= len;
+        dy /= len;
+
+        // Base point
         double sx = context.getViewport().worldToScreenX(worldStart.getX());
         double sy = context.getViewport().worldToScreenY(worldStart.getY());
 
-        // --- direction in screen space ---
-        double dx = Math.cos(angle);
-        double dy = Math.sin(angle);
-
-        // --- endpoint in screen space (FIXED LENGTH) ---
+        // Endpoint
         double ex = sx + dx * lengthPx;
         double ey = sy + dy * lengthPx;
 
-        // --- perpendicular ---
+        // Perpendicular
         double px = -dy;
         double py = dx;
 
         double headLen = lengthPx * 0.25;
-        double headWid = lengthPx * 0.1;
+        double headWid = lengthPx * 0.10;
 
         double bx = ex - dx * headLen;
         double by = ey - dy * headLen;
@@ -64,10 +73,10 @@ public class OverlayRenderer {
         double rx = bx - px * headWid;
         double ry = by - py * headWid;
 
-        // --- draw line ---
+        // Shaft
         context.getGc().strokeLine(sx, sy, ex, ey);
 
-        // --- draw head ---
+        // Head
         context.getGc().fillPolygon(
             new double[]{ex, lx, rx},
             new double[]{ey, ly, ry},

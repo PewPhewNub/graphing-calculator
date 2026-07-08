@@ -203,7 +203,8 @@ public class EditorPane extends ScrollPane implements GraphElementListener{
             editor.setSelected(false);
         }
         if(element instanceof AbstractPlot plot){
-            editors.get(plot).setSelected(true);
+            AbstractEditor editor = editors.get(plot);
+            if(editor != null) editor.setSelected(true);
         }
     }
 

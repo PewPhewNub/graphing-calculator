@@ -101,7 +101,7 @@ public class FunctionGraphScene extends GraphScene{
 
     public void lateUpdate(){
         if(plotsChanged || viewportMoved || variablesChanged){
-            coordinator.compute(graph.viewport);
+            coordinator.compute(graph.viewport, gridData);
         }
         
         generateGridData(80);
@@ -249,15 +249,15 @@ public class FunctionGraphScene extends GraphScene{
         // TODO Auto-generated method stub
         return;
     }
+    enum CurrentMode{
+        NONE,
+
+        PANNING,
+        INSPECTING,
+        RESCALE_X,
+        RESCALE_Y,
+        ZOOM
+    }
 }
     
 
-enum CurrentMode{
-    NONE,
-
-    PANNING,
-    INSPECTING,
-    RESCALE_X,
-    RESCALE_Y,
-    ZOOM
-}

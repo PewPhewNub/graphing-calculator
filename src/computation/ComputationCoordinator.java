@@ -14,6 +14,7 @@ import plotting.GraphElement;
 import plotting.GraphElementListener;
 import plotting.GraphElementManager;
 import plotting.Variable;
+import plotting.data.GridData;
 import plotting.data.curve.CurveData;
 import plotting.data.curve.FunctionCurveData;
 import plotting.data.curve.ImplicitCurveData;
@@ -34,6 +35,7 @@ public class ComputationCoordinator implements GraphElementListener{
     private final Map<AbstractPlot, AbstractPlotComputer<?,?>> computers = new HashMap<>();
     private final ArrayList<Intersection> intersections = new ArrayList<>();
     private volatile Viewport pendingViewport;
+    private volatile GridData pendingGridData;
     private final Object signal = new Object();
 
     public ComputationCoordinator(GraphElementManager manager){
@@ -54,13 +56,14 @@ public class ComputationCoordinator implements GraphElementListener{
             return t;
         });
 
-    public void compute(Viewport viewport) {
+    public void compute(Viewport viewport, GridData gridData) {
         synchronized (signal) {
             pendingViewport = viewport.copy();
+            pendingGridData = gridData.copy();
             signal.notify();
         }
     }
-    private void computeData(Viewport viewport) {
+    private void computeData(Viewport viewport, GridData gridData) {
         EvaluationContext context = manager.buildEvaluationContext();
 
         List<Future<?>> futures = new ArrayList<>();
@@ -68,7 +71,7 @@ public class ComputationCoordinator implements GraphElementListener{
         for (AbstractPlotComputer<?, ?> computer : computers.values()) {
             futures.add(pool.submit(() -> {
                 computer.ensureCoverage(viewport, context.copy());
-                computer.generateCurveData(viewport, context.copy());
+                computer.generateCurveData(viewport, gridData, context.copy());
             }));
         }
 
@@ -183,9 +186,10 @@ public class ComputationCoordinator implements GraphElementListener{
         while (!Thread.currentThread().isInterrupted()) {
 
             Viewport viewport;
+            GridData gridData;
 
             synchronized (signal) {
-                while (pendingViewport == null) {
+                while (pendingViewport == null || pendingGridData == null) {
                     try {
                         signal.wait();
                     } catch (InterruptedException e) {
@@ -194,10 +198,12 @@ public class ComputationCoordinator implements GraphElementListener{
                 }
 
                 viewport = pendingViewport;
+                gridData = pendingGridData;
                 pendingViewport = null;
+                pendingGridData  = null;
             }
 
-            computeData(viewport);
+            computeData(viewport, gridData);
         }
     }
 }

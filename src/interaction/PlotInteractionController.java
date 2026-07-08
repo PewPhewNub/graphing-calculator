@@ -26,6 +26,7 @@ public abstract class PlotInteractionController implements GraphElementListener{
 
     protected GraphElementManager graphElementManager;
     protected ComputationCoordinator coordinator;
+    protected UndoManager undoManager;
 
     public PlotInteractionController(GraphElementManager plotManager, ComputationCoordinator coordinator){
         this.graphElementManager = plotManager;
@@ -71,5 +72,9 @@ public abstract class PlotInteractionController implements GraphElementListener{
         selectedCurve = null;
         selectedPoint = null;
         graphElementManager.setSelectedElement(null);
+    }
+
+    public void setUndoManager(UndoManager undoManager) {
+        this.undoManager = undoManager;
     }
 }

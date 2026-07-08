@@ -86,6 +86,7 @@ public class GraphTab extends Tab{
     }
     public void setUndoManager(UndoManager undoManager) {
         this.undoManager = undoManager;
+        scene.getInteraction().setUndoManager(undoManager);
         uiPanel.setUndoManager(undoManager);
     }
 

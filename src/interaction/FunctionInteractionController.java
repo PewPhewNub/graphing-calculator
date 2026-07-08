@@ -113,6 +113,7 @@ public class FunctionInteractionController extends PlotInteractionController{
     }
 
     public Point2D applySnapping(Point2D candidate, CurveData curve, ArrayList<Intersection> intersections, Viewport viewport){
+        //if(candidate == null) return null;
         if(!snappingEnabled) return candidate;
         double screenX = viewport.worldToScreenX(candidate.getX());
         double screenY = viewport.worldToScreenY(candidate.getY());

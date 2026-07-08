@@ -2,20 +2,26 @@ package interaction;
 
 import java.util.ArrayList;
 
+import computation.AbstractPlotComputer;
 import computation.ComputationCoordinator;
+import interaction.commands.EditInitialPointCommand;
 import javafx.geometry.Point2D;
+import math.Point;
 import parser.EvaluationContext;
 import plotting.GraphElement;
 import plotting.GraphElementManager;
 import plotting.data.curve.CurveData;
 import plotting.data.curve.FunctionCurveData;
-import plotting.data.curve.ImplicitCurveData;
 import plotting.data.curve.Intersection;
-import plotting.data.curve.ParametricCurveData;
-import plotting.data.curve.PolarCurveData;
+import plotting.data.curve.ODECurveData;
+import plotting.plots.FunctionPlot;
+import plotting.plots.ODECapable;
 import rendering.camera.Viewport;
 
 public class ODEInteractionController extends PlotInteractionController{
+
+    boolean editingPoint;
+    Point2D selectedEditPoint;
     
     public ODEInteractionController(GraphElementManager plotManager, ComputationCoordinator coordinator) {
         super(plotManager, coordinator);
@@ -25,7 +31,8 @@ public class ODEInteractionController extends PlotInteractionController{
     public void update(double mouseX, double mouseY, Viewport viewport, EvaluationContext context) {
         if(Double.isNaN(mouseY) || Double.isNaN(mouseX)) return;
         updateHover(coordinator.getCurveData(), mouseX, mouseY, viewport);
-        updateSelection(mouseX, mouseY, context,  coordinator.getIntersections(), viewport);
+        
+        if(!editingPoint)updateSelection(mouseX, mouseY, context,  coordinator.getIntersections(), viewport);
     }
 
     public InteractionResult findClosestCurve(ArrayList<CurveData> curves, double mouseX, double mouseY){
@@ -75,7 +82,7 @@ public class ODEInteractionController extends PlotInteractionController{
         super.setSelectedPlot(hoveredPlot);
         selectedCurve = hoveredCurve;
 
-        selectedPoint = applySnapping(hoveredPoint, hoveredCurve, coordinator.getIntersections(), viewport);
+        selectedPoint = applySnapping(hoveredPoint, hoveredCurve, viewport);
     }
 
     public void updateSelection(double mouseX, double mouseY, EvaluationContext context, ArrayList<Intersection> intersections, Viewport viewport){
@@ -95,29 +102,13 @@ public class ODEInteractionController extends PlotInteractionController{
             selectedPoint = applySnapping(
                 f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
-                intersections,
                 viewport
             );
         }
-        if(selectedCurve instanceof ParametricCurveData f){
+        if(selectedCurve instanceof ODECurveData f){
             selectedPoint = applySnapping(
                 f.targettedPoint(mouseX, mouseY, context),
                 selectedCurve,
-                intersections,
-                viewport
-            );
-        }if(selectedCurve instanceof PolarCurveData f){
-            selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY, context),
-                selectedCurve,
-                intersections,
-                viewport
-            );
-        }if(selectedCurve instanceof ImplicitCurveData f){
-            selectedPoint = applySnapping(
-                f.targettedPoint(mouseX, mouseY, context),
-                selectedCurve,
-                intersections,
                 viewport
             );
         }
@@ -135,14 +126,14 @@ public class ODEInteractionController extends PlotInteractionController{
         return null;
     }
 
-    public Point2D applySnapping(Point2D candidate, CurveData curve, ArrayList<Intersection> intersections, Viewport viewport){
+    public Point2D applySnapping(Point2D candidate, CurveData curve, Viewport viewport){
         if(!snappingEnabled) return candidate;
         double screenX = viewport.worldToScreenX(candidate.getX());
         double screenY = viewport.worldToScreenY(candidate.getY());
 
         double dist2 = Double.POSITIVE_INFINITY;
         Point2D currentPoint = null;
-        for(Point2D point : getSnapPoints(curve, intersections)){
+        for(Point2D point : getSnapPoints(curve)){
             double dx = screenX - viewport.worldToScreenX(point.getX());
             double dy = screenY - viewport.worldToScreenY(point.getY());
 
@@ -157,15 +148,9 @@ public class ODEInteractionController extends PlotInteractionController{
         }else return candidate;
     }
 
-    public ArrayList<Point2D> getSnapPoints(CurveData curve, ArrayList<Intersection> intersections){
+    public ArrayList<Point2D> getSnapPoints(CurveData curve){
         ArrayList<Point2D> points = new ArrayList<>();
         points.addAll(curve.featurePoints());
-
-        for(Intersection intersection : intersections){
-            if(intersection.isOn(curve.plot())){
-                points.add(intersection.getPoint());
-            }
-        }
 
         return points;
     }
@@ -174,6 +159,10 @@ public class ODEInteractionController extends PlotInteractionController{
         hoveredPlot = null;
         hoveredCurve = null;
         hoveredPoint = null;
+    }
+
+    public void forceSelectPoint(Point2D candidate){
+
     }
 
     @Override
@@ -220,5 +209,58 @@ public class ODEInteractionController extends PlotInteractionController{
     public void elementMovedTo(GraphElement element, int index) {
         // TODO Auto-generated method stub
         return;
+    }
+    public Point2D getSelectedEditPoint() {
+        return selectedEditPoint;
+    }
+    public boolean isEditingPoint() {
+        return editingPoint;
+    }
+    public void setEditingPoint(boolean editingPoint) {
+        this.editingPoint = editingPoint;
+    }
+    public boolean setSelectedEditPoint(Point2D selectedEditPoint, Viewport viewport) {
+        if(selectedCurve == null){
+            editingPoint = false;
+            return false;
+        }
+        if(selectedEditPoint == null){
+            editingPoint = false;
+            return false;
+        }
+        ArrayList<Point2D> featurePoints = getSnapPoints(selectedCurve);
+
+        double dist2 = Double.POSITIVE_INFINITY;
+        Point2D currentPoint = null;
+        for(Point2D point : featurePoints){
+            double dx = selectedEditPoint.getX() - viewport.worldToScreenX(point.getX());
+            double dy = selectedEditPoint.getY() - viewport.worldToScreenY(point.getY());
+
+            if(dx*dx + dy*dy < dist2){
+                dist2 = dx*dx + dy*dy;
+                currentPoint = point;
+            }
+        }
+
+        if(dist2 < 100){
+            this.selectedEditPoint = currentPoint;
+            editingPoint = true;
+            return true;
+        }
+        editingPoint = false;
+        return false;
+    }
+    public boolean setInitialPoint(double mouseX, double mouseY){
+        if(!editingPoint) return false;
+        if(selectedEditPoint == null) return false;
+
+        if(graphElementManager.getSelectedElement() instanceof ODECapable odeplot){
+            if(!(odeplot instanceof FunctionPlot))
+            undoManager.execute(
+                new EditInitialPointCommand(odeplot, graphElementManager, new Point(mouseX, mouseY))
+            );
+            return true;
+        }
+        return false;
     }
 }
