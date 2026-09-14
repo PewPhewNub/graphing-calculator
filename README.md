@@ -115,113 +115,96 @@ src/
 ```
 
 ## Running
+Requirements
 
-### Requirements
+The packaged release is currently available for Windows only.
 
-#### Windows
+Java 25 or newer
+Maven 3.9+
 
-The packaged release is currently available for **Windows only**.
-
-* Java 21 or newer
-* JavaFX 25
-* Jackson 2.9.9
+JavaFX and Jackson dependencies are managed automatically by Maven.
 
 ### From Release
 
 The latest packaged release is currently available for Windows.
 
-1. Download the latest release from the [Releases](https://github.com/PewPhewNub/graphing-calculator/releases) page.
-2. Extract the downloaded archive.
-3. Run `run.bat`.
+Download the latest release from the Releases page.
+Extract the downloaded archive.
+Run run.bat.
 
 A Linux release is planned for a future release.
 
 ### From Source
 
-The project can also be cloned and run directly from source.
+The project uses Maven for dependency management and building.
 
-> **Note:** The project currently does not use Maven or Gradle. Dependencies therefore need to be configured manually. A Maven-based build system may be added in a future update.
+Maven automatically downloads the required JavaFX and Jackson dependencies, so they do not need to be downloaded or added manually.
 
 #### 1. Clone the Repository
 
 Clone the repository using Git:
 
-```bash
 git clone https://github.com/PewPhewNub/graphing-calculator.git
 cd graphing-calculator
-```
 
 Alternatively, the repository can be downloaded as a ZIP file from GitHub and extracted manually.
 
 #### 2. Install Java
 
-Install **Java 21 or newer** and make sure your Java installation is correctly configured.
+Install Java 25 or newer and make sure your Java installation is correctly configured.
 
-The project was developed and tested using a newer Java runtime, but Java 21+ is the intended minimum version.
+Check your Java installation with:
 
-#### 3. Install JavaFX
+java -version
+javac -version
 
-The project uses **JavaFX 25**.
+Both should report Java 25 or newer.
 
-Download the JavaFX SDK and extract it somewhere on your system.
+#### 3. Install Maven
 
-The JavaFX SDK contains a `lib` directory containing the required JavaFX JAR files.
+Install Maven 3.9 or newer.
 
-Add the JAR files from the JavaFX `lib` directory to the project's **Referenced Libraries** in VS Code, or configure them as libraries in your IDE.
+Verify that Maven is available:
 
-The JavaFX libraries must also be supplied to the JVM using the Java module path.
+mvn -version
 
-For example:
+Maven should report the Java installation being used by the build.
 
-```text
---module-path "PATH_TO_JAVAFX/lib"
---add-modules javafx.controls,javafx.graphics,javafx.fxml,javafx.web
-```
+#### 4. Build the Project
 
-If running directly from VS Code, these can be added to the Java launch configuration through the appropriate VM arguments.
+From the project directory, run:
 
-#### 4. Install Jackson
+mvn clean package
 
-The project uses **Jackson 2.9.9** for JSON-based project saving and loading.
+Maven will automatically:
 
-The required Jackson JAR files must be downloaded and added to the project's **Referenced Libraries**, alongside the JavaFX libraries.
+Download the required dependencies
+Compile the source code
+Copy application resources
+Package the application into a JAR
+Generate the runtime dependency classpath
 
-Jackson is used by the persistence system to serialize and deserialize calculator projects.
+The resulting build files are placed in the target/ directory.
 
-#### 5. Configure VM Arguments
+To compile without packaging, use:
 
-When launching the application, JavaFX requires the JavaFX module path and modules to be specified.
+mvn clean compile
 
-A typical launch configuration should contain VM arguments similar to:
+#### 5. Run the Application
 
-```text
---module-path "PATH_TO_JAVAFX/lib"
---add-modules javafx.controls,javafx.graphics,javafx.fxml,javafx.web
-```
+The main application class is:
 
-Replace `PATH_TO_JAVAFX/lib` with the location of the JavaFX SDK's `lib` directory on your system.
+app.Main
 
-The exact launch configuration may vary depending on the IDE and operating system.
+The project can be launched from an IDE configured with the Maven project, or using an appropriate JavaFX runtime configuration for the target platform.
 
-#### 6. Run the Application
+The Maven project configuration is contained in pom.xml.
 
-Once JavaFX and Jackson have been added to the project, open the project in VS Code or another Java IDE.
+## Project Structure
 
-Run:
+The main source code is located under src/ and is organized into separate systems for parsing, mathematics, plotting, rendering, interaction, persistence, and the user interface.
 
-```text
-src/app/Main.java
-```
-
-or the `app.Main` class.
-
-If the dependencies and JavaFX VM arguments are configured correctly, the application should launch normally.
-
-### Project Structure
-
-The main source code is located under `src/` and is organized into separate systems for parsing, mathematics, plotting, rendering, interaction, persistence, and the user interface.
-
-For more information about how the calculator works internally, see the technical documentation.
+Maven configuration and dependency management are defined in pom.xml.
 
 ## Usage
 
