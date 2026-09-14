@@ -2,8 +2,6 @@ package plotting.data.curve;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
-
 import javafx.geometry.Point2D;
 import parser.EvaluationContext;
 import plotting.data.ParametricCurveChunk;

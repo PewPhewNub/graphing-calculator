@@ -2,3 +2,9 @@ bin/
 .vscode/
 .DS_Store
 Thumbs.db
+target/
+*.class
+.classpath
+.project
+.settings/
+run-maven.sh
