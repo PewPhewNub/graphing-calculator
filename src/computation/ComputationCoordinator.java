@@ -31,6 +31,10 @@ import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
 
 public class ComputationCoordinator implements GraphElementListener{
+    /**
+     * The main computation engine for the graphing calculator. It coordinates a computer for each plot
+     * and runs computations for each plot in parallel.
+     */
     private final GraphElementManager manager;
     private final Map<AbstractPlot, AbstractPlotComputer<?,?>> computers = new HashMap<>();
     private final ArrayList<Intersection> intersections = new ArrayList<>();

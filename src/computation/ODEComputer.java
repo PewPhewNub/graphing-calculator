@@ -104,47 +104,47 @@ public class ODEComputer extends AbstractPlotComputer<ODEPlot, ODECurveData>{
 
         ArrayList<Point> pts = data.getRightPoints();
 
-for (int i = 0; i < pts.size() - 1; i++) {
-    Point a = pts.get(i);
-    Point b = pts.get(i + 1);
+        for (int i = 0; i < pts.size() - 1; i++) {
+            Point a = pts.get(i);
+            Point b = pts.get(i + 1);
 
-    visible.add(new Segment2D(
-        new Point2D(a.x, a.y),
-        new Point2D(b.x, b.y)
-    ));
-}
+            visible.add(new Segment2D(
+                new Point2D(a.x, a.y),
+                new Point2D(b.x, b.y)
+            ));
+        }
 
         data.setVisibleSegments(visible);
         data.setArrows(newArrows);
     }
 
     private void mergeChunkSegments(
-    ODECurveChunk chunk,
-    Viewport viewport,
-    double minPixelDistance2,
-    ArrayList<Segment2D> visible
-) {
-    List<Segment2D> segments = chunk.getSegments();
-    if (segments.isEmpty())
-        return;
+        ODECurveChunk chunk,
+        Viewport viewport,
+        double minPixelDistance2,
+        ArrayList<Segment2D> visible
+    ) {
+        List<Segment2D> segments = chunk.getSegments();
+        if (segments.isEmpty())
+            return;
 
-    Point2D anchor = segments.get(0).point1;
-    for (int i = 0; i < segments.size(); i++) {
-        Segment2D segment = segments.get(i);
-        Point2D current = segment.point2;
+        Point2D anchor = segments.get(0).point1;
+        for (int i = 0; i < segments.size(); i++) {
+            Segment2D segment = segments.get(i);
+            Point2D current = segment.point2;
 
-        double dx = viewport.worldToScreenX(current.getX()) - viewport.worldToScreenX(anchor.getX());
-        double dy = viewport.worldToScreenY(current.getY()) - viewport.worldToScreenY(anchor.getY());
+            double dx = viewport.worldToScreenX(current.getX()) - viewport.worldToScreenX(anchor.getX());
+            double dy = viewport.worldToScreenY(current.getY()) - viewport.worldToScreenY(anchor.getY());
 
-        boolean isLast = (i == segments.size() - 1);
+            boolean isLast = (i == segments.size() - 1);
 
-        if (dx * dx + dy * dy < minPixelDistance2 && !isLast)
-            continue;
+            if (dx * dx + dy * dy < minPixelDistance2 && !isLast)
+                continue;
 
-        visible.add(new Segment2D(anchor, current));
-        anchor = current;
+            visible.add(new Segment2D(anchor, current));
+            anchor = current;
+        }
     }
-}
 
     private double extendRight(
         double targetX,
@@ -159,7 +159,7 @@ for (int i = 0; i < pts.size() - 1; i++) {
         ODESolution solution = ODESolving.RK4(
             plot.getFunction(context),
             new Point(last.x, last.y),
-            0.05,
+            plot.getStepSize(),
             targetX
         );
 
@@ -186,7 +186,7 @@ for (int i = 0; i < pts.size() - 1; i++) {
         ODESolution solution = ODESolving.RK4(
             plot.getFunction(context),
             new Point(last.x, last.y),
-            -0.05,
+            -plot.getStepSize(),
             targetX
         );
 

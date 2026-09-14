@@ -7,6 +7,7 @@ import parser.ParseException;
 import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.GraphElementData;
 import persistence.plotdata.ImplicitPlotData;
+import persistence.plotdata.ODEPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PolarPlotData;
 import persistence.plotdata.VariableData;
@@ -14,10 +15,12 @@ import plotting.GraphElementManager;
 import plotting.Variable;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
+import plotting.plots.ODEPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
 import scene.GraphScene;
+import math.Point;
 
 public final class Deserializer {
     Deserializer(){}
@@ -77,6 +80,16 @@ public final class Deserializer {
                 ImplicitPlot plot;
                 try {
                     plot = new ImplicitPlot(d.name, d.expression1, d.expression2, Color.web(d.color));
+                graphElementManager.addElement(plot);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if(data instanceof ODEPlotData d){
+                ODEPlot plot;
+                try {
+                    plot = new ODEPlot(d.name, d.expression, new Point(d.initialX, d.initialY), d.stepSize, Color.web(d.color), d.showSlopeField);
                 graphElementManager.addElement(plot);
                 } catch (ParseException e) {
                     // TODO Auto-generated catch block

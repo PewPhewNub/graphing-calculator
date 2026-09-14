@@ -4,14 +4,33 @@ import java.util.HashSet;
 
 import parser.EvaluationContext;
 
-public class FunctionNode extends ExpressionNode{
+/**
+ * Represents a mathematical function call (e.g., sin(x), sqrt(y)).
+ */
+public class FunctionNode extends ExpressionNode {
+    /** The name of the function (e.g., "sin"). */
     private final String functionName;
+    
+    /** The argument expression node. */
     private final ExpressionNode argument;
+    
+    /**
+     * Constructs a new FunctionNode.
+     *
+     * @param functionName the name of the function
+     * @param argument the expression node passed as an argument
+     */
     public FunctionNode(String functionName, ExpressionNode argument) {
         this.functionName = functionName;
         this.argument = argument;
     }
 
+    /**
+     * Evaluates the argument and applies the corresponding mathematical function.
+     *
+     * @param context the {@link EvaluationContext}
+     * @return the result of applying the function, or {@code Double.NaN} if unrecognized
+     */
     public double evaluate(EvaluationContext context){
         double argumentValue = argument.evaluate(context);
 
@@ -50,16 +69,22 @@ public class FunctionNode extends ExpressionNode{
         return Double.NaN;
     }    
 
+    /** Returns a string representation of the function call. */
     public String toString(){
         return " " + functionName + "(" + argument.toString() + ") ";
     }
+    
     @Override
     public HashSet<String> getVariables() {
         return argument.getVariables();
     }
+    
+    /** Returns the name of the function. */
     public String getFunctionName() {
         return functionName;
     }
+    
+    /** Returns the argument node. */
     public ExpressionNode getArgument() {
         return argument;
     }

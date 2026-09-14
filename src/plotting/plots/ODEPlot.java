@@ -17,11 +17,13 @@ public class ODEPlot extends AbstractPlot implements ODECapable{
     public String expression;
     boolean autoGenerate = false;
     boolean showSlopeField = false;
+    double stepSize = 1e-3;
 
-    public ODEPlot(String name, String expression, Point initial, Color color, boolean showSlopeField) throws ParseException{
+    public ODEPlot(String name, String expression, Point initial, double stepSize, Color color, boolean showSlopeField) throws ParseException{
         this.initial = initial;
         this.name = name;
         this.expression = expression;
+        this.stepSize = stepSize;
         definition = PlotGenerator.generateDefinition(expression, "y", Set.of("x"));
         this.color = color;
         this.showSlopeField = showSlopeField;
@@ -51,11 +53,17 @@ public class ODEPlot extends AbstractPlot implements ODECapable{
     public void setShowSlopeField(boolean showSlopeField) {
         this.showSlopeField = showSlopeField;
     }
+    public double getStepSize() {
+        return stepSize;
+    }
+    public void setStepSize(double stepSize) {
+        this.stepSize = stepSize;
+    }
 
     @Override
     public ODEPlot copy() {
         try {
-            return new ODEPlot(name, expression, initial, color, showSlopeField);
+            return new ODEPlot(name, expression, initial, stepSize, color, showSlopeField);
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -69,6 +77,7 @@ public class ODEPlot extends AbstractPlot implements ODECapable{
             if(p.definition == null) return false;
             name = p.name;
             initial = p.initial;
+            stepSize = p.stepSize;
             color = p.color;
             expression = p.expression;
             definition = p.definition;
@@ -83,6 +92,7 @@ public class ODEPlot extends AbstractPlot implements ODECapable{
         if(plot instanceof ODEPlot p){
             return name.trim().equals(p.name.trim())&&
                    initial.equals(p.initial)&&
+                   stepSize == p.stepSize && 
                    color.equals(p.color)&&
                    expression.equals(p.expression)&&
                    showSlopeField == p.showSlopeField;

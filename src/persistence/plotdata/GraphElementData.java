@@ -28,6 +28,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         value = VariableData.class,
         name = "VARIABLE"
     ),
+    @JsonSubTypes.Type(
+        value = ODEPlotData.class,
+        name = "ODE"
+    ),
 })
 public abstract class GraphElementData {
     public String name;

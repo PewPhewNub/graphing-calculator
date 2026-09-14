@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import persistence.plotdata.FunctionPlotData;
 import persistence.plotdata.ImplicitPlotData;
+import persistence.plotdata.ODEPlotData;
 import persistence.plotdata.ParametricPlotData;
 import persistence.plotdata.PolarPlotData;
 import persistence.plotdata.VariableData;
@@ -12,16 +13,21 @@ import plotting.GraphElementManager;
 import plotting.Variable;
 import plotting.plots.FunctionPlot;
 import plotting.plots.ImplicitPlot;
+import plotting.plots.ODEPlot;
 import plotting.plots.ParametricPlot;
 import plotting.plots.PolarPlot;
 import rendering.camera.Viewport;
+import scene.FunctionGraphScene;
 import scene.GraphScene;
+import scene.ODEGraphScene;
 
 public final class Serializer {
     Serializer(){}
 
     public static ProjectData serialize(GraphScene scene){
         ProjectData data = new ProjectData();
+        if(scene instanceof FunctionGraphScene) data.graphType = GraphType.CARTESIAN;
+        else if(scene instanceof ODEGraphScene) data.graphType = GraphType.ODE;
         serializeViewportData(data, scene.getGraph().viewport);
         serializePlotData(data, scene.getPlotManager());
         
@@ -78,6 +84,18 @@ public final class Serializer {
                 plotData.expression2 = p.expression2;
                 plotData.name = p.getName();
                 plotData.color = p.getColor().toString();
+
+                data.elements.add(plotData);
+            }
+            if(element instanceof ODEPlot p){
+                ODEPlotData plotData = new ODEPlotData();
+                plotData.expression = p.expression;
+                plotData.name = p.getName();
+                plotData.color = p.getColor().toString();
+                plotData.initialX = p.getInitial().x;
+                plotData.initialY = p.getInitial().y;
+                plotData.showSlopeField = p.showSlopeField();
+                plotData.stepSize = p.getStepSize();
 
                 data.elements.add(plotData);
             }

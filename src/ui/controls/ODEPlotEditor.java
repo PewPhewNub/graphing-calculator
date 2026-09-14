@@ -30,6 +30,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
     private EquationInput box0;
     private LabelledInput box1;
     private LabelledInput box2;
+    private LabelledInput box3;
 
     private MoreOptionsButton advancedButton;
     private VBox advancedOptionsPanel;
@@ -49,6 +50,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
 
         box1.setText(plot.getInitial().x + "");
         box2.setText(plot.getInitial().y + "");
+        box3.setText(plot.getStepSize() + "");
         addHandlers();
     }
 
@@ -85,6 +87,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         
         box1 = new LabelledInput("Initial Point x:", 9, "0", 14);
         box2 = new LabelledInput("Initial Point y:", 9, "1", 14);
+        box3 = new LabelledInput("Step size: ", 9, "0.001", 14);
 
         this.getChildren().add(box0);
         this.getChildren().add(generate);
@@ -92,8 +95,9 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         this.getChildren().add(advancedOptionsPanel);
         advancedOptionsPanel.getChildren().add(box1);
         advancedOptionsPanel.getChildren().add(box2);
+        advancedOptionsPanel.getChildren().add(box3);
 
-        autoGenerate = new CheckBox("Auto-Generate Solution upon loading chunks");
+        autoGenerate = new CheckBox("Auto-Generate chunks");
         autoGenerate.setFont(new Font(12));
         autoGenerate.setSelected(false);
         autoGenerate.setOnAction(e ->{
@@ -159,8 +163,28 @@ public class ODEPlotEditor extends AbstractPlotEditor{
             }
         });
 
+        TextFormatter<String> formatter3 = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+
+            // Allow intermediate editing states
+            if (newText.isEmpty()
+                    || newText.equals("-")
+                    || newText.equals(".")
+                    || newText.equals("-.")) {
+                return change;
+            }
+
+            try {
+                Double.parseDouble(newText);
+                return change;
+            } catch (NumberFormatException e) {
+                return null; // reject the edit
+            }
+        });
+
         box1.setTextFormatter(formatter1);
         box2.setTextFormatter(formatter2);
+        box3.setTextFormatter(formatter3);
 
         slopeField.setOnAction(e -> updateElement());
     }
@@ -179,6 +203,7 @@ public class ODEPlotEditor extends AbstractPlotEditor{
                 new Point(
                     Double.parseDouble(box1.getText().trim()), 
                     Double.parseDouble(box2.getText().trim())),
+                Double.parseDouble(box3.getText()),
                 colorChooser.getSelectedColor(),
                 slopeField.isSelected()
             );
@@ -210,9 +235,11 @@ public class ODEPlotEditor extends AbstractPlotEditor{
         if(!box1.isFocused()){
             box1.setText(Double.toString(fPlot.getInitial().x));
         }
-
         if(!box2.isFocused()){
             box2.setText(Double.toString(fPlot.getInitial().y));
+        }
+        if(!box3.isFocused()){
+            box3.setText(Double.toString(fPlot.getStepSize()));
         }
 
         nameLabel.setText(plot.getName());

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>HOW_TO_USE</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h1 id="graphing-calculator-user-guide">Graphing Calculator — User
+Guide</h1>
+<h2 id="introduction">1. Introduction</h2>
+<p>Welcome to the Graphing Calculator.</p>
+<p>This application is a JavaFX-based mathematical graphing program
+designed to provide an interactive environment for plotting and
+exploring mathematical expressions.</p>
+<p>The calculator supports multiple types of graphs, interactive
+navigation, variables, numerical differential-equation plotting,
+undo/redo functionality, and persistent graph configurations.</p>
+<p>This guide explains how to use the application, how to enter
+mathematical expressions, how each plotting mode works, and how to
+interact with graphs.</p>
+<hr />
+<h1 id="getting-started">2. Getting Started</h1>
+<p>When the application starts, you are presented with the graphing
+workspace.</p>
+<p>The main graph displays:</p>
+<ul>
+<li>The coordinate axes</li>
+<li>Grid lines</li>
+<li>Plotted functions and equations</li>
+<li>Interactive graph controls</li>
+</ul>
+<p>Depending on the selected mode, the application provides different
+controls for entering and manipulating mathematical expressions.</p>
+<p>The basic workflow is:</p>
+<ol type="1">
+<li>Select the appropriate plotting mode.</li>
+<li>Enter your mathematical expression.</li>
+<li>Create/add the plot.</li>
+<li>Interact with the resulting graph.</li>
+<li>Modify the expression or parameters as required.</li>
+</ol>
+<hr />
+<h1 id="expression-syntax">3. Expression Syntax</h1>
+<p>The calculator uses mathematical expressions to describe graphs.</p>
+<h2 id="numbers">3.1 Numbers</h2>
+<p>Numbers can be entered directly.</p>
+<p>Examples:</p>
+<pre class="text"><code>5
+3.14
+-2
+0.001</code></pre>
+<p>Decimal values are supported.</p>
+<hr />
+<h2 id="basic-arithmetic">3.2 Basic Arithmetic</h2>
+<p>The standard arithmetic operators can be used.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Operator</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Addition</td>
+<td><code>+</code></td>
+<td><code>x + 2</code></td>
+</tr>
+<tr>
+<td>Subtraction</td>
+<td><code>-</code></td>
+<td><code>x - 2</code></td>
+</tr>
+<tr>
+<td>Multiplication</td>
+<td><code>*</code></td>
+<td><code>2*x</code></td>
+</tr>
+<tr>
+<td>Division</td>
+<td><code>/</code></td>
+<td><code>x/2</code></td>
+</tr>
+<tr>
+<td>Power</td>
+<td><code>^</code></td>
+<td><code>x^2</code></td>
+</tr>
+</tbody>
+</table>
+<p>Implicit multiplication (2x being equivalent to 2*x) is supported,
+but may now always work. For clarity, multiplication should be written
+explicitly where required by the expression parser.</p>
+<p>Examples:</p>
+<pre class="text"><code>2*x
+x/3
+x^2
+3*x^2 + 2*x - 1</code></pre>
+<hr />
+<h1 id="parentheses">4. Parentheses</h1>
+<p>Parentheses can be used to control the order of operations.</p>
+<p>Examples:</p>
+<pre class="text"><code>(x + 2)^2
+(x - 1)/(x + 3)
+2*(x + 1)
+sin(x + 1)</code></pre>
+<p>Parentheses are particularly important when using functions.</p>
+<hr />
+<h1 id="mathematical-functions">5. Mathematical Functions</h1>
+<p>Functions are written using their function name followed by
+parentheses containing their argument.</p>
+<p>For example:</p>
+<pre class="text"><code>sin(x)
+cos(x)
+tan(x)</code></pre>
+<h3 id="important">Important</h3>
+<p>Functions require parentheses.</p>
+<p>Correct:</p>
+<pre class="text"><code>sin(x)
+cos(x)
+sqrt(x)</code></pre>
+<p>Incorrect:</p>
+<pre class="text"><code>sin x
+cos x
+sqrt x</code></pre>
+<p>The expression parser treats function calls differently from ordinary
+variables, so the argument must be explicitly provided using
+parentheses.</p>
+<hr />
+<h1 id="trigonometric-functions">6. Trigonometric Functions</h1>
+<p>Trigonometric functions can be used inside expressions.</p>
+<p>Examples:</p>
+<pre class="text"><code>sin(x)
+cos(x)
+tan(x)</code></pre>
+<p>They can also be combined with other expressions:</p>
+<pre class="text"><code>2*sin(x)
+sin(x)^2
+sin(2*x)
+x*cos(x)</code></pre>
+<p>Functions can be nested inside other expressions where supported.</p>
+<p>For example:</p>
+<pre class="text"><code>sin(x^2)
+cos(2*x + 1)</code></pre>
+<hr />
+<h1 id="function-composition">7. Function Composition</h1>
+<p>Functions can be used as part of larger mathematical expressions.</p>
+<p>Examples:</p>
+<pre class="text"><code>sin(x) + cos(x)
+sin(x)*cos(x)
+sqrt(x^2 + 1)</code></pre>
+<p>Parentheses can be used to make the intended order of evaluation
+explicit.</p>
+<hr />
+<h1 id="cartesian-plotting">8. Cartesian Plotting</h1>
+<p>Cartesian plotting is used for ordinary functions of the form:</p>
+<pre class="text"><code>y = f(x)</code></pre>
+<p>For example:</p>
+<pre class="text"><code>y = x^2</code></pre>
+<p>produces a parabola.</p>
+<p>Other examples include:</p>
+<pre class="text"><code>y = x^3
+y = sin(x)
+y = cos(x)
+y = x^2 + 2*x - 3</code></pre>
+<p>Cartesian plots are useful for exploring ordinary functions and their
+behavior over the coordinate plane.</p>
+<hr />
+<h1 id="multiple-plots">9. Multiple Plots</h1>
+<p>Multiple plots can be displayed simultaneously.</p>
+<p>For example, you can compare:</p>
+<pre class="text"><code>y = x^2</code></pre>
+<p>with:</p>
+<pre class="text"><code>y = 2*x + 1</code></pre>
+<p>This allows different mathematical functions to be viewed
+together.</p>
+<p>Each plot maintains its own computational state, allowing plots to be
+independently manipulated and evaluated.</p>
+<hr />
+<h1 id="variables-and-parameters">10. Variables and Parameters</h1>
+<p>The calculator supports variables and parameters within its
+plotting/computation system.</p>
+<p>Variables allow mathematical expressions to depend on values other
+than the primary graph variable.</p>
+<p>For example, an expression can contain a parameter whose value can be
+changed to observe how the resulting graph changes.</p>
+<p>This can be useful for exploring families of functions.</p>
+<p>For example, conceptually:</p>
+<pre class="text"><code>y = a*x^2</code></pre>
+<p>can represent a family of parabolas whose shape depends on
+<code>a</code>.</p>
+<p>When adding a variable to a function definition, you must also add a
+variable component to the list, it will NOT be added automatically.
+After creating the component, you must also rename the variable name to
+the corresponding name of the variable present in the definition.</p>
+<hr />
+<h1 id="parametric-graphs">11. Parametric Graphs</h1>
+<p>Parametric equations describe both coordinates using a parameter.</p>
+<p>A parametric curve can be represented using:</p>
+<pre class="text"><code>x = x(t)
+y = y(t)</code></pre>
+<p>where <code>t</code> is the parameter.</p>
+<p>A common example is a circle:</p>
+<pre class="text"><code>x(t) = cos(t)
+y(t) = sin(t)</code></pre>
+<p>Parametric equations are useful when a curve cannot conveniently be
+represented as a single-valued function <code>y = f(x)</code>.</p>
+<p>They can also represent curves that loop, self-intersect, or have
+multiple values of <code>y</code> for the same <code>x</code>.</p>
+<hr />
+<h1 id="polar-graphs">12. Polar Graphs</h1>
+<p>Polar equations represent a curve using an angle and a radial
+distance.</p>
+<p>A polar equation is written in terms of:</p>
+<pre class="text"><code>r</code></pre>
+<p>and the angular variable (3B8). Type out 'theta' (fully in lowercase)
+and the character will be replaced by the symbol. Polar functions will
+NOT work without the symbol as the independent variable.</p>
+<p>For example, a circle-like or cardioid-style curve can be represented
+using expressions involving trigonometric functions.</p>
+<p>Polar plotting is particularly useful for studying:</p>
+<ul>
+<li>Circles</li>
+<li>Spirals</li>
+<li>Rose curves</li>
+<li>Cardioids</li>
+<li>Other rotationally symmetric curves</li>
+</ul>
+<hr />
+<h1 id="implicit-graphs">13. Implicit Graphs</h1>
+<p>Implicit equations define relationships between <code>x</code> and
+<code>y</code> without explicitly solving for <code>y</code>.</p>
+<p>For example:</p>
+<pre class="text"><code>x^2 + y^2 = 25</code></pre>
+<p>represents a circle.</p>
+<p>Implicit plotting is useful for equations such as:</p>
+<pre class="text"><code>x^2 + y^2 = 25</code></pre>
+<p>and other curves that may be difficult or impossible to express
+conveniently as:</p>
+<pre class="text"><code>y = f(x)</code></pre>
+<p>Implicit graphs are experimental and are not guaranteed to wrok
+reliably.</p>
+<hr />
+<h1 id="ode-mode">14. ODE Mode</h1>
+<p>The application includes a dedicated mode for plotting ordinary
+differential equations.</p>
+<p>An ordinary differential equation describes a relationship involving
+a function and one or more of its derivatives.</p>
+<p>ODE plotting differs from ordinary function plotting because the
+graph is obtained numerically from the differential equation and an
+initial condition.</p>
+<hr />
+<h1 id="initial-conditions">15. Initial Conditions</h1>
+<p>An initial condition specifies the starting point from which an ODE
+solution is calculated.</p>
+<p>The initial point can be represented by its coordinates.</p>
+<p>The application displays the initial point on the graph when it is
+selected.</p>
+<p>This allows the starting condition of the numerical solution to be
+inspected visually.</p>
+<hr />
+<h1 id="moving-the-ode-initial-point">16. Moving the ODE Initial
+Point</h1>
+<p>The ODE initial point can be moved interactively.</p>
+<p>To move the initial point:</p>
+<ol type="1">
+<li>Select the ODE plot.</li>
+<li>Locate the initial-condition point.</li>
+<li>Drag the point to a new location.</li>
+<li>The ODE solution is recalculated using the new initial
+condition.</li>
+</ol>
+<p>This provides an interactive way of exploring how changing the
+initial condition affects the solution.</p>
+<hr />
+<h1 id="undoing-initial-point-changes">17. Undoing Initial-Point
+Changes</h1>
+<p>Changes to the ODE initial point participate in the application’s
+undo system.</p>
+<p>After moving the initial point, the change can be undone using the
+normal undo functionality.</p>
+<p>This makes it possible to experiment with different initial
+conditions without permanently losing the previous state.</p>
+<hr />
+<h1 id="ode-step-size">18. ODE Step Size</h1>
+<p>Numerical ODE solutions are calculated using discrete steps.</p>
+<p>The step size controls how far the numerical solver advances during
+each calculation step.</p>
+<p>In general:</p>
+<ul>
+<li>Smaller step sizes can provide greater numerical resolution.</li>
+<li>Larger step sizes can reduce computation time.</li>
+<li>Extremely large steps may reduce the quality of the numerical
+approximation.</li>
+</ul>
+<p>When experimenting with an ODE, adjust the step size depending on the
+behavior of the equation and the desired balance between accuracy and
+computation.</p>
+<hr />
+<h1 id="navigating-the-graph">19. Navigating the Graph</h1>
+<p>The graph is interactive and can be explored using mouse
+controls.</p>
+<p>You can zoom into regions of interest and move around the coordinate
+plane.</p>
+<p>Interactive navigation is particularly useful when studying:</p>
+<ul>
+<li>Local behavior</li>
+<li>Intersections</li>
+<li>Rapidly changing functions</li>
+<li>ODE solutions</li>
+<li>Large-scale graph behavior</li>
+</ul>
+<hr />
+<h1 id="mouse-centered-zooming">20. Mouse-Centered Zooming</h1>
+<p>Zooming is centered around the mouse position.</p>
+<p>This means that when you zoom in on a particular region, the point
+underneath the cursor remains the focus of the zoom.</p>
+<p>This makes it easier to explore specific parts of a graph without
+repeatedly repositioning the view.</p>
+<hr />
+<h1 id="axis-rescaling">21. Axis Rescaling</h1>
+<p>The graph supports axis-specific rescaling.</p>
+<p>To rescale an axis, use the appropriate modifier key together with
+the scroll wheel.</p>
+</body>
+</html>

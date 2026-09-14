@@ -3,12 +3,24 @@ package math;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
 
+/**
+ * Utility class providing numerical methods for solving Ordinary Differential Equations (ODEs).
+ */
 public class ODESolving {
+    /**
+     * Solves a first-order ODE using the fourth-order Runge-Kutta (RK4) method.
+     *
+     * @param f        the ODE function dy/dx = f(x, y)
+     * @param initial  the initial condition (x0, y0)
+     * @param stepSize the step size for numerical integration
+     * @param max      the maximum x-value to integrate to
+     * @return an {@link ODESolution} containing the calculated points
+     */
     public static ODESolution RK4(BiFunction<Double, Double, Double> f, Point initial, double stepSize, double max){
         if(f == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
         if(initial == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
         if(stepSize == 0 || !Double.isFinite(stepSize) || !Double.isFinite(max)) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
-        //if((max - initial.x) * stepSize < 0) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
+        
         int maxIter = (int)Math.abs((max - initial.x)/stepSize);
         if(maxIter > 1e7) return new ODESolution(ODEStatus.EXCEEDED_MAX_ITERATIONS);
         
@@ -24,6 +36,14 @@ public class ODESolving {
         return new ODESolution(list, (int)maxIter, stepSize, ODEStatus.SUCCESS);
     }
 
+    /**
+     * Performs a single RK4 integration step for a first-order ODE.
+     *
+     * @param f        the ODE function dy/dx = f(x, y)
+     * @param initial  the current state (x, y)
+     * @param stepSize the step size
+     * @return the new state (x + stepSize, y + dy)
+     */
     public static Point RK4Step(BiFunction<Double, Double, Double> f, Point initial, double stepSize){
         double currentX = initial.x; double currentY = initial.y; 
         double k1 = f.apply(currentX, currentY);
@@ -50,12 +70,22 @@ public class ODESolving {
         return new Point(currentX + stepSize, currentY + stepSize*(k1 + 2*k2 + 2*k3 + k4)/6);
     }
 
+    /**
+     * Solves a first-order ODE using an adaptive step size RK4 method.
+     *
+     * @param f         the ODE function dy/dx = f(x, y)
+     * @param initial   the initial condition (x0, y0)
+     * @param stepSize  the initial step size
+     * @param max       the maximum x-value
+     * @param tolerance the error tolerance for adaptive stepping
+     * @return an {@link ODESolution} containing the points
+     */
     public static ODESolution adaptiveRK4(BiFunction<Double, Double, Double> f, Point initial, double stepSize, double max, double tolerance){
         double multiplier = 1;
         if(f == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
         if(initial == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
         if(stepSize == 0 || !Double.isFinite(stepSize) || !Double.isFinite(max)) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
-        //if((max - initial.x) * stepSize < 0) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
+        
         ArrayList<Point> list = new ArrayList<>();
         int acceptedSteps = 1; int rejectedSteps = 0;
         double minimumStepUsed = stepSize; double maximumStepUsed = stepSize;
@@ -66,23 +96,17 @@ public class ODESolving {
             if(list.size() > 1e7) return new ODESolution(list, minimumStepUsed, maximumStepUsed, acceptedSteps, rejectedSteps, ODEStatus.EXCEEDED_MAX_ITERATIONS);
             double sign = Math.signum(stepSize*multiplier);
             double h = sign * Math.min(Math.abs(stepSize*multiplier), Math.abs(max-current.x));
-            //if(h < tolerance/10) return new ODESolution(ODEStatus.INVALID_STEPSIZE);
+            
             Point safetyCurrent =  RK4Step(f, current, h);
             Point currentHalf1 = RK4Step(f, current, h / 2);
             Point currentHalf2 = RK4Step(f, currentHalf1, h / 2);
             if (current.x == currentHalf2.x) {
-                System.out.println("Infinite loop detected: Stagnation at " + current.x);
-                break; // Break to prevent the hang
+                break; 
             }
             if(safetyCurrent.isNaN() || currentHalf1.isNaN() || currentHalf2.isNaN()) return new ODESolution(ODEStatus.ENCOUNTERED_NAN);
             double error = Math.abs(safetyCurrent.y - currentHalf2.y)/15;
             
             if(Math.abs(h) < 1e-14){
-                System.out.println(current.x);
-                System.out.println(h);
-                System.out.println(error);
-                System.out.println(safetyCurrent.y);
-                System.out.println(currentHalf2.y);
                 return new ODESolution(ODEStatus.STEPSIZE_UNDERFLOW);
             }
             if(error == 0){
@@ -106,6 +130,17 @@ public class ODESolving {
         return new ODESolution(list, minimumStepUsed, maximumStepUsed, acceptedSteps, rejectedSteps, ODEStatus.SUCCESS);
     }
 
+    /**
+     * Solves a system of two first-order ODEs using RK4.
+     *
+     * @param dx        the function for dx/dt
+     * @param dy        the function for dy/dt
+     * @param t0        the initial time
+     * @param initial   the initial point (x0, y0)
+     * @param stepSize  the step size
+     * @param maxTime   the maximum time
+     * @return an {@link ODESolution}
+     */
     public static ODESolution RK4(BiFunction<Double, Double, Double> dx, BiFunction<Double, Double, Double> dy, double t0, Point initial, double stepSize, double maxTime){
         if(dy == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);        
         if(dx == null) return new ODESolution(ODEStatus.INVALID_ARGUMENTS);
@@ -126,6 +161,15 @@ public class ODESolving {
         return new ODESolution(list, (int)maxIter, stepSize, ODEStatus.SUCCESS);
     }
 
+    /**
+     * Performs a single RK4 step for a system of two ODEs.
+     *
+     * @param dx       function for dx/dt
+     * @param dy       function for dy/dt
+     * @param initial  the current state
+     * @param stepSize the step size
+     * @return the new state
+     */
     public static Point RK4Step(BiFunction<Double, Double, Double> dx, BiFunction<Double, Double, Double> dy, Point initial, double stepSize){
         double currentX = initial.x; double currentY = initial.y; 
         double kx1 = dx.apply(currentX, currentY);

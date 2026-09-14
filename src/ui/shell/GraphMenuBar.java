@@ -27,6 +27,7 @@ public class GraphMenuBar extends MenuBar{
     Menu graph;
     Menu plot;
     Menu help;
+    private HowToUseWindow howToUseWindow;
 
     public GraphMenuBar(TabPane tabPane, MainWindow window, WindowManager windowManager, FileActions fileActions, UndoManager undoManager){
         setBackground(new Background(
@@ -211,14 +212,22 @@ public class GraphMenuBar extends MenuBar{
     public void populateHelpMenu(){
         help = new Menu("Help");
 
+
         MenuItem about = new MenuItem("About");
         About aboutAlert = new About();
-
         about.setOnAction(e -> {
             aboutAlert.showAndWait();
         });
 
+        MenuItem howToUse = new MenuItem("How to Use");
+        howToUse.setOnAction(e -> {
+            if(howToUseWindow == null) howToUseWindow = new HowToUseWindow();
+            howToUseWindow.show();
+            howToUseWindow.toFront();
+        });
+
         help.getItems().add(about);
+        help.getItems().add(howToUse);
 
         getMenus().add(help);
     }
