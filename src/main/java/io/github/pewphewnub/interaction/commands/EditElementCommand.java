@@ -1,0 +1,30 @@
+package io.github.pewphewnub.interaction.commands;
+
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.plotting.GraphElementManager;
+
+public class EditElementCommand implements Command{
+    private final GraphElement target;
+    private final GraphElement before;
+    private final GraphElement after;
+    private final GraphElementManager plotManager;
+
+    public EditElementCommand(GraphElement target, GraphElement before, GraphElement after, GraphElementManager plotManager){
+        this.target = target;
+        this.before = before;
+        this.after = after;
+        this.plotManager = plotManager;
+    }
+
+    @Override
+    public void execute() {
+        target.copyFrom(after);
+        plotManager.elementChanged(target);
+    }
+
+    @Override
+    public void undo() {
+        target.copyFrom(before);
+        plotManager.elementChanged(target);
+    }
+}

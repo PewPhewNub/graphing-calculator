@@ -1,0 +1,197 @@
+package io.github.pewphewnub.ui.shell;
+
+import java.util.ArrayList;
+
+import io.github.pewphewnub.app.GraphApplication;
+import io.github.pewphewnub.app.WindowManager;
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.interaction.commands.AddGraphCommand;
+import io.github.pewphewnub.interaction.commands.RemoveGraphCommand;
+import io.github.pewphewnub.parser.ParseException;
+import io.github.pewphewnub.plotting.plots.FunctionPlot;
+import io.github.pewphewnub.scene.FunctionGraphScene;
+import io.github.pewphewnub.scene.GraphScene;
+import io.github.pewphewnub.settings.ApplicationSettings;
+import io.github.pewphewnub.settings.SettingsListener;
+import io.github.pewphewnub.settings.SettingsManager;
+import io.github.pewphewnub.settings.Theme;
+import javafx.animation.AnimationTimer;
+import javafx.collections.ListChangeListener;
+import javafx.scene.Scene;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+public class MainWindow implements SettingsListener{
+    private Stage stage;
+    private TabPane tabPane;
+    private GraphApplication app;
+    private SettingsManager settingsManager;
+    private WindowManager windowManager;
+    private FileActions fileActions;
+    private UndoManager undoManager;
+    Scene scene;
+    MenuBar menuBar;
+
+    private AnimationTimer timer;
+
+    public MainWindow(Stage stage, GraphApplication app, WindowManager windowManager, SettingsManager settingsManager){
+        this.app = app;
+        undoManager = new UndoManager();
+        tabPane = new TabPane();
+        this.windowManager = windowManager;
+        this.settingsManager = settingsManager;
+        settingsManager.addListener(this);
+        this.fileActions = new FileActions(stage, tabPane,this);
+        this.stage = stage;
+        stage.setOnCloseRequest(e -> {
+            e.consume();
+            removeAll();
+            stage.close();
+        });
+        
+        initializeMenus();
+        
+        tabPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        tabPane.setMinSize(0, 100);
+        tabPane.setFocusTraversable(false);
+
+        GraphTab tab = new GraphTab("New Graph", new FunctionGraphScene(new ApplicationSettings()));
+        addGraphScene(tab);
+        try {
+            tab.getGraphScene().getPlotManager().addElement(new FunctionPlot("New Explicit Plot", "x", Color.RED));
+            tab.getGraphScene().getPlotManager().addElement(new FunctionPlot("New Explicit Plot", "x^2", Color.BLUE));
+        } catch (ParseException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        undoManager.clearStacks();
+
+        tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
+            if(tabPane.getTabs().isEmpty()){
+                close();
+            }
+        });
+        
+        BorderPane pane = new BorderPane();
+
+        pane.setTop(menuBar);
+        pane.setCenter(tabPane);
+
+        scene = new Scene(pane, 1600, 900);
+    }
+
+    public void show(){
+        stage.setScene(scene);
+        stage.setTitle("Almost Desmos");
+        stage.initStyle(StageStyle.DECORATED);
+        stage.setMinWidth(400);
+        stage.setMinHeight(300);
+        stage.show();
+
+        timer = new AnimationTimer() {
+            private static final long FIXED_STEP = 16_666_667L; // 60 Hz
+            private long previous = 0;
+            private long accumulator = 0;
+            @Override
+            public void handle(long now) {
+                GraphTab tab = (GraphTab)(tabPane.getSelectionModel().getSelectedItem());
+                if(tab == null) return;
+                GraphScene current = (tab).getGraphScene();
+                if (previous == 0)
+                    previous = now;
+                long delta = now - previous;
+                previous = now;
+                accumulator += delta;
+                current.update();
+                while (accumulator >= FIXED_STEP) {
+                    current.fixedUpdate();
+                    accumulator -= FIXED_STEP;
+                }
+                current.lateUpdate();
+                current.render();
+
+                tab.updateStatusBar();
+            }
+        };
+        timer.start();
+    }
+
+    public void initializeMenus(){
+        menuBar = new GraphMenuBar(tabPane, this, windowManager, fileActions, undoManager);
+    }
+    public void close(){
+        stage.close();
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void removeGraphScene(){
+        GraphTab graphTab = (GraphTab)tabPane.getSelectionModel().getSelectedItem();
+        if(graphTab.isDirty()){
+            if(!fileActions.unsaved(graphTab)) return;
+        }
+        graphTab.getGraphScene()
+            .getCoordinator().close();
+        undoManager.execute(new RemoveGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex(), 
+            graphTab, 
+            tabPane));
+        if(tabPane.getTabs().isEmpty()){
+            close();
+        }
+    }
+    public void removeGraphScene(GraphTab graphTab){
+        if(graphTab.isDirty()){
+            if(!fileActions.unsaved(graphTab)) return;
+        }
+        undoManager.execute(new RemoveGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex(), 
+            graphTab, 
+            tabPane));
+        if(tabPane.getTabs().isEmpty()){
+            close();
+        }
+    }
+    public void addGraphScene(GraphTab graphTab){
+        graphTab.setUndoManager(undoManager);
+        graphTab.setOnCloseRequest(e -> {
+            e.consume();
+            removeGraphScene();
+            return;
+        });
+        undoManager.execute(new AddGraphCommand(
+            tabPane.getSelectionModel().getSelectedIndex() + 1,
+            graphTab, 
+            tabPane));
+    }
+
+    public void removeAll(){
+        ArrayList<Tab> tabs = new ArrayList<>(tabPane.getTabs());
+
+        for(Tab tab : tabs){
+            ((GraphTab)tab).getGraphScene().getCoordinator().close();
+        }
+        tabPane.getTabs().clear();
+        timer.stop();
+        stage.close();
+    }
+
+    @Override
+    public void themeChanged(Theme theme) {
+        
+    }
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
+    }
+}
+enum GraphType{
+    CARTESIAN
+}

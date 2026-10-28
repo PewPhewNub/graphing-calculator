@@ -1,0 +1,167 @@
+package io.github.pewphewnub.parser;
+
+import java.util.ArrayList;
+
+/**
+ * Performs lexical analysis on a raw mathematical expression string.
+ * Converts the input string into a list of {@link Token} objects,
+ * which can then be processed by the {@link Parser}.
+ */
+public class Lexer {
+    /** The raw input expression string. */
+    public String inputString;
+    
+    /** The current character offset in the input string. */
+    public int position;
+    
+    /** The list of tokens generated after tokenization. */
+    public ArrayList<Token> tokenList;
+
+    /**
+     * Constructs a new Lexer for the given input string.
+     *
+     * @param inputString the mathematical expression to tokenize
+     */
+    public Lexer(String inputString){
+        this.inputString = inputString;
+        position = 0;
+        this.tokenList = new ArrayList<>();
+    }
+
+    /**
+     * Executes the lexical analysis process, parsing the entire input string
+     * and populating the {@code tokenList}.
+     *
+     * @throws ParseException if an unexpected character or invalid token is encountered
+     */
+    public void tokenize() throws ParseException{
+        while(!isAtEnd()){
+            skipWhitespace();
+            if (isAtEnd()) break;
+            if(isDigit(peek()) || peek() == '.'){
+                Token token = readNumber();
+                if(token.type == TokenType.ERROR){
+                    throw new ParseException("ERROR");
+                }
+                tokenList.add(token);
+            }else if(isLetter(peek())){
+                Token token = readIdentifier();
+                if(token.type == TokenType.ERROR){
+                    throw new ParseException("ERROR");
+                }
+                tokenList.add(token);
+            }else{
+                Token token = readOperator();
+                if(token.type == TokenType.ERROR){
+                    throw new ParseException("ERROR");
+                }
+                tokenList.add(token);
+            }
+        }
+        tokenList.add(new Token(TokenType.EOF, "EOF", position));
+    }
+
+    /** Advances to the next character in the input and returns it. */
+    private char advance(){
+        return inputString.charAt(position++);
+    }
+    
+    /** Returns the current character without advancing the position. */
+    private char peek(){
+        if (isAtEnd()) return '\0';
+        return inputString.charAt(position);
+    }
+    
+    /** Checks if the lexer has reached the end of the input string. */
+    private boolean isAtEnd(){
+        return position >= inputString.length();
+    }
+    
+    /** Returns true if the character is a digit. */
+    private boolean isDigit(char c){
+        return Character.isDigit(c);
+    }
+    
+    /** Returns true if the character is a letter. */
+    private boolean isLetter(char c){
+        return Character.isLetter(c);
+    }
+    
+    /** Returns true if the character is a decimal point. */
+    private boolean isPoint(char c){
+        return c == '.';
+    }
+
+    /**
+     * Reads a sequence of numeric characters and constructs a {@code NUMBER} token.
+     * Supports integers and floating-point numbers.
+     *
+     * @return a {@link Token} of type {@code NUMBER}
+     */
+    public Token readNumber(){
+        int startingIndex = position;
+        String string = "";
+        boolean isDecimal = false;
+        while (!isAtEnd() && (isDigit(peek()) || isPoint(peek()))) {
+            char c = advance();
+            if (isPoint(c)) {
+                if (isDecimal) break;
+                isDecimal = true;
+            }
+            string = string + c;
+        }
+        return new Token(TokenType.NUMBER,
+                string,
+                startingIndex);
+    }
+
+    /**
+     * Reads a sequence of alphanumeric characters and constructs an {@code IDENTIFIER} token.
+     *
+     * @return a {@link Token} of type {@code IDENTIFIER}, or {@code ERROR} if invalid
+     */
+    public Token readIdentifier(){
+        if(!isLetter(peek())) return new Token(TokenType.ERROR, "ERROR", position);
+        int startingIndex = position;
+        String string = "";
+        while (!isAtEnd() && (isDigit(peek()) || isLetter(peek()))) {
+            char c = advance();
+            string = string + c;
+        }
+        return new Token(TokenType.IDENTIFIER,
+                string,
+                startingIndex);
+    }
+
+    /** Skips over any whitespace characters in the input stream. */
+    public void skipWhitespace(){
+        while(!isAtEnd() && (peek() == ' ' || peek() == '\t' || peek() == '\n'))
+            advance();
+    }
+
+    /**
+     * Reads a single operator character and constructs the corresponding token.
+     *
+     * @return a {@link Token} representing the operator, or {@code ERROR} if invalid
+     */
+    public Token readOperator(){
+        if(!isAtEnd() && (isLetter(peek()) || isDigit(peek()))) return new Token(TokenType.ERROR, "ERROR", position);
+        int startingIndex = position;
+        char c = advance();
+        TokenType type = switch (c) {
+        case '+' -> TokenType.PLUS;
+        case '-' -> TokenType.MINUS;
+        case '*' -> TokenType.STAR;
+        case '/' -> TokenType.SLASH;
+        case '^' -> TokenType.POW;
+        case '(' -> TokenType.LPAREN;
+        case ')' -> TokenType.RPAREN;
+        case '=' -> TokenType.ASSIGN;
+        case ',' -> TokenType.COMMA;
+        default -> TokenType.ERROR;
+        };
+        return new Token(type,
+                null,
+                startingIndex);
+    }
+}
