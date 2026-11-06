@@ -2,7 +2,8 @@ package io.github.pewphewnub.parser.node;
 
 import java.util.HashSet;
 import java.util.Set;
-import main.java.io.github.pewphewnub.parser.EvaluationContext;
+
+import io.github.pewphewnub.parser.EvaluationContext;
 
 /**
  * Represents a formal definition in the AST (e.g., f(x) = ...).

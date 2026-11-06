@@ -1,4 +1,4 @@
-package io.github.ui.components;
+package io.github.pewphewnub.ui.components;
 
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.Font;

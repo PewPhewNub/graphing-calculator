@@ -1,0 +1,9 @@
+pane{
+    -fx-margin:5px;
+}
+.close-button{
+    -fx-stroke: -app-border;
+    -fx-stroke-width: 2.5px;
+    -fx-stroke-line-cap: round;
+    -fx-margin: 5px 5px 5px 5px;
+}

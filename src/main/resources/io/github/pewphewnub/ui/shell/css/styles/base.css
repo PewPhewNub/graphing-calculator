@@ -1,0 +1,501 @@
+
+/* =========================================
+   GLOBAL
+   ========================================= */
+
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -app-bg;
+    -fx-text-fill: -app-text;
+    -fx-margin-bottom: 30px;
+}
+
+.label {
+    -fx-text-fill: -app-text;
+}
+
+.text {
+    -fx-fill: -app-text;
+}
+
+.tooltip {
+    -fx-background-color: -app-surface-alt;
+    -fx-text-fill: -app-text;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 6px 10px;
+    -fx-font-size: 12px;
+}
+
+.separator .line {
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px 0 0 0;
+}
+
+/* =========================================
+   LAYOUT CONTAINERS
+   ========================================= */
+
+.border-pane,
+.stack-pane,
+.anchor-pane,
+.grid-pane,
+.flow-pane,
+.tile-pane {
+    -fx-background-color: -app-bg;
+}
+
+.vbox,
+.hbox {
+    -fx-background-color: transparent;
+}
+
+/* Optional custom layout classes */
+
+.panel {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 12px;
+}
+
+.sidebar {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-width: 0 1px 0 0;
+    -fx-padding: 12px;
+}
+
+.toolbar {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 8px;
+}
+
+.status-bar {
+    -fx-background-color: -app-surface-alt;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 5px 10px;
+}
+
+/* =========================================
+   MENU BAR / MENUS
+   ========================================= */
+
+.menu-bar {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 2px 5px;
+}
+
+.menu-bar .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 5px;
+}
+
+.menu-bar .menu-button .label {
+    -fx-text-fill: -app-text;
+}
+
+.menu-bar .menu-button:hover,
+.menu-bar .menu-button:showing {
+    -fx-background-color: -app-hover;
+}
+
+.context-menu {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px;
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-padding: 7px 12px;
+}
+
+.menu-item .label {
+    -fx-text-fill: -app-text;
+}
+
+.menu-item:focused {
+    -fx-background-color: -app-selected;
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: -app-text;
+}
+
+.menu-item:disabled {
+    -fx-opacity: 0.45;
+}
+
+.context-menu .separator {
+    -fx-padding: 4px 0;
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.button,
+.toggle-button {
+    -fx-background-color: -app-surface-alt;
+    -fx-text-fill: -app-text;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 7px 14px;
+    -fx-cursor: hand;
+}
+
+.button:hover,
+.toggle-button:hover {
+    -fx-background-color: -app-hover;
+}
+
+.button:pressed,
+.toggle-button:selected {
+    -fx-background-color: -app-selected;
+}
+
+.button:focused,
+.toggle-button:focused {
+    -fx-border-color: -app-border-focus;
+}
+
+.button:disabled,
+.toggle-button:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}
+
+.button.primary {
+    -fx-background-color: -app-accent;
+    -fx-text-fill: -app-accent-text;
+    -fx-border-color: transparent;
+}
+
+.button.primary:hover {
+    -fx-background-color: -app-accent-hover;
+}
+
+.button.danger {
+    -fx-background-color: -app-error;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+/* =========================================
+   TEXT INPUTS
+   ========================================= */
+
+.text-field,
+.password-field,
+.text-area {
+    -fx-background-color: -app-surface-alt;
+    -fx-text-fill: -app-text;
+    -fx-prompt-text-fill: -app-text-muted;
+    -fx-highlight-fill: -app-selected;
+    -fx-highlight-text-fill: -app-text;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 7px 10px;
+}
+
+.text-field:focused,
+.password-field:focused,
+.text-area:focused {
+    -fx-border-color: -app-border-focus;
+}
+
+.text-area .content {
+    -fx-background-color: -app-surface-alt;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+/* =========================================
+   COMBO BOX / CHOICE BOX
+   ========================================= */
+
+.combo-box,
+.choice-box {
+    -fx-background-color: -app-surface-alt;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.combo-box:hover,
+.choice-box:hover {
+    -fx-background-color: -app-hover;
+}
+
+.combo-box .list-cell,
+.choice-box .label {
+    -fx-text-fill: -app-text;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text;
+    -fx-padding: 7px 10px;
+}
+
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: -app-selected;
+}
+
+.combo-box .arrow,
+.choice-box .arrow {
+    -fx-background-color: -app-text-muted;
+}
+
+/* =========================================
+   CHECKBOX / RADIO BUTTON
+   ========================================= */
+
+.check-box,
+.radio-button {
+    -fx-text-fill: -app-text;
+    -fx-cursor: hand;
+}
+
+.check-box .box,
+.radio-button .radio {
+    -fx-background-color: -app-surface-alt;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.radio-button .radio {
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.check-box:selected .box,
+.radio-button:selected .radio {
+    -fx-background-color: -app-accent;
+    -fx-border-color: -app-accent;
+}
+
+.check-box:selected .mark,
+.radio-button:selected .dot {
+    -fx-background-color: -app-accent-text;
+}
+
+/* =========================================
+   SLIDER
+   ========================================= */
+
+.slider .track {
+    -fx-background-color: -app-surface-alt;
+    -fx-background-radius: 5px;
+}
+
+.slider .thumb {
+    -fx-background-color: -app-accent;
+    -fx-background-radius: 50%;
+}
+
+.slider .thumb:hover {
+    -fx-background-color: -app-accent-hover;
+}
+
+/* =========================================
+   SCROLL PANE / SCROLL BAR
+   ========================================= */
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -app-border;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -app-text-muted;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* =========================================
+   TAB PANE
+   ========================================= */
+
+.tab-pane {
+    -fx-background-color: -app-bg;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: -app-surface;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 14px;
+}
+
+.tab .tab-label {
+    -fx-text-fill: -app-text-muted;
+}
+
+.tab:selected {
+    -fx-background-color: -app-selected;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: -app-text;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: -app-bg;
+}
+
+/* =========================================
+   LIST VIEW / TABLE VIEW
+   ========================================= */
+
+.list-view,
+.table-view {
+    -fx-background-color: -app-surface;
+    -fx-border-color: -app-border;
+}
+
+.list-cell,
+.table-row-cell {
+    -fx-background-color: -app-surface;
+    -fx-text-fill: -app-text;
+}
+
+.list-cell:filled:hover,
+.table-row-cell:filled:hover {
+    -fx-background-color: -app-hover;
+}
+
+.list-cell:filled:selected,
+.table-row-cell:filled:selected {
+    -fx-background-color: -app-selected;
+}
+
+.table-cell {
+    -fx-text-fill: -app-text;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background,
+.table-view .column-header {
+    -fx-background-color: -app-surface-alt;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -app-text;
+}
+
+/* =========================================
+   PROGRESS
+   ========================================= */
+
+.progress-bar .track {
+    -fx-background-color: -app-surface-alt;
+    -fx-background-radius: 5px;
+}
+
+.progress-bar .bar {
+    -fx-background-color: -app-accent;
+    -fx-background-radius: 5px;
+}
+
+.progress-indicator {
+    -fx-progress-color: -app-accent;
+}
+
+/* =========================================
+   GRAPHING CALCULATOR
+   ========================================= */
+
+.graph-container {
+    -fx-background-color: -app-graph-bg;
+    -fx-border-color: -app-border;
+}
+
+.expression-panel {
+    -fx-background-color: -app-surface;
+    -fx-padding: 10px;
+    -fx-spacing: 8px;
+}
+
+.expression-row {
+    -fx-background-color: -app-surface-alt;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+    -fx-spacing: 8px;
+}
+
+.expression-row:hover {
+    -fx-background-color: -app-hover;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-text;
+}
+
+.muted-label {
+    -fx-text-fill: -app-text-muted;
+}
+
+.error-label {
+    -fx-text-fill: -app-error;
+}
+
+.success-label {
+    -fx-text-fill: -app-success;
+}

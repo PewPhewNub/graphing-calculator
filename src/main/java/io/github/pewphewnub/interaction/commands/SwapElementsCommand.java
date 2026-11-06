@@ -1,7 +1,7 @@
 package io.github.pewphewnub.interaction.commands;
 
-import main.java.io.github.pewphewnub.plotting.GraphElement;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.plotting.GraphElementManager;
 
 public class SwapElementsCommand implements Command{
     GraphElement plot1;

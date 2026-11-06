@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Dialog?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.GridPane?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="10"
+      alignment="CENTER_LEFT"
+      styleClass="about-content">
+    
+    <GridPane hgap="10" vgap="10">
+        <Label text="Width:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label text="Height:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label text="Background:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label text="Export Destination:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+
+        <TextField fx:id="widthField"
+                    styleClass="export-field"
+                    promptText="Width"
+                    text="1920"
+                    GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <TextField fx:id="heightField"
+                    styleClass="export-field"
+                    promptText="Height"
+                    text="1080"
+                    GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <CheckBox fx:id="transparentBackgroundCheckBox"
+                    styleClass="export-checkbox"
+                    text="Transparent Background"
+                    GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <fx:define>
+            <ToggleGroup fx:id="exportToggleGroup"/>
+        </fx:define>
+        <RadioButton fx:id="fileRadioButton"
+                    styleClass="export-radio-button"
+                    text="Export to File"
+                    toggleGroup="$exportToggleGroup"
+                    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <RadioButton fx:id="clipboardRadioButton"
+                    styleClass="export-radio-button"
+                    text="Copy to Clipboard"
+                    toggleGroup="$exportToggleGroup"
+                    GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+    </GridPane>
+
+</VBox>

@@ -1,13 +1,13 @@
-package main.java.io.github.pewphewnub.scene;
+package io.github.pewphewnub.scene;
 
+import io.github.pewphewnub.interaction.ODEInteractionController;
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.rendering.camera.CameraIntent;
+import io.github.pewphewnub.rendering.camera.Viewport;
+import io.github.pewphewnub.settings.ApplicationSettings;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
-import main.java.io.github.pewphewnub.interaction.ODEInteractionController;
-import main.java.io.github.pewphewnub.plotting.GraphElement;
-import main.java.io.github.pewphewnub.rendering.camera.CameraIntent;
-import main.java.io.github.pewphewnub.rendering.camera.Viewport;
-import main.settings.ApplicationSettings;
 
 public class ODEGraphScene extends GraphScene{
     

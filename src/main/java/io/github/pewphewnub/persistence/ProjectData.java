@@ -1,7 +1,8 @@
-package main.java.io.github.pewphewnub.persistence;
+package io.github.pewphewnub.persistence;
 
 import java.util.ArrayList;
-import main.java.io.github.pewphewnub.persistence.plotdata.GraphElementData;
+
+import io.github.pewphewnub.persistence.plotdata.GraphElementData;
 
 public class ProjectData {
     public int version = 1;

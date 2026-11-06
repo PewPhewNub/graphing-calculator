@@ -1,4 +1,4 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;

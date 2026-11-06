@@ -1,17 +1,18 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+
+import io.github.pewphewnub.persistence.ProjectIO;
+import io.github.pewphewnub.rendering.exporting.ExportOptions;
+import io.github.pewphewnub.rendering.exporting.ImageExporter;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import main.java.io.github.pewphewnub.persistence.ProjectIO;
-import main.java.io.github.pewphewnub.rendering.exporting.ExportOptions;
-import main.java.io.github.pewphewnub.rendering.exporting.ImageExporter;
 
 public class FileActions {
     private final Stage stage;

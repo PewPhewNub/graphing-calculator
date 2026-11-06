@@ -1,0 +1,25 @@
+.about-content {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "System";
+}
+
+.about-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202124;
+}
+
+.about-version {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.about-description {
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+}
+
+.about-footer {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6b7280;
+}

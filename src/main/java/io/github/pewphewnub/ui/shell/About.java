@@ -1,27 +1,41 @@
-package io.github.ui.shell;
 
+package io.github.pewphewnub.ui.shell;
+
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
+import javafx.scene.layout.VBox;
 
-public class About extends Alert{
-    public About(){
+public class About extends Alert {
+
+    public About() {
         super(AlertType.INFORMATION);
 
         setTitle("About");
-        setHeaderText("Graphing Calculator");
-        setContentText("""
-        Version 1.0
+        setHeaderText(null);
+        setContentText(null);
 
-        A desktop graphing calculator developed as a personal project.
+        try {
+            FXMLLoader loader = new FXMLLoader(
+            getClass().getResource(
+                "/io/github/pewphewnub/ui/shell/fxml/About.fxml"
+            )
+        );
 
-        Supports 4 plot types:
-        - Function : y = f(x)
-        - Parametric : x(t), y(t)
-        - Polar : r = f(\u03B8)
-        - Implicit f(x,y) = 0
+            VBox content = loader.load();
 
-        Designed and implemented from scratch in Java and JavaFX
+            getDialogPane().setContent(content);
 
-        © 2026 PewPhewNub
-        """);
+            getDialogPane().getStylesheets().add(
+                getClass().getResource(
+                    "/io/github/pewphewnub/ui/shell/css/About.css"
+                ).toExternalForm()
+            );
+
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "Failed to load About dialog", e
+            );
+        }
     }
 }

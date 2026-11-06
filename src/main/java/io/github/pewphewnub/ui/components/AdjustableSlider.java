@@ -1,4 +1,4 @@
-package io.github.ui.components;
+package io.github.pewphewnub.ui.components;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;

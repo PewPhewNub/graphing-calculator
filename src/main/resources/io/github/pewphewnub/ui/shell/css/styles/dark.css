@@ -1,0 +1,43 @@
+
+.root {
+    /* Backgrounds */
+    -app-bg: #171A22;
+    -app-surface: #242936;
+    -app-surface-alt: #303746;
+    -app-hover: #3A4354;
+    -app-selected: #344D73;
+
+    /* Text */
+    -app-text: #E8EAF0;
+    -app-text-muted: #A1AABC;
+    -app-text-disabled: #737D90;
+
+    /* Borders */
+    -app-border: #394150;
+    -app-border-focus: #649AF5;
+
+    /* Accent */
+    -app-accent: #649AF5;
+    -app-accent-hover: #82AEFF;
+    -app-accent-text: #101827;
+
+    /* Status */
+    -app-success: #4FC48A;
+    -app-warning: #F1B95B;
+    -app-error: #F07575;
+
+    /* Graph UI */
+    -app-graph-bg: #1E2330;
+    -app-grid: #343C4C;
+    -app-axis: #A1AABC;
+
+    /* JavaFX control defaults */
+    -fx-base: -app-surface;
+    -fx-background: -app-bg;
+    -fx-control-inner-background: -app-surface;
+    -fx-accent: -app-accent;
+    -fx-focus-color: -app-accent;
+    -fx-faint-focus-color: transparent;
+    -fx-text-base-color: -app-text;
+    -fx-text-background-color: -app-text;
+}

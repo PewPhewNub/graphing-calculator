@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.fxml.FXML?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Background?>
+<?import javafx.scene.layout.BackgroundFill?>
+<?import javafx.scene.layout.Border?>
+<?import javafx.scene.layout.BorderStroke?>
+<?import javafx.scene.layout.BorderStrokeStyle?>
+<?import javafx.scene.layout.BorderWidths?>
+<?import javafx.scene.layout.CornerRadii?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.paint.Color?>
+
+<fx:root type = "HBox"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="20"
+      alignment="CENTER_LEFT"
+      styleClass="status-bar">
+    
+    <Label styleClass="mouse-x"
+           fx:id="mouseX"/>
+    <Label styleClass="mouse-y"
+           fx:id="mouseY"/>
+    <Label styleClass="current-scale-x"
+           fx:id="currentScaleX"/>
+    <Label styleClass="current-scale-y"
+           fx:id="currentScaleY"/>
+    <Label styleClass="view"
+           fx:id="view"/>
+    <Label styleClass="plots-count"
+           fx:id="plotsCount"/>
+</fx:root>

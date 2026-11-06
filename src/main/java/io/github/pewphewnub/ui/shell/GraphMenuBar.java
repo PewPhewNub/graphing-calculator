@@ -1,5 +1,13 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 
+import io.github.pewphewnub.app.WindowManager;
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.rendering.camera.CameraIntent;
+import io.github.pewphewnub.scene.FunctionGraphScene;
+import io.github.pewphewnub.scene.ODEGraphScene;
+import io.github.pewphewnub.settings.ApplicationSettings;
+import io.github.pewphewnub.settings.Theme;
+import io.github.pewphewnub.settings.ThemeManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
@@ -12,12 +20,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
-import main.java.io.github.pewphewnub.app.WindowManager;
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.rendering.camera.CameraIntent;
-import main.java.io.github.pewphewnub.scene.FunctionGraphScene;
-import main.java.io.github.pewphewnub.scene.ODEGraphScene;
-import main.settings.ApplicationSettings;
 
 public class GraphMenuBar extends MenuBar{
 
@@ -187,6 +189,14 @@ public class GraphMenuBar extends MenuBar{
         });
         resetView.setAccelerator(KeyCombination.keyCombination("CTRL + SHIFT + EQUALS"));
         
+        view.getItems().add(new SeparatorMenuItem());
+
+        CheckMenuItem toggleDarkMode = new CheckMenuItem("Toggle Dark Mode");
+        view.getItems().add(toggleDarkMode);
+        toggleDarkMode.setOnAction(e -> {
+            ThemeManager.applyTheme(toggleDarkMode.isSelected()?Theme.DARK:Theme.LIGHT);
+        });
+
         getMenus().add(view);
     }
 

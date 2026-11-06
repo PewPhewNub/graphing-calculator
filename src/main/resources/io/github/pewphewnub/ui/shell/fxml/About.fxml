@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="10"
+      alignment="CENTER_LEFT"
+      styleClass="about-content">
+
+    <padding>
+        <Insets top="20" right="24" bottom="20" left="24"/>
+    </padding>
+
+    <Label text="Graphing Calculator"
+           styleClass="about-title"/>
+
+    <Label text="Version 1.1.0"
+           styleClass="about-version"/>
+
+    <Label text="A JavaFX application for graphing and exploring mathematical functions."
+           wrapText="true"
+           styleClass="about-description"/>
+
+    <Label text="Built with Java and JavaFX."
+           styleClass="about-footer"/>
+
+</VBox>

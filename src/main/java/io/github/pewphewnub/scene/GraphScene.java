@@ -1,6 +1,23 @@
-package main.java.io.github.pewphewnub.scene;
+package io.github.pewphewnub.scene;
 
 import java.util.ArrayList;
+
+import io.github.pewphewnub.computation.ComputationCoordinator;
+import io.github.pewphewnub.interaction.FunctionInteractionController;
+import io.github.pewphewnub.interaction.InputController;
+import io.github.pewphewnub.interaction.ODEInteractionController;
+import io.github.pewphewnub.interaction.PlotInteractionController;
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.plotting.GraphElementListener;
+import io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.plotting.data.GridData;
+import io.github.pewphewnub.rendering.camera.CameraSystem;
+import io.github.pewphewnub.rendering.camera.Viewport;
+import io.github.pewphewnub.rendering.camera.ViewportListener;
+import io.github.pewphewnub.rendering.core.RenderContext;
+import io.github.pewphewnub.rendering.core.Renderer;
+import io.github.pewphewnub.rendering.graph.Graph;
+import io.github.pewphewnub.settings.ApplicationSettings;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyEvent;
@@ -14,22 +31,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import main.java.io.github.pewphewnub.computation.ComputationCoordinator;
-import main.java.io.github.pewphewnub.interaction.FunctionInteractionController;
-import main.java.io.github.pewphewnub.interaction.InputController;
-import main.java.io.github.pewphewnub.interaction.ODEInteractionController;
-import main.java.io.github.pewphewnub.interaction.PlotInteractionController;
-import main.java.io.github.pewphewnub.plotting.GraphElement;
-import main.java.io.github.pewphewnub.plotting.GraphElementListener;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
-import main.java.io.github.pewphewnub.plotting.data.GridData;
-import main.java.io.github.pewphewnub.rendering.camera.CameraSystem;
-import main.java.io.github.pewphewnub.rendering.camera.Viewport;
-import main.java.io.github.pewphewnub.rendering.camera.ViewportListener;
-import main.java.io.github.pewphewnub.rendering.core.RenderContext;
-import main.java.io.github.pewphewnub.rendering.core.Renderer;
-import main.java.io.github.pewphewnub.rendering.graph.Graph;
-import main.settings.ApplicationSettings;
 
 public abstract class GraphScene implements GraphElementListener, ViewportListener{
     protected StackPane root;

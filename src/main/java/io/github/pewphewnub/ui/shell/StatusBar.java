@@ -1,5 +1,9 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 
+import java.io.IOException;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -14,50 +18,32 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 public class StatusBar extends HBox{
-    public Label mouseX;
-    public Label mouseY;
-    public Label currentScaleX;
-    public Label currentScaleY;
-    public Label view;
-    public Label plotsCount;
+    @FXML public Label mouseX;
+    @FXML public Label mouseY;
+    @FXML public Label currentScaleX;
+    @FXML public Label currentScaleY;
+    @FXML public Label view;
+    @FXML public Label plotsCount;
     public StatusBar(){
-        setPadding(new Insets(2, 10, 2, 10));
-        setAlignment(Pos.CENTER_RIGHT);
-        setBackground(
-            new Background(
-                new BackgroundFill(
-                    Color.rgb(240, 240, 240),
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY
-                )
-            )
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("/io/github/pewphewnub/ui/shell/fxml/StatusBar.fxml")
         );
-        setBorder(
-            new Border(
-                new BorderStroke(
-                    Color.LIGHTGRAY,
-                    BorderStrokeStyle.SOLID,
-                    CornerRadii.EMPTY,
-                    new BorderWidths(2, 0, 2, 0)
-                )
-            )
+        loader.setRoot(this);
+        loader.setController(this);
+            
+        try{
+            loader.load();
+        }catch(IOException e){
+            throw new IllegalStateException(
+                "Failed to load status bar", e
+            );
+        }
+
+        getStylesheets().add(
+            getClass().getResource(
+                "/io/github/pewphewnub/ui/shell/css/StatusBar.css"
+            ).toExternalForm()
         );
-
-        setSpacing(20);
-        mouseX = new Label("x: ----");
-        getChildren().add(mouseX);
-        mouseY = new Label("y: ----");
-        getChildren().add(mouseY);
-        currentScaleX = new Label("Scale X: ----/--");
-        getChildren().add(currentScaleX);
-        currentScaleY = new Label("Scale Y: ----/--");
-        getChildren().add(currentScaleY);
-        view = new Label("View : --x--");
-        getChildren().add(view);
-        plotsCount = new Label("Plots: --");
-        getChildren().add(plotsCount);
-
-        setHeight(30);
     }
 
     public void update(double mouseX, double mouseY, double scaleX, double scaleY, double width, double height, int plotCount){

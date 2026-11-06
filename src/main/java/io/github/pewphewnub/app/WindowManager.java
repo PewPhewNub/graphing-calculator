@@ -43,4 +43,7 @@ public class WindowManager {
             window.close();
         }
     }
+    public ArrayList<MainWindow> getWindows() {
+        return windows;
+    }
 }

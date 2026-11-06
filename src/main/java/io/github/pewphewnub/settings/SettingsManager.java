@@ -1,19 +1,15 @@
-package main.settings;
+package io.github.pewphewnub.settings;
 
 import java.util.ArrayList;
 
 
 public class SettingsManager {
     private ApplicationSettings settings;
-    private ArrayList<SettingsListener> listeners = new ArrayList<>();
-
     public SettingsManager(){
-        listeners = new ArrayList<>();
         settings = new ApplicationSettings();
     }
 
     public SettingsManager(ApplicationSettings settings){
-        listeners = new ArrayList<>();
         this.settings = settings;
     }
     public ApplicationSettings getSettings(){
@@ -26,19 +22,5 @@ public class SettingsManager {
 
     public void load(){
 
-    }
-
-    public void addListener(SettingsListener listener){
-        listeners.add(listener);
-    }
-    public void removeListener(SettingsListener listener){
-        listeners.remove(listener);
-    }
-
-    public void setTheme(Theme theme){
-        settings.theme = theme;
-        for(SettingsListener listener : listeners){
-            listener.themeChanged(theme);
-        }
     }
 }

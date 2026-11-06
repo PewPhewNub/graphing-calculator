@@ -3,13 +3,11 @@ import io.github.pewphewnub.interaction.UndoManager;
 import io.github.pewphewnub.plotting.GraphElementManager;
 import io.github.pewphewnub.scene.GraphMode;
 import io.github.pewphewnub.scene.GraphScene;
-import io.github.pewphewnub.settings.ThemeColors;
 import io.github.pewphewnub.ui.components.ToolTip;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -22,7 +20,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-public class UIPanel extends BorderPane implements Themeable{
+public class UIPanel extends BorderPane{
     GraphScene graphScene;
     GraphElementManager plotManager;
     ControlBar controlBar;
@@ -178,9 +176,5 @@ public class UIPanel extends BorderPane implements Themeable{
         addPlotButton.setUndoManager(undoManager);
         controlBar.setUndoManager(undoManager);
         editorPane.setUndoManager(undoManager);
-    }
-    @Override
-    public void applyTheme(Node node, ThemeColors colors) {
-        
     }
 }

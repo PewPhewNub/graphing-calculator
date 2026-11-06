@@ -12,9 +12,7 @@ import io.github.pewphewnub.plotting.plots.FunctionPlot;
 import io.github.pewphewnub.scene.FunctionGraphScene;
 import io.github.pewphewnub.scene.GraphScene;
 import io.github.pewphewnub.settings.ApplicationSettings;
-import io.github.pewphewnub.settings.SettingsListener;
 import io.github.pewphewnub.settings.SettingsManager;
-import io.github.pewphewnub.settings.Theme;
 import javafx.animation.AnimationTimer;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Scene;
@@ -26,7 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class MainWindow implements SettingsListener{
+public class MainWindow{
     private Stage stage;
     private TabPane tabPane;
     private GraphApplication app;
@@ -45,7 +43,6 @@ public class MainWindow implements SettingsListener{
         tabPane = new TabPane();
         this.windowManager = windowManager;
         this.settingsManager = settingsManager;
-        settingsManager.addListener(this);
         this.fileActions = new FileActions(stage, tabPane,this);
         this.stage = stage;
         stage.setOnCloseRequest(e -> {
@@ -184,12 +181,14 @@ public class MainWindow implements SettingsListener{
         stage.close();
     }
 
-    @Override
-    public void themeChanged(Theme theme) {
-        
-    }
     public SettingsManager getSettingsManager() {
         return settingsManager;
+    }
+    public Scene getScene() {
+        return scene;
+    }
+    public WindowManager getWindowManager() {
+        return windowManager;
     }
 }
 enum GraphType{

@@ -1,5 +1,14 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.interaction.commands.DuplicateElementCommand;
+import io.github.pewphewnub.interaction.commands.PushElementToBottomCommand;
+import io.github.pewphewnub.interaction.commands.PushElementToTopCommand;
+import io.github.pewphewnub.interaction.commands.RemoveElementCommand;
+import io.github.pewphewnub.interaction.commands.SwapElementsCommand;
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.ui.components.ToolTip;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,15 +22,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.interaction.commands.DuplicateElementCommand;
-import main.java.io.github.pewphewnub.interaction.commands.PushElementToBottomCommand;
-import main.java.io.github.pewphewnub.interaction.commands.PushElementToTopCommand;
-import main.java.io.github.pewphewnub.interaction.commands.RemoveElementCommand;
-import main.java.io.github.pewphewnub.interaction.commands.SwapElementsCommand;
-import main.java.io.github.pewphewnub.plotting.GraphElement;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
-import main.java.io.github.pewphewnub.ui.components.ToolTip;
 
 public class ControlBar extends HBox{
     GraphElementManager plotManager;

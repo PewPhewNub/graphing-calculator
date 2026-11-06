@@ -1,5 +1,9 @@
-package io.github.ui.controls;
+package io.github.pewphewnub.ui.controls;
 
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.ui.components.CloseButton;
+import io.github.pewphewnub.ui.components.ColorChooser;
+import io.github.pewphewnub.ui.components.EditableLabel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
@@ -12,10 +16,6 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.ui.components.CloseButton;
-import main.java.io.github.pewphewnub.ui.components.ColorChooser;
-import main.java.io.github.pewphewnub.ui.components.EditableLabel;
 
 public abstract class AbstractEditor extends VBox{
 

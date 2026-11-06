@@ -1,17 +1,18 @@
-package io.github.ui.shell;
+package io.github.pewphewnub.ui.shell;
 
 import java.io.File;
+
+import io.github.pewphewnub.interaction.InputController;
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.rendering.camera.Viewport;
+import io.github.pewphewnub.scene.GraphScene;
+import io.github.pewphewnub.settings.ApplicationSettings;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import main.java.io.github.pewphewnub.interaction.InputController;
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
-import main.java.io.github.pewphewnub.rendering.camera.Viewport;
-import main.java.io.github.pewphewnub.scene.GraphScene;
-import main.settings.ApplicationSettings;
 
 public class GraphTab extends Tab{
     private GraphScene scene;

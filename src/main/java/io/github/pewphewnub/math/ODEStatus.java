@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.math;
+package io.github.pewphewnub.math;
 
 /**
  * Enumerates the possible states of an Ordinary Differential Equation (ODE) solver.

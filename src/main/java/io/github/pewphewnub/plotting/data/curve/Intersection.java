@@ -1,7 +1,7 @@
-package main.java.io.github.pewphewnub.plotting.data.curve;
+package io.github.pewphewnub.plotting.data.curve;
 
+import io.github.pewphewnub.plotting.plots.AbstractPlot;
 import javafx.geometry.Point2D;
-import main.java.io.github.pewphewnub.plotting.plots.AbstractPlot;
 
 public class Intersection {
     Point2D point;

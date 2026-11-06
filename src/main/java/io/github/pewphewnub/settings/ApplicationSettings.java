@@ -1,11 +1,11 @@
 package io.github.pewphewnub.settings;
 
 public class ApplicationSettings {
-    public Theme theme;
+    public ThemeManager themeManager;
     public RendererSettings rendererSettings = new RendererSettings();
 
     public ApplicationSettings(){
-        theme = Theme.LIGHT;
+        themeManager = new ThemeManager();
     }
 
     public void setRendererSettings(RendererSettings rendererSettings) {

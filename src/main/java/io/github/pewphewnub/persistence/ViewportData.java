@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.persistence;
+package io.github.pewphewnub.persistence;
 
 public class ViewportData {
     public double centerX;

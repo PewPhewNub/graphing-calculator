@@ -1,11 +1,11 @@
-package io.github.ui.controls;
+package io.github.pewphewnub.ui.controls;
 
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.interaction.commands.EditElementCommand;
-import main.java.io.github.pewphewnub.parser.ParseException;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
-import main.java.io.github.pewphewnub.plotting.plots.ImplicitPlot;
-import main.java.io.github.pewphewnub.ui.components.EquationInput;
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.interaction.commands.EditElementCommand;
+import io.github.pewphewnub.parser.ParseException;
+import io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.plotting.plots.ImplicitPlot;
+import io.github.pewphewnub.ui.components.EquationInput;
 
 public class ImplicitPlotEditor extends AbstractPlotEditor{
 

@@ -1,12 +1,12 @@
-package main.java.io.github.pewphewnub.scene;
+package io.github.pewphewnub.scene;
 
+import io.github.pewphewnub.plotting.GraphElement;
+import io.github.pewphewnub.plotting.plots.AbstractPlot;
+import io.github.pewphewnub.plotting.plots.FunctionCapable;
+import io.github.pewphewnub.rendering.camera.CameraIntent;
+import io.github.pewphewnub.rendering.camera.Viewport;
+import io.github.pewphewnub.settings.ApplicationSettings;
 import javafx.scene.Cursor;
-import main.java.io.github.pewphewnub.plotting.GraphElement;
-import main.java.io.github.pewphewnub.plotting.plots.AbstractPlot;
-import main.java.io.github.pewphewnub.plotting.plots.FunctionCapable;
-import main.java.io.github.pewphewnub.rendering.camera.CameraIntent;
-import main.java.io.github.pewphewnub.rendering.camera.Viewport;
-import main.settings.ApplicationSettings;
 
 public class FunctionGraphScene extends GraphScene{
     

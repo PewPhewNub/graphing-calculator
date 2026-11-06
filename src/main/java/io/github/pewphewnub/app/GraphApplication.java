@@ -1,6 +1,7 @@
 package io.github.pewphewnub.app;
 
 import io.github.pewphewnub.settings.SettingsManager;
+import io.github.pewphewnub.settings.ThemeManager;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
@@ -12,6 +13,7 @@ public class GraphApplication {
         settingsManager = new SettingsManager();
         settingsManager.load();
         windowManager = new WindowManager(this, settingsManager);
+        ThemeManager.setWindowManager(windowManager);
     }
     public void start(Stage stage){
         windowManager.createWindow(stage);

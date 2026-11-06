@@ -1,7 +1,8 @@
 package io.github.pewphewnub.parser.node;
 
 import java.util.HashSet;
-import main.java.io.github.pewphewnub.parser.EvaluationContext;
+
+import io.github.pewphewnub.parser.EvaluationContext;
 
 /**
  * Base class for all nodes in the Abstract Syntax Tree (AST).

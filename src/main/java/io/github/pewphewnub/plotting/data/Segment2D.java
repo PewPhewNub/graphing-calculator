@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.plotting.data;
+package io.github.pewphewnub.plotting.data;
 
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;

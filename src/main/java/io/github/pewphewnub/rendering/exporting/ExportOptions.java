@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.rendering.exporting;
+package io.github.pewphewnub.rendering.exporting;
 
 public record ExportOptions(
     int width,

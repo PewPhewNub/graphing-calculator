@@ -1,10 +1,10 @@
-package io.github.ui.controls;
+package io.github.pewphewnub.ui.controls;
 
+import io.github.pewphewnub.interaction.UndoManager;
+import io.github.pewphewnub.interaction.commands.RemoveElementCommand;
+import io.github.pewphewnub.plotting.GraphElementManager;
+import io.github.pewphewnub.plotting.plots.AbstractPlot;
 import javafx.scene.layout.VBox;
-import main.java.io.github.pewphewnub.interaction.UndoManager;
-import main.java.io.github.pewphewnub.interaction.commands.RemoveElementCommand;
-import main.java.io.github.pewphewnub.plotting.GraphElementManager;
-import main.java.io.github.pewphewnub.plotting.plots.AbstractPlot;
 
 public abstract class AbstractPlotEditor extends AbstractEditor {
     AbstractPlot plot;

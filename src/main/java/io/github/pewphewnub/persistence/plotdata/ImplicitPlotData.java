@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.persistence.plotdata;
+package io.github.pewphewnub.persistence.plotdata;
 
 public class ImplicitPlotData extends PlotData{
     public String expression1;

@@ -1,25 +1,36 @@
-package main.settings;
+package io.github.pewphewnub.settings;
 
-import javafx.scene.paint.Color;
+import io.github.pewphewnub.app.WindowManager;
+import io.github.pewphewnub.ui.shell.MainWindow;
+import javafx.scene.Scene;
 
-public class ThemeManager {
-    public static ThemeColors getColors(Theme theme){
+public final class ThemeManager {
+    private static final String CSS_PATH =
+        "/io/github/pewphewnub/ui/shell/css/styles/";
 
-        return switch(theme){
+    private static final String BASE =
+        ThemeManager.class.getResource(
+            CSS_PATH + "base.css"
+        ).toExternalForm();
 
-            case LIGHT -> new ThemeColors(
-                Color.WHITE,
-                Color.WHITESMOKE,
-                Color.LIGHTGRAY,
-                Color.BLACK
+    private static Theme currentTheme = Theme.LIGHT;
+    private static WindowManager windowManager;
+
+    public static void setWindowManager(WindowManager windowManager) {
+        ThemeManager.windowManager = windowManager;
+    }
+    public static void applyTheme(Theme theme) {
+        for(MainWindow i : windowManager.getWindows()){
+            Scene scene = i.getScene();
+            for(Theme j : Theme.values()) scene.getStylesheets().remove((j.value));
+
+            scene.getStylesheets().addAll(
+                theme.getValue(), BASE
             );
+        }
+    }
 
-            case DARK -> new ThemeColors(
-                Color.rgb(40,40,40),
-                Color.rgb(55,55,55),
-                Color.GRAY,
-                Color.WHITE
-            );
-        };
+    public Theme getCurrentTheme() {
+        return currentTheme;
     }
 }

@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.rendering.graph;
+package io.github.pewphewnub.rendering.graph;
 
 public class GraphSettings {
     public boolean showGridlines = true;

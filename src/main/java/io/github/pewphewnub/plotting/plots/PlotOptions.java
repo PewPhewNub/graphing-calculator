@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.plotting.plots;
+package io.github.pewphewnub.plotting.plots;
 
 import javafx.scene.paint.Color;
 

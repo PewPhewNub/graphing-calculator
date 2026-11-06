@@ -1,25 +1,30 @@
-package io.github.ui.components;
+package io.github.pewphewnub.ui.components;
 
-import javafx.geometry.Insets;
-import javafx.scene.control.Tooltip;
+import java.io.IOException;
+
+import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 
 public class CloseButton extends Pane{
     public CloseButton(){
-        Line l1 = new Line(8, 8, 22, 22);
-        Line l2 = new Line(22, 8, 8, 22);
+        try {
+            FXMLLoader loader = new FXMLLoader(
+            getClass().getResource(
+                "/io/github/pewphewnub/ui/shell/fxml/CloseButton.fxml"
+            ));
 
-        l1.setStrokeWidth(2.5);
-        l2.setStrokeWidth(2.5);
-        l1.setStroke(Color.GRAY);
-        l2.setStroke(Color.GRAY);
-
-        getChildren().addAll(l1, l2);
-
-        setPadding(new Insets(5, 5, 0, 0));
-
-        Tooltip.install(this, new ToolTip("Close Editor"));
+            loader.setRoot(this);
+            loader.setController(this);
+            loader.load();
+            getStylesheets().add(
+                getClass().getResource(
+                    "/io/github/pewphewnub/ui/shell/css/CloseButton.css"
+                ).toExternalForm()
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "Failed to load editor actions", e
+            );
+        }
     }
 }

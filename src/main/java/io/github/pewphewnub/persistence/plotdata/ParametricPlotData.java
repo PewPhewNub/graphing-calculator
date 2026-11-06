@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.persistence.plotdata;
+package io.github.pewphewnub.persistence.plotdata;
 
 public class ParametricPlotData extends PlotData{
     public String expression1;

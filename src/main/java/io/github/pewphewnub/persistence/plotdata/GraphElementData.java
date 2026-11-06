@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.persistence.plotdata;
+package io.github.pewphewnub.persistence.plotdata;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

@@ -1,0 +1,18 @@
+.status-bar {
+    -fx-padding: 2px 10px 2px 10px;
+
+    -fx-background-color: -app-background;
+
+    -fx-border-color: lightgrey;
+    -fx-border-style: solid;
+    -fx-border-width: 2px 0 2px 0;
+}
+
+.mouse-x,
+.mouse-y,
+.current-scale-x,
+.current-scale-y,
+.view,
+.plots-count {
+    -fx-text-fill: -app-text;
+}

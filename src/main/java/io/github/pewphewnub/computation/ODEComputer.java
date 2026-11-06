@@ -2,21 +2,22 @@ package io.github.pewphewnub.computation;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.pewphewnub.math.ODESolution;
+import io.github.pewphewnub.math.ODESolving;
+import io.github.pewphewnub.math.ODEStatus;
+import io.github.pewphewnub.math.Point;
+import io.github.pewphewnub.parser.EvaluationContext;
+import io.github.pewphewnub.plotting.data.Arrow;
+import io.github.pewphewnub.plotting.data.GridData;
+import io.github.pewphewnub.plotting.data.ODECurveChunk;
+import io.github.pewphewnub.plotting.data.Segment2D;
+import io.github.pewphewnub.plotting.data.curve.ODECurveData;
+import io.github.pewphewnub.plotting.plots.ODEPlot;
+import io.github.pewphewnub.rendering.camera.Viewport;
+import io.github.pewphewnub.rendering.camera.ViewportState;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
-import main.java.io.github.pewphewnub.math.ODESolution;
-import main.java.io.github.pewphewnub.math.ODESolving;
-import main.java.io.github.pewphewnub.math.ODEStatus;
-import main.java.io.github.pewphewnub.math.Point;
-import main.java.io.github.pewphewnub.parser.EvaluationContext;
-import main.java.io.github.pewphewnub.plotting.data.Arrow;
-import main.java.io.github.pewphewnub.plotting.data.GridData;
-import main.java.io.github.pewphewnub.plotting.data.ODECurveChunk;
-import main.java.io.github.pewphewnub.plotting.data.Segment2D;
-import main.java.io.github.pewphewnub.plotting.data.curve.ODECurveData;
-import main.java.io.github.pewphewnub.plotting.plots.ODEPlot;
-import main.java.io.github.pewphewnub.rendering.camera.Viewport;
-import main.java.io.github.pewphewnub.rendering.camera.ViewportState;
 
 public class ODEComputer extends AbstractPlotComputer<ODEPlot, ODECurveData>{
 

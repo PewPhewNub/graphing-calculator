@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.rendering.camera;
+package io.github.pewphewnub.rendering.camera;
 
 public record CameraIntent(
     double deltaX, double deltaY,

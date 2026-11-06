@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.scene;
+package io.github.pewphewnub.scene;
 
 public class SceneSettings {
     public boolean showGrid;

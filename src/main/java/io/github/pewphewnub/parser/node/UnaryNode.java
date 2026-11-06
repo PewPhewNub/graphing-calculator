@@ -1,8 +1,9 @@
 package io.github.pewphewnub.parser.node;
 
 import java.util.HashSet;
-import main.java.io.github.pewphewnub.parser.EvaluationContext;
-import main.java.io.github.pewphewnub.parser.TokenType;
+
+import io.github.pewphewnub.parser.EvaluationContext;
+import io.github.pewphewnub.parser.TokenType;
 
 /**
  * Represents a unary expression in the AST (e.g., +x, -x).

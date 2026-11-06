@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.plotting.data;
+package io.github.pewphewnub.plotting.data;
 
 import java.util.ArrayList;
 import java.util.List;

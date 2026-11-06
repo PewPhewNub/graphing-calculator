@@ -1,4 +1,4 @@
-package main.settings;
+package io.github.pewphewnub.settings;
 
 public class SceneSettings {
     public RendererSettings rendererSettings;

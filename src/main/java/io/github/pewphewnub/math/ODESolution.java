@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.math;
+package io.github.pewphewnub.math;
 
 import java.util.ArrayList;
 

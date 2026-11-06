@@ -1,4 +1,4 @@
-package main.java.io.github.pewphewnub.plotting;
+package io.github.pewphewnub.plotting;
 
 public class Variable extends GraphElement{
     String name = "a";
